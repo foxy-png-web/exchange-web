@@ -1,123 +1,124 @@
-<div id="authModal" class="auth-overlay">
-    <div class="auth-container">
-        <div class="auth-header">
-            <img src="https://cryptologos.cc/logos/crypto-com-coin-cro-logo.png" width="30">
-            <span>owner-ex.pro</span>
-        </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWNER-EX PRO | Trading Platform</title>
+    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        :root { 
+            --bg-deep: #040d08; --panel-bg: #0a1f14; --item-bg: #0d2b1c;
+            --accent: #00ffad; --red: #ff5252; --text: #94a3b8; --border: #1a3a2a;
+        }
+        
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg-deep); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        <div class="auth-content">
+        /* --- СТРАНИЦА ВХОДА (OVERLAY) --- */
+        #authPage {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #0f172a 0%, #040d08 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .auth-card {
+            width: 380px; background: #0f172a; border-radius: 24px;
+            border: 2px solid var(--accent); box-shadow: 0 0 30px rgba(0, 255, 173, 0.2);
+            overflow: hidden;
+        }
+        .auth-header { background: #131c2e; padding: 20px; text-align: center; border-bottom: 1px solid #1e293b; color: white; font-weight: bold; font-size: 20px; }
+        .auth-body { padding: 25px; }
+        .auth-tabs { display: flex; background: #1e293b; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text); cursor: pointer; border-radius: 10px; font-weight: bold; }
+        .tab.active { background: #2d3e50; color: white; }
+        .input-label { font-size: 12px; color: var(--text); margin-bottom: 8px; display: block; }
+        .auth-input { width: 100%; background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 12px; color: white; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .type-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-box { flex: 1; padding: 12px; border: 1px solid #1e293b; border-radius: 12px; text-align: center; cursor: pointer; font-size: 14px; }
+        .type-box.active { background: var(--accent); color: black; font-weight: bold; }
+        .enter-btn { width: 100%; background: var(--accent); border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .enter-btn:hover { filter: brightness(1.1); }
+
+        /* --- ИНТЕРФЕЙС ТЕРМИНАЛА (СКРЫТ ПО УМОЛЧАНИЮ) --- */
+        #tradingTerminal { display: none; } /* Появится после входа */
+        
+        .sidebar { width: 60px; background: var(--panel-bg); border-right: 1px solid var(--border); position: fixed; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 15px; }
+        .side-icon { margin-bottom: 25px; cursor: pointer; font-size: 22px; color: var(--text); }
+        .side-icon.active { color: var(--accent); }
+        
+        .top-bar { height: 50px; background: var(--panel-bg); border-bottom: 1px solid var(--border); margin-left: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .main-area { margin-left: 60px; height: calc(100vh - 50px); display: flex; }
+        .chart-vessel { flex-grow: 1; position: relative; }
+        
+        .right-bar { width: 280px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .trade-block { background: var(--item-bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
+        .btn-trade { height: 80px; border-radius: 10px; border: none; cursor: pointer; font-weight: 900; font-size: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.1s; }
+        .btn-up { background: var(--accent); color: #000; box-shadow: 0 4px 0 #00ad75; }
+        .btn-down { background: var(--red); color: #fff; box-shadow: 0 4px 0 #b71c1c; }
+        .btn-trade:active { transform: translateY(3px); box-shadow: none; }
+        
+        #notify { position: fixed; bottom: 20px; left: 80px; padding: 12px 25px; border-radius: 6px; display: none; z-index: 10000; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="authPage">
+    <div class="auth-card">
+        <div class="auth-header">owner-ex.pro</div>
+        <div class="auth-body">
             <div class="auth-tabs">
-                <button class="tab-btn" onclick="switchTab('login')">Вход</button>
-                <button class="tab-btn active" onclick="switchTab('reg')">Регистрация</button>
+                <button class="tab" onclick="setTab(this)">Вход</button>
+                <button class="tab active" onclick="setTab(this)">Регистрация</button>
             </div>
-
             <label class="input-label">Тип аккаунта</label>
-            <div class="account-types">
-                <div class="type-box active">
-                    <span>👤 Индивидуальный</span>
-                </div>
-                <div class="type-box">
-                    <span>🏛 Бизнес</span>
-                </div>
+            <div class="type-selector">
+                <div class="type-box active" onclick="setType(this)">👤 Личный</div>
+                <div class="type-box" onclick="setType(this)">🏛 Бизнес</div>
             </div>
-
-            <label class="input-label">Адрес эл. почты</label>
-            <input type="email" class="auth-input" placeholder="Введите свой адрес эл. почты">
-
-            <div class="ref-code">Реферальный код (необязательно) ▾</div>
-
-            <div class="checkbox-row">
-                <input type="checkbox" id="news">
-                <label for="news">Я хочу получать эксклюзивные предложения и обновления от Owner-Ex</label>
-            </div>
-
-            <button class="main-auth-btn" onclick="closeAuth()">Создать аккаунт с электронной почтой</button>
-
-            <div class="divider"><span>или</span></div>
-
-            <button class="google-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="18">
-                Продолжить с Google
-            </button>
-
-            <p class="auth-footer">
-                Отправляя свой адрес эл. почты, Вы подтверждаете, что прочли <a href="#">Уведомление о конфиденциальности</a>
-            </p>
+            <label class="input-label">Email</label>
+            <input type="email" class="auth-input" placeholder="example@mail.com">
+            <button class="enter-btn" onclick="finishAuth()">Войти в терминал</button>
+            <div style="text-align:center; margin-top:15px; font-size:12px; color:var(--text); cursor:pointer;">Продолжить с Google</div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Стили окна как на скриншоте */
-    .auth-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85); display: none; /* Скрыто по умолчанию */
-        justify-content: center; align-items: center; z-index: 9999;
-    }
+<div id="tradingTerminal">
+    <div class="sidebar">
+        <div class="side-icon active">📈</div>
+        <div class="side-icon">💰</div>
+        <div class="side-icon">👥</div>
+        <div class="side-icon" style="margin-top:auto; padding-bottom:20px;" onclick="location.reload()">➔</div>
+    </div>
 
-    .auth-container {
-        width: 380px; background: #0f172a; border-radius: 20px;
-        border: 2px solid #00ffad; box-shadow: 0 0 20px rgba(0, 255, 173, 0.3);
-        overflow: hidden; animation: scaleIn 0.3s ease;
-    }
+    <div class="top-bar">
+        <div style="background:var(--item-bg); padding:5px 15px; border-radius:5px; border:1px solid var(--border);">
+            BTC/USDT <span style="color:var(--accent); font-weight:bold;">82%</span>
+        </div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <div id="price" style="font-family:monospace; font-size:18px;">0.00</div>
+            <div style="text-align:right">
+                <div style="font-size:10px; color:var(--text)">Реальный счет</div>
+                <div id="balance" style="color:var(--accent); font-weight:bold; font-size:18px;">$1,000.00</div>
+            </div>
+        </div>
+    </div>
 
-    @keyframes scaleIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+    <div class="main-area">
+        <div class="chart-vessel" id="chart"></div>
+        <div class="right-bar">
+            <div class="trade-block">
+                <span class="input-label">СУММА ИНВЕСТИЦИИ</span>
+                <input type="number" id="amt" value="50" style="background:transparent; border:none; color:white; font-size:22px; font-weight:bold; width:100%; outline:none;">
+            </div>
+            <div style="text-align:center; color:var(--accent); font-size:28px; font-weight:bold; margin:10px 0;">+82%</div>
+            <button class="btn-trade btn-up" onclick="trade('up')">ВЫШЕ ↑</button>
+            <button class="btn-trade btn-down" style="margin-top:10px;" onclick="trade('down')">НИЖЕ ↓</button>
+        </div>
+    </div>
+</div>
 
-    .auth-header {
-        background: linear-gradient(to bottom, #061c3a, #0f172a);
-        padding: 20px; text-align: center; border-bottom: 1px solid #1e293b;
-        color: white; font-weight: bold; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
+<div id="notify"></div>
 
-    .auth-content { padding: 20px; }
-
-    .auth-tabs {
-        display: flex; background: #1e293b; border-radius: 10px; padding: 4px; margin-bottom: 20px;
-    }
-
-    .tab-btn {
-        flex: 1; border: none; background: transparent; color: #94a3b8;
-        padding: 10px; cursor: pointer; border-radius: 8px; font-weight: bold;
-    }
-
-    .tab-btn.active { background: #2d3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-    .input-label { color: #94a3b8; font-size: 12px; display: block; margin-bottom: 8px; }
-
-    .account-types { display: flex; gap: 10px; margin-bottom: 20px; }
-
-    .type-box {
-        flex: 1; padding: 12px; border: 1px solid #1e293b; border-radius: 10px;
-        text-align: center; color: white; cursor: pointer; font-size: 14px;
-    }
-
-    .type-box.active { background: #00ffad; color: black; font-weight: bold; }
-
-    .auth-input {
-        width: 100%; background: #1e293b; border: 1px solid #334155;
-        padding: 12px; border-radius: 10px; color: white; margin-bottom: 15px; box-sizing: border-box;
-    }
-
-    .ref-code { color: #94a3b8; font-size: 13px; cursor: pointer; margin-bottom: 15px; }
-
-    .checkbox-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 20px; }
-    .checkbox-row label { color: #94a3b8; font-size: 11px; line-height: 1.4; }
-
-    .main-auth-btn {
-        width: 100%; background: #00ffad; border: none; padding: 14px;
-        border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; margin-bottom: 15px;
-    }
-
-    .divider { text-align: center; border-bottom: 1px solid #1e293b; line-height: 0.1em; margin: 10px 0 20px; }
-    .divider span { background: #0f172a; padding: 0 10px; color: #64748b; font-size: 12px; }
-
-    .google-btn {
-        width: 100%; background: white; color: black; border: none; padding: 12px;
-        border-radius: 10px; font-weight: bold; cursor: pointer; display: flex;
-        align-items: center; justify-content: center; gap: 10px;
-    }
-
-    .auth-footer { color: #64748b; font-size: 10px; text-align: center; margin-top: 15px; line-height: 1.4; }
-    .auth-footer a { color: #3b82f6; text-decoration: none; }
-</style>
+<script src="app.js?v=final"></script>
+</body>
+</html>
 
