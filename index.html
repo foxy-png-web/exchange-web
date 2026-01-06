@@ -2,185 +2,118 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OWNER-EX | Professional Trading Platform</title>
+    <title>OWNER-EX PRO | Professional Terminal</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { 
-            --bg: #06090f; --card: #12181f; --accent: #00ffad; 
-            --red: #ff3b5c; --green: #00f08b; --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg: #0b0e11; --panel: #161a1e; --accent: #00ffad; 
+            --red: #f6465d; --green: #0ecb81; --text: #eaecef; --border: #2b2f36;
         }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'BinancePlex', sans-serif; overflow: hidden; }
 
-        /* ОКНО ВХОДА / РЕГИСТРАЦИИ */
-        #authOverlay {
-            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
+        /* HEADER INFO BAR */
+        .ticker-bar {
+            height: 45px; background: var(--panel); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; gap: 25px; font-size: 13px;
         }
-        .auth-card {
-            background: var(--card); padding: 40px; border-radius: 30px; border: 1px solid var(--accent);
-            width: 380px; text-align: center; box-shadow: 0 0 50px rgba(0, 255, 173, 0.1);
-        }
-        .auth-nav { display: flex; background: var(--glass); border-radius: 12px; margin-bottom: 25px; padding: 5px; }
-        .auth-nav button { flex: 1; background: none; border: none; color: gray; padding: 10px; cursor: pointer; font-weight: bold; }
-        .auth-nav button.active { background: var(--accent); color: black; border-radius: 8px; }
+        .price-live { font-size: 18px; font-weight: bold; color: var(--green); }
 
-        /* ТЕРМИНАЛ */
-        #terminal { display: none; height: 100vh; flex-direction: column; }
-        header { 
-            height: 60px; background: var(--card); display: flex; align-items: center; 
-            justify-content: space-between; padding: 0 25px; border-bottom: 1px solid var(--border);
-        }
-        .main-layout { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; }
+        .main-layout { display: grid; grid-template-columns: 60px 1fr 280px 280px; height: calc(100vh - 45px); }
 
-        .sidebar { 
-            width: 70px; background: var(--card); border-radius: 20px; 
-            display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 25px; border: 1px solid var(--border);
-        }
-        .nav-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; background: var(--glass); }
-        .nav-icon:hover { background: var(--accent); color: black; }
+        /* SIDEBAR */
+        .sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 20px; }
+        .side-icon { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .side-icon:hover { opacity: 1; color: var(--accent); }
 
-        .chart-container { flex: 1; display: flex; flex-direction: column; background: #000; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; position: relative; }
-        #tvChart { flex: 1; width: 100%; }
+        /* ORDER BOOK (СТАКАН) */
+        .order-book { border-right: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; }
+        .ob-header { padding: 10px; font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--border); }
+        .ob-row { display: grid; grid-template-columns: 1fr 1fr; padding: 2px 10px; font-size: 12px; position: relative; }
+        .ob-row.red { color: var(--red); }
+        .ob-row.green { color: var(--green); }
 
-        .trade-panel { width: 300px; background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .input-box { background: var(--glass); padding: 12px; border-radius: 15px; border: 1px solid var(--border); }
-        .input-box input { background: transparent; border: none; color: white; font-size: 20px; font-weight: bold; width: 100%; outline: none; }
-        
-        .trade-btn { height: 70px; border-radius: 15px; border: none; font-weight: 900; font-size: 18px; cursor: pointer; color: white; transition: 0.2s; }
-        .up { background: var(--green); } .down { background: var(--red); }
-        .trade-btn:active { transform: scale(0.96); }
+        /* CENTER AREA */
+        .center-area { display: flex; flex-direction: column; overflow: hidden; }
+        #chartContainer { flex: 1; }
+        .bottom-tabs { height: 180px; border-top: 1px solid var(--border); background: var(--panel); }
 
-        /* МОДАЛКИ */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--card); width: 400px; border-radius: 25px; padding: 30px; border: 1px solid var(--accent); }
+        /* TRADE PANEL */
+        .trade-panel { background: var(--panel); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .trade-input-group { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; }
+        .trade-input-group label { display: block; font-size: 11px; color: #848e9c; }
+        .trade-input-group input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 16px; }
+
+        .btn-trade { height: 45px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-green { background: var(--green); color: black; }
+        .btn-red { background: var(--red); color: white; }
     </style>
 </head>
 <body>
 
-<div id="authOverlay">
-    <div class="auth-card">
-        <h2 style="color:var(--accent)">OWNER-EX</h2>
-        <div class="auth-nav">
-            <button class="active">Регистрация</button>
-            <button>Вход</button>
-        </div>
-        <input type="email" placeholder="Email" class="input-box" style="width:90%; margin-bottom:15px; background:var(--glass); border:1px solid var(--border); color:white; padding:12px; border-radius:10px;">
-        <input type="password" placeholder="Пароль" class="input-box" style="width:90%; margin-bottom:15px; background:var(--glass); border:1px solid var(--border); color:white; padding:12px; border-radius:10px;">
-        <button class="trade-btn up" style="width:100%; height:50px;" onclick="startApp()">Начать торговать</button>
-    </div>
+<div class="ticker-bar">
+    <div style="font-weight: bold; font-size: 16px;">BTC / USDT</div>
+    <div class="price-live" id="topPrice">0.00</div>
+    <div><span style="color: gray;">24h Изм.</span> <span id="change24" style="color: var(--green);">+0.00%</span></div>
+    <div><span style="color: gray;">24h Макс.</span> <span id="high24">0.00</span></div>
+    <div><span style="color: gray;">24h Объем</span> <span id="vol24">0.00 BTC</span></div>
 </div>
 
-<div id="terminal">
-    <header>
-        <div style="font-weight:900; color:var(--accent)">OWNER-EX PRO</div>
-        <div id="balanceDisplay" style="color:var(--green); font-weight:bold;">$10,000.00</div>
-    </header>
+<div class="main-layout">
+    <div class="sidebar">
+        <div class="side-icon">🔍</div>
+        <div class="side-icon">📊</div>
+        <div class="side-icon">⚙️</div>
+    </div>
 
-    <div class="main-layout">
-        <div class="sidebar">
-            <div class="nav-icon">📈</div>
-            <div class="nav-icon" onclick="openModal('cashModal')">💳</div>
-            <div class="nav-icon" onclick="openModal('profileModal')">👤</div>
-        </div>
-
-        <div class="chart-container">
-            <div style="padding:10px; background:rgba(255,255,255,0.02); display:flex; gap:15px; align-items:center;">
-                <span id="symbolLabel">BTC/USDT</span>
-                <span style="font-size:12px; color:var(--accent);">● 10s Live</span>
+    <div class="center-area">
+        <div id="chartContainer"></div>
+        <div class="bottom-tabs">
+            <div style="padding: 10px; border-bottom: 1px solid var(--border); font-size: 12px;">
+                <span style="border-bottom: 2px solid var(--accent); padding-bottom: 8px;">Открытые позиции (0)</span>
+                <span style="margin-left: 20px; color: gray;">История сделок</span>
             </div>
-            <div id="tvChart"></div>
-        </div>
-
-        <div class="trade-panel">
-            <div class="input-box"><label style="font-size:10px; color:gray;">СУММА</label><input type="number" id="amount" value="100"></div>
-            <div class="input-box"><label style="font-size:10px; color:gray;">ВРЕМЯ (СЕК)</label><input type="number" id="tradeSec" value="30"></div>
-            <button class="trade-btn up" onclick="alert('Сделка открыта!')">ВЫШЕ</button>
-            <button class="trade-btn down" onclick="alert('Сделка открыта!')">НИЖЕ</button>
+            <div style="display: flex; justify-content: center; align-items: center; height: 140px; color: gray; font-size: 14px;">
+                У вас пока нет открытых позиций
+            </div>
         </div>
     </div>
-</div>
 
-<div id="cashModal" class="modal">
-    <div class="modal-content">
-        <h2 style="color:var(--accent)">Касса</h2>
-        <button class="trade-btn up" style="width:100%; height:50px; margin-bottom:10px;" onclick="cashAction('Депозит')">ДЕПОЗИТ</button>
-        <button class="trade-btn down" style="width:100%; height:50px;" onclick="cashAction('Вывод')">ВЫВОД СРЕДСТВ</button>
-        <button onclick="closeModal()" style="width:100%; margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">Закрыть</button>
+    <div class="order-book">
+        <div class="ob-header">Стакан заявок (BTC)</div>
+        <div id="asks" style="display: flex; flex-direction: column-reverse; flex: 1; overflow: hidden;"></div>
+        <div id="midPrice" style="padding: 10px; text-align: center; font-size: 18px; font-weight: bold; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">0.00</div>
+        <div id="bids" style="flex: 1; overflow: hidden;"></div>
     </div>
-</div>
 
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <h2 style="color:var(--accent)">Профиль</h2>
-        <div id="pView">
-            <p>Имя: <span id="curName">Хозяин</span></p>
-            <button class="trade-btn up" style="width:100%; height:40px; font-size:14px;" onclick="document.getElementById('pView').style.display='none'; document.getElementById('pEdit').style.display='block';">Изменить данные</button>
+    <div class="trade-panel">
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-trade" style="flex: 1; background: var(--bg); border: 1px solid var(--accent); color: white;">Купить</button>
+            <button class="btn-trade" style="flex: 1; background: transparent; color: gray;">Продать</button>
         </div>
-        <div id="pEdit" style="display:none;">
-            <input type="text" id="newName" placeholder="Новое имя" class="input-box" style="width:90%; margin-bottom:10px;">
-            <button class="trade-btn up" style="width:100%; height:40px;" onclick="saveName()">Сохранить</button>
+        <div class="trade-input-group">
+            <label>Цена (USDT)</label>
+            <input type="number" id="tradePrice">
         </div>
-        <button onclick="closeModal()" style="width:100%; margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">Закрыть</button>
+        <div class="trade-input-group">
+            <label>Количество (BTC)</label>
+            <input type="number" step="0.001">
+        </div>
+        <button class="btn-trade btn-green">Купить BTC</button>
+        <div style="border-top: 1px solid var(--border); margin: 5px 0;"></div>
+        <button class="btn-trade btn-red">Продать BTC</button>
     </div>
 </div>
 
 <script>
-    let chart, candleSeries, currentCandle = null;
-    const AGG = 10;
+    // Инициализация проф. графика
+    const chart = LightweightCharts.createChart(document.getElementById('chartContainer'), {
+        layout: { background: { color: '#0b0e11' }, textColor: '#848e9c' },
+        grid: { vertLines: { color: '#1f2226' }, horzLines: { color: '#1f2226' } },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        timeScale: { borderColor: '#2b2f36', timeVisible: true }
+    });
+    const candleSeries = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
 
-    function startApp() {
-        document.getElementById('authOverlay').style.display = 'none';
-        document.getElementById('terminal').style.display = 'flex';
-        initChart();
-    }
-
-    async function initChart() {
-        chart = LightweightCharts.createChart(document.getElementById('tvChart'), {
-            layout: { background: { color: '#000' }, textColor: '#848e9c' },
-            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { borderColor: '#222', timeVisible: true, secondsVisible: true }
-        });
-        candleSeries = chart.addCandlestickSeries({ upColor: '#00f08b', downColor: '#ff3b5c' });
-
-        // 1. ЗАГРУЗКА ИСТОРИИ (чтобы график не был пустым)
-        const resp = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=100');
-        const history = await resp.json();
-        const formattedData = history.map(d => ({
-            time: d[0] / 1000, open: parseFloat(d[1]), high: parseFloat(d[2]), low: parseFloat(d[3]), close: parseFloat(d[4])
-        }));
-        candleSeries.setData(formattedData);
-
-        // 2. ПОДКЛЮЧЕНИЕ LIVE (10 сек фиксация)
-        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1s');
-        ws.onmessage = (e) => {
-            const k = JSON.parse(e.data).k;
-            const t = Math.floor(k.t / 1000);
-            const blockStart = t - (t % AGG);
-            
-            if (!currentCandle || blockStart > currentCandle.time) {
-                currentCandle = { time: blockStart, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c) };
-            } else {
-                currentCandle.close = parseFloat(k.c);
-                if (parseFloat(k.h) > currentCandle.high) currentCandle.high = parseFloat(k.h);
-                if (parseFloat(k.l) < currentCandle.low) currentCandle.low = parseFloat(k.l);
-            }
-            candleSeries.update(currentCandle);
-        };
-    }
-
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
-    
-    function cashAction(type) { alert(type + ': Система платежей временно на техобслуживании. Попробуйте позже.'); }
-    
-    function saveName() {
-        const name = document.getElementById('newName').value;
-        if(name) document.getElementById('curName').innerText = name;
-        document.getElementById('pEdit').style.display='none';
-        document.getElementById('pView').style.display='block';
-    }
-</script>
-</body>
-</html>
-
+    // Эмуляция стакана
+    function updateOrder
+        
