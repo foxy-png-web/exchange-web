@@ -1,88 +1,72 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>OWNER-EX | Professional Trading</title>
-    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
-    <style>
-        body { background: #0b0e11; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; }
-        .tab-content { display: none; }
-        #trade { display: block; }
-        
-        /* Карточка биржи */
-        .card { background: #181a20; padding: 20px; border-radius: 12px; border: 1px solid #2b3139; }
-        
-        /* Кнопки навигации */
-        .nav { display: flex; gap: 10px; margin-bottom: 15px; }
-        .nav button { background: #2b3139; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .nav button.active { background: #fcd535; color: black; font-weight: bold; }
-
-        /* Панель управления сделкой */
-        .trade-panel { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #2b3139; }
-        .time-options { display: flex; gap: 10px; }
-        .time-btn { background: #2b3139; border: 1px solid #474d57; color: white; padding: 5px 12px; border-radius: 4px; cursor: pointer; flex: 1; }
-        .time-btn:hover { border-color: #fcd535; }
-
-        .action-btns { display: flex; gap: 10px; }
-        .btn-buy { background: #00ffad; color: #000; font-weight: bold; flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer; }
-        .btn-sell { background: #ff3a33; color: #fff; font-weight: bold; flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer; }
-        
-        #livePrice { color: #00ffad; font-size: 24px; font-weight: bold; }
-        #qrCode { background: white; padding: 10px; border-radius: 8px; margin: 15px auto; display: block; width: 150px; }
-    </style>
-</head>
-<body>
-
-    <div class="nav">
-        <button onclick="openTab('trade')" id="btn-trade" class="active">Торговля</button>
-        <button onclick="openTab('wallet')" id="btn-wallet">Кошелек</button>
+<header>
+    <div class="logo">OWNER-EX PRO</div>
+    <div class="user-section">
+        <div class="balance-box">
+            <span style="font-size: 10px; color: #848e9c; display: block;">BALANS</span>
+            <span class="balance-info" id="topBalance">1000.00 $</span>
+        </div>
+        <div class="profile-icon" onclick="toggleProfile()">👤</div>
     </div>
+</header>
 
-    <div id="trade" class="tab-content">
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span>BTC / USDT Live</span>
-                <span id="livePrice">0.00</span>
-            </div>
-            
-            <div id="chartContainer" style="width: 100%; height: 350px;"></div>
+<div class="chart-controls">
+    <button class="btn-sm active">BTC/USDT</button>
+    <button class="btn-sm">ETH/USDT</button>
+    <button class="btn-sm">SOL/USDT</button>
+    <div style="width:1px; background: var(--border); margin: 0 5px;"></div>
+    <button class="btn-sm active">1m</button>
+    <button class="btn-sm">5m</button>
+    <button class="btn-sm">15m</button>
+</div>
 
-            <div class="trade-panel">
-                <div style="font-size: 14px; color: #848e9c;">Время экспирации:</div>
-                <div class="time-options">
-                    <button class="time-btn">1m</button>
-                    <button class="time-btn">5m</button>
-                    <button class="time-btn">15m</button>
-                    <button class="time-btn">1h</button>
-                </div>
-                
-                <div class="action-btns">
-                    <button class="btn-buy" onclick="alert('Ордер BUY отправлен!')">BUY / ВВЕРХ</button>
-                    <button class="btn-sell" onclick="alert('Ордер SELL отправлен!')">SELL / ВНИЗ</button>
-                </div>
+<div class="main-layout">
+    <div class="chart-area" id="chartContainer">
+        <div id="tradeTimer">Time left: <span id="timerSec">00:00</span></div>
+    </div>
+    
+    <div class="trade-area">
+        <div class="input-group">
+            <span class="input-label">SUMMA ($)</span>
+            <input type="number" id="tradeAmount" class="trade-input" value="10">
+            <div class="quick-select">
+                <button class="btn-sm" onclick="setAmount(10)">10</button>
+                <button class="btn-sm" onclick="setAmount(20)">20</button>
+                <button class="btn-sm" onclick="setAmount(50)">50</button>
+                <button class="btn-sm" onclick="setAmount(100)">100</button>
             </div>
         </div>
-    </div>
 
-    <div id="wallet" class="tab-content">
-        <div class="card" style="text-align: center;">
-            <h3>Пополнение баланса (BTC)</h3>
-            <img id="qrCode" src="" alt="QR">
-            <div style="background: #0b0e11; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; word-break: break-all;">
-                1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+        <div class="input-group">
+            <span class="input-label">VREMYA (MIN)</span>
+            <select id="expTime" class="trade-input">
+                <option value="1">1 MINUTA</option>
+                <option value="2">2 MINUTY</option>
+                <option value="5">5 MINUT</option>
+            </select>
+        </div>
+
+        <div style="margin-top: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span style="color: #848e9c;">Vyplata:</span>
+                <span style="color: var(--green);">82% ($<span id="payout">18.20</span>)</span>
             </div>
-            <p style="color: #848e9c; font-size: 13px; margin-top: 15px;">Зачисление после 2-х подтверждений сети</p>
+            <button class="action-btn btn-up" onclick="placeTrade('up')">Kupit ↑</button>
+            <button class="action-btn btn-down" onclick="placeTrade('down')">Prodat ↓</button>
         </div>
     </div>
-    <script src="app.js?v=1.4"></script>
-    <script>
-        // Простая функция переключения вкладок
-        function openTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
-            document.getElementById('btn-' + id).classList.add('active');
-        }
-    </script>
+</div>
+
+<div id="profileMenu" class="profile-menu">
+    <div style="padding: 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px;">
+        <div style="font-weight: bold;">Gost' #777</div>
+        <div style="font-size: 11px; color: var(--green);">Status: Online</div>
+    </div>
+    <div class="menu-item">📊 Istoriya sdelok</div>
+    <div class="menu-item">👥 Referaly</div>
+    <div class="menu-item">🌐 Yazyk: RU</div>
+    <div class="menu-item" style="color: var(--red);">Log Out</div>
+</div>
+
+<script src="app.js?v=3.0"></script>
 </body>
 </html>
