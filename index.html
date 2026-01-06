@@ -1,46 +1,38 @@
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-</div>
-                        <div>
-                            <label class="text-xs text-gray-400 uppercase tracking-wider">Время экспирации</label>
-                            <div class="grid grid-cols-3 gap-2 mt-2">
-                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">1m</button>
-                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">5m</button>
-                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">15m</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 gap-3">
-                    <button onclick="placeTrade('UP')" class="btn-buy w-full text-lg">BUY / UP</button>
-                    <button onclick="placeTrade('DOWN')" class="btn-sell w-full text-lg">SELL / DOWN</button>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>OWNER-EX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body { background-color: #0b0e11; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .glass-card { background: #181a20; border-radius: 16px; border: 1px solid #2b3139; }
+    </style>
+</head>
+<body class="p-6">
+    <nav class="flex space-x-4 mb-6">
+        <div class="nav-item active cursor-pointer text-yellow-500" onclick="openTab('trade')">Биржа</div>
+        <div class="nav-item cursor-pointer" onclick="openTab('wallet')">Кошелек</div>
+    </nav>
+
+    <div id="trade" class="tab-content active">
+        <div class="glass-card p-4">
+            <div class="text-2xl mb-2">BTC / USDT: <span id="livePrice" class="text-green-400">0.00</span></div>
+            <div id="chartContainer" style="height: 400px; width: 100%;"></div>
         </div>
     </div>
 
     <div id="wallet" class="tab-content">
-        <div class="glass-card p-10 max-w-xl mx-auto text-center space-y-6">
-            <h2 class="text-3xl font-bold">Пополнение баланса</h2>
-            <p class="text-gray-400">Отправьте BTC на персональный адрес. Средства будут зачислены после 2 подтверждений сети.</p>
-            <div class="bg-white p-3 rounded-2xl inline-block">
-                <img id="qrCode" src="" alt="QR">
-            </div>
-            <div class="bg-[#1e2329] p-4 rounded-xl font-mono text-[#fcd535] text-sm break-all border border-dashed border-gray-600" id="btcAddress">
-                1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
-            </div>
+        <div class="glass-card p-6 text-center">
+            <h2 class="text-xl mb-4">Пополнение баланса</h2>
+            <img id="qrCode" class="mx-auto mb-4 bg-white p-2" src="" alt="QR">
+            <p class="font-mono text-xs break-all" id="btcAddress">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
         </div>
     </div>
-</main>
 
-<footer class="mt-20 p-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-    <p>&copy; 2026 OWNER-EX. <a href="#" onclick="alert('Terms of Service: Trading involves risk.')" class="underline hover:text-[#fcd535]">Terms of Service</a></p>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="app.js" defer></script>
+    <script src="app.js"></script>
 </body>
-
 </html>
-
-
