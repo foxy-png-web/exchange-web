@@ -7,22 +7,31 @@ function startChart() {
     var chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    // Создаем график
+    // Создаем график по новым правилам библиотеки v4+
     var chart = LightweightCharts.createChart(chartBox, {
-        layout: { background: { color: '#181a20' }, textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#2b3139' }, horzLines: { color: '#2b3139' } },
+        layout: { 
+            background: { color: '#181a20' }, 
+            textColor: '#d1d4dc' 
+        },
+        grid: { 
+            vertLines: { color: '#2b3139' }, 
+            horzLines: { color: '#2b3139' } 
+        },
         width: chartBox.clientWidth,
         height: 400
     });
 
-    // Фикс ошибки: используем актуальный метод addCandlestick
-    candleSeries = chart.addCandlestick({
-        upColor: '#00ffad', downColor: '#ff3a33',
-        borderUpColor: '#00ffad', borderDownColor: '#ff3a33',
-        wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
+    // ИСПРАВЛЕНИЕ: Новый метод добавления свечей
+    candleSeries = chart.addCandlestickSeries({
+        upColor: '#00ffad', 
+        downColor: '#ff3a33',
+        borderUpColor: '#00ffad', 
+        borderDownColor: '#ff3a33',
+        wickUpColor: '#00ffad', 
+        wickDownColor: '#ff3a33'
     });
 
-    // Подключаем живые данные
+    // Подключение к Binance
     var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
     
     binanceSocket.onmessage = function(event) {
@@ -41,7 +50,6 @@ function startChart() {
         }
     };
 
-    // Авто-размер при изменении окна
     window.addEventListener('resize', function() {
         chart.applyOptions({ width: chartBox.clientWidth });
     });
