@@ -1,32 +1,33 @@
-// Настройки
-const OWNER_WALLET = "ВАШ_АДРЕС_METAMASK"; 
-const BTC_DEPOSIT_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
-const API_URL = "https://ВАШ-СЕРВЕР.onrender.com";
+var OWNER_WALLET = "ВАШ_АДРЕС_METAMASK";
+var BTC_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
 
-let candleSeries;
+var candleSeries;
 
-// 1. Инициализация графика
-function initChart() {
-    const container = document.getElementById('chartContainer');
-    if (!container) return;
+function startChart() {
+    var chartBox = document.getElementById('chartContainer');
+    if (!chartBox) return;
 
-    const chart = LightweightCharts.createChart(container, {
-        layout: { backgroundColor: '#181a20', textColor: '#d1d4dc' },
+    // Создаем график
+    var chart = LightweightCharts.createChart(chartBox, {
+        layout: { background: { color: '#181a20' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#2b3139' }, horzLines: { color: '#2b3139' } },
-        timeScale: { timeVisible: true }
+        width: chartBox.clientWidth,
+        height: 400
     });
 
-    candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', downColor: '#ff3a33', 
-        borderUpColor: '#00ffad', borderDownColor: '#ff3a33', 
+    // Фикс ошибки: используем актуальный метод addCandlestick
+    candleSeries = chart.addCandlestick({
+        upColor: '#00ffad', downColor: '#ff3a33',
+        borderUpColor: '#00ffad', borderDownColor: '#ff3a33',
         wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
     });
 
-    // Подключение к Binance для живых данных
-    const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-    socket.onmessage = function(event) {
-        const msg = JSON.parse(event.data);
-        const k = msg.k;
+    // Подключаем живые данные
+    var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
+    
+    binanceSocket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        var k = data.k;
         candleSeries.update({
             time: k.t / 1000,
             open: parseFloat(k.o),
@@ -34,27 +35,30 @@ function initChart() {
             low: parseFloat(k.l),
             close: parseFloat(k.c)
         });
-        const priceLabel = document.getElementById('livePrice');
-        if (priceLabel) priceLabel.innerText = parseFloat(k.c).toFixed(2);
+        var priceDiv = document.getElementById('livePrice');
+        if (priceDiv) {
+            priceDiv.innerText = parseFloat(k.c).toFixed(2);
+        }
     };
+
+    // Авто-размер при изменении окна
+    window.addEventListener('resize', function() {
+        chart.applyOptions({ width: chartBox.clientWidth });
+    });
 }
 
-// 2. Переключение вкладок
-function openTab(tabId) {
-    const contents = document.querySelectorAll('.tab-content');
-    contents.forEach(function(c) { c.style.display = 'none'; });
-    
-    const activeTab = document.getElementById(tabId);
-    if (activeTab) activeTab.style.display = 'block';
+function openTab(name) {
+    var tabs = document.getElementsByClassName('tab-content');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = 'none';
+    }
+    document.getElementById(name).style.display = 'block';
 }
 
-// 3. Запуск при загрузке
 window.onload = function() {
-    initChart();
-    
-    // Установка QR-кода
-    const qr = document.getElementById('qrCode');
-    if (qr) {
-        qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + BTC_DEPOSIT_ADDR;
+    startChart();
+    var qrImg = document.getElementById('qrCode');
+    if (qrImg) {
+        qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + BTC_ADDR;
     }
 };
