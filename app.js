@@ -4,15 +4,18 @@ let lastPrice = 0;
 let isTradeOpen = false;
 let priceLine;
 
-function initChart() {
-    const chartBox = document.getElementById('chartContainer');
-    if (!chartBox) return;
+function startApp() {
+    const chartContainer = document.getElementById('chartContainer');
+    if (!chartContainer || typeof LightweightCharts === 'undefined') {
+        console.error("Библиотека не загружена или контейнер не найден");
+        return;
+    }
 
-    const chart = LightweightCharts.createChart(chartBox, {
+    const chart = LightweightCharts.createChart(chartContainer, {
         layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#181a20' }, horzLines: { color: '#181a20' } },
-        width: chartBox.clientWidth,
-        height: chartBox.clientHeight,
+        width: chartContainer.clientWidth,
+        height: chartContainer.clientHeight,
         timeScale: { timeVisible: true, secondsVisible: true }
     });
 
@@ -22,22 +25,22 @@ function initChart() {
     });
 
     const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-    socket.onmessage = (e) => {
-        const d = JSON.parse(e.data).k;
-        lastPrice = parseFloat(d.c);
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data).k;
+        lastPrice = parseFloat(data.c);
         candleSeries.update({
-            time: d.t / 1000, open: parseFloat(d.o), high: parseFloat(d.h), low: parseFloat(d.l), close: lastPrice
+            time: data.t / 1000,
+            open: parseFloat(data.o),
+            high: parseFloat(data.h),
+            low: parseFloat(data.l),
+            close: lastPrice
         });
         document.getElementById('livePrice').innerText = lastPrice.toFixed(2);
     };
 
     window.addEventListener('resize', () => {
-        chart.applyOptions({ width: chartBox.clientWidth, height: chartBox.clientHeight });
+        chart.applyOptions({ width: chartContainer.clientWidth, height: chartContainer.clientHeight });
     });
-}
-
-function toggleProfile() { 
-    document.getElementById('profileMenu').classList.toggle('active'); 
 }
 
 function placeTrade(type) {
@@ -45,20 +48,22 @@ function placeTrade(type) {
     const amount = parseFloat(document.getElementById('tradeAmount').value);
     const duration = parseInt(document.getElementById('expTime').value) * 60;
     
-    if (balance < amount) return alert("Недостаточно средств!");
+    if (balance < amount) {
+        alert("Недостаточно баланса!");
+        return;
+    }
 
     isTradeOpen = true;
     balance -= amount;
     updateUI();
 
     const entryPrice = lastPrice;
-    
     priceLine = candleSeries.createPriceLine({
         price: entryPrice,
         color: type === 'up' ? '#00ffad' : '#ff3a33',
         lineWidth: 2,
         lineStyle: 2,
-        title: type === 'up' ? 'ВВЕРХ' : 'ВНИЗ',
+        title: type === 'up' ? 'ВХОД ВВЕРХ' : 'ВХОД ВНИЗ',
     });
 
     document.getElementById('tradeTimer').style.display = 'block';
@@ -68,40 +73,43 @@ function placeTrade(type) {
         timeLeft--;
         const m = Math.floor(timeLeft / 60);
         const s = timeLeft % 60;
-        document.getElementById('timerSec').innerText = ${m}:${s < 10 ? '0'+s : s};
+        document.getElementById('timerSec').innerText = (m < 10 ? '0' + m : m) + ":" + (s < 10 ? '0' + s : s);
 
         if (timeLeft <= 0) {
             clearInterval(timer);
-            const win = (type === 'up' && lastPrice > entryPrice) || (type === 'down' && lastPrice < entryPrice);
-            candleSeries.removePriceLine(priceLine);
-            document.getElementById('tradeTimer').style.display = 'none';
-            
-            if (win) {
-                const profit = amount * 1.82;
-                balance += profit;
-                showResult(ВЫИГРЫШ: +$${profit.toFixed(2)}, '#00ffad');
-            } else {
-                showResult(ПРОИГРЫШ: $0.00, '#ff3a33');
-            }
-            isTradeOpen = false;
-            updateUI();
+            finishTrade(type, entryPrice, amount);
         }
     }, 1000);
 }
 
-function showResult(text, color) {
-    const res = document.createElement('div');
-    res.style.cssText = position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:40px; font-weight:bold; z-index:10000; text-shadow: 2px 2px 10px #000; text-align:center; width:100%;;
-    res.innerText = text;
-    document.body.appendChild(res);
-    setTimeout(() => res.remove(), 3000);
+function finishTrade(type, entryPrice, amount) {
+    const win = (type === 'up' && lastPrice > entryPrice) || (type === 'down' && lastPrice < entryPrice);
+    candleSeries.removePriceLine(priceLine);
+    document.getElementById('tradeTimer').style.display = 'none';
+    
+    if (win) {
+        const profit = amount * 1.82;
+        balance += profit;
+        showOverlay(`ВЫИГРЫШ: +$${profit.toFixed(2)}`, '#00ffad');
+    } else {
+        showOverlay(`ПРОИГРЫШ: $0.00`, '#ff3a33');
+    }
+    
+    isTradeOpen = false;
+    updateUI();
+}
+
+function showOverlay(text, color) {
+    const el = document.createElement('div');
+    el.style.cssText = `position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:40px; font-weight:bold; z-index:2000; text-shadow: 2px 2px 10px #000;`;
+    el.innerText = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
 }
 
 function updateUI() {
     document.getElementById('topBalance').innerText = balance.toFixed(2) + " $";
 }
 
-window.onload = () => {
-    initChart();
-    updateUI();
-};
+// Запуск только после полной загрузки страницы
+window.onload = startApp;
