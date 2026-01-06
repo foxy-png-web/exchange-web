@@ -1,42 +1,65 @@
-let balance = 1000.00;
+let balance = 10000.00;
+let user = { email: '', name: 'Хозяин', surname: '', phone: '', bday: '' };
 let lastPrice = 0;
 let candleSeries;
-let isTrading = false;
 
-// Вход в систему
-function finishAuth() {
+// СИСТЕМА ВХОДА
+function toggleAuth(type) {
+    const tabs = document.querySelectorAll('.tab');
+    tabs[0].classList.toggle('active', type === 'reg');
+    tabs[1].classList.toggle('active', type === 'login');
+}
+
+function startApp() {
+    user.email = document.getElementById('regEmail').value || 'guest@mail.ru';
+    document.getElementById('viewEmail').innerText = user.email;
+    
     document.getElementById('authPage').style.opacity = '0';
     setTimeout(() => {
         document.getElementById('authPage').style.display = 'none';
-        document.getElementById('tradingTerminal').style.display = 'block';
-        initChart(); // Запускаем график только после входа
-    }, 400);
+        document.getElementById('mainApp').style.display = 'flex';
+        initChart();
+    }, 500);
 }
 
-function setTab(el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
+// УПРАВЛЕНИЕ ДАННЫМИ ПРОФИЛЯ
+function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+
+function editData() {
+    document.getElementById('userDataView').style.display = 'none';
+    document.getElementById('userDataEdit').style.display = 'block';
 }
 
-function setType(el) {
-    document.querySelectorAll('.type-box').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
+function saveData() {
+    user.name = document.getElementById('editName').value;
+    user.surname = document.getElementById('editSurname').value;
+    user.phone = document.getElementById('editPhone').value;
+    user.bday = document.getElementById('editBday').value;
+
+    document.getElementById('viewName').innerText = user.name || 'Не указано';
+    document.getElementById('viewSurname').innerText = user.surname || 'Не указано';
+    document.getElementById('viewPhone').innerText = user.phone || 'Не указано';
+    document.getElementById('viewBday').innerText = user.bday || 'Не указано';
+
+    document.getElementById('userDataView').style.display = 'block';
+    document.getElementById('userDataEdit').style.display = 'none';
 }
 
-// График
+// ГРАФИК В РАМКЕ
 function initChart() {
-    const container = document.getElementById('chart');
-    const chart = LightweightCharts.createChart(container, {
-        layout: { background: { color: '#040d08' }, textColor: '#94a3b8' },
-        grid: { vertLines: { color: '#0d2b1c' }, horzLines: { color: '#0d2b1c' } },
-        width: container.clientWidth,
-        height: container.clientHeight,
-        timeScale: { timeVisible: true, secondsVisible: true }
+    const chartDiv = document.getElementById('chartBox');
+    const chart = LightweightCharts.createChart(chartDiv, {
+        layout: { background: { color: '#000' }, textColor: '#94a3b8' },
+        grid: { vertLines: { color: '#0a1f14' }, horzLines: { color: '#0a1f14' } },
+        width: chartDiv.clientWidth,
+        height: chartDiv.clientHeight,
+        timeScale: { borderVisible: false, timeVisible: true }
     });
 
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', downColor: '#ff5252',
-        borderVisible: false, wickUpColor: '#00ffad', wickDownColor: '#ff5252'
+        upColor: '#00ffad', downColor: '#ff5252', borderVisible: false,
+        wickUpColor: '#00ffad', wickDownColor: '#ff5252'
     });
 
     const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
@@ -44,53 +67,32 @@ function initChart() {
         const k = JSON.parse(e.data).k;
         lastPrice = parseFloat(k.c);
         candleSeries.update({
-            time: k.t / 1000,
-            open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: lastPrice
+            time: k.t / 1000, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: lastPrice
         });
-        document.getElementById('price').innerText = lastPrice.toFixed(2);
+        document.getElementById('priceLabel').innerText = "BTC/USDT: " + lastPrice.toFixed(2);
     };
+
+    window.onresize = () => chart.applyOptions({ width: chartDiv.clientWidth, height: chartDiv.clientHeight });
 }
 
-// Торговля
-function trade(type) {
-    if (isTrading) return;
-    const amount = parseFloat(document.getElementById('amt').value);
-    if (balance < amount) return msg("Недостаточно средств", "#ff5252");
-
-    isTrading = true;
+// ТОРГОВЛЯ
+function goTrade(type) {
+    const amount = parseFloat(document.getElementById('tradeAmt').value);
+    if (balance < amount) return alert("Недостаточно средств!");
+    
     balance -= amount;
-    updateUI();
-
-    const entry = lastPrice;
-    const line = candleSeries.createPriceLine({
-        price: entry, color: type === 'up' ? '#00ffad' : '#ff5252',
-        lineWidth: 2, title: type === 'up' ? 'ВВЕРХ' : 'ВНИЗ'
-    });
-
-    msg("Сделка открыта (5с)", "#00ffad");
-
+    document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
+    
+    // Эмуляция результата через 5 секунд
     setTimeout(() => {
-        const win = (type === 'up' && lastPrice > entry) || (type === 'down' && lastPrice < entry);
-        candleSeries.removePriceLine(line);
+        const win = Math.random() > 0.5; // Просто для теста
         if (win) {
-            const p = amount * 1.82;
-            balance += p;
-            msg(`ВЫИГРЫШ: +$${p.toFixed(2)}`, "#00ffad");
+            balance += amount * 1.82;
+            alert("ВЫИГРЫШ!");
         } else {
-            msg(`ПРОИГРЫШ: -$${amount}`, "#ff5252");
+            alert("ПРОИГРЫШ");
         }
-        isTrading = false;
-        updateUI();
+        document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
     }, 5000);
-}
-
-function msg(t, c) {
-    const n = document.getElementById('notify');
-    n.innerText = t; n.style.background = c; n.style.display = 'block';
-    setTimeout(() => n.style.display = 'none', 3000);
-}
-
-function updateUI() {
-    document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
 }
 
