@@ -1,0 +1,41 @@
+</div>
+                        <div>
+                            <label class="text-xs text-gray-400 uppercase tracking-wider">Время экспирации</label>
+                            <div class="grid grid-cols-3 gap-2 mt-2">
+                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">1m</button>
+                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">5m</button>
+                                <button class="bg-[#2b3139] py-2 rounded-lg text-sm hover:bg-gray-600">15m</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="placeTrade('UP')" class="btn-buy w-full text-lg">BUY / UP</button>
+                    <button onclick="placeTrade('DOWN')" class="btn-sell w-full text-lg">SELL / DOWN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wallet" class="tab-content">
+        <div class="glass-card p-10 max-w-xl mx-auto text-center space-y-6">
+            <h2 class="text-3xl font-bold">Пополнение баланса</h2>
+            <p class="text-gray-400">Отправьте BTC на персональный адрес. Средства будут зачислены после 2 подтверждений сети.</p>
+            <div class="bg-white p-3 rounded-2xl inline-block">
+                <img id="qrCode" src="" alt="QR">
+            </div>
+            <div class="bg-[#1e2329] p-4 rounded-xl font-mono text-[#fcd535] text-sm break-all border border-dashed border-gray-600" id="btcAddress">
+                1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="mt-20 p-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+    <p>&copy; 2026 OWNER-EX. <a href="#" onclick="alert('Terms of Service: Trading involves risk.')" class="underline hover:text-[#fcd535]">Terms of Service</a></p>
+</footer>
+
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
