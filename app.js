@@ -1,72 +1,110 @@
-<header>
-    <div class="logo">OWNER-EX PRO</div>
-    <div class="user-section">
-        <div class="balance-box">
-            <span style="font-size: 10px; color: #848e9c; display: block;">BALANS</span>
-            <span class="balance-info" id="topBalance">1000.00 $</span>
-        </div>
-        <div class="profile-icon" onclick="toggleProfile()">👤</div>
-    </div>
-</header>
+let balance = 1000.00;
+let candleSeries;
+let lastPrice = 0;
+let isTradeOpen = false;
+let priceLine;
 
-<div class="chart-controls">
-    <button class="btn-sm active">BTC/USDT</button>
-    <button class="btn-sm">ETH/USDT</button>
-    <button class="btn-sm">SOL/USDT</button>
-    <div style="width:1px; background: var(--border); margin: 0 5px;"></div>
-    <button class="btn-sm active">1m</button>
-    <button class="btn-sm">5m</button>
-    <button class="btn-sm">15m</button>
-</div>
+function initChart() {
+    const chartBox = document.getElementById('chartContainer');
+    if (!chartBox) return;
 
-<div class="main-layout">
-    <div class="chart-area" id="chartContainer">
-        <div id="tradeTimer">Time left: <span id="timerSec">00:00</span></div>
-    </div>
+    // Создаем профессиональный график
+    const chart = LightweightCharts.createChart(chartBox, {
+        layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#181a20' }, horzLines: { color: '#181a20' } },
+        width: chartBox.clientWidth,
+        height: chartBox.clientHeight,
+        timeScale: { timeVisible: true, secondsVisible: true }
+    });
+
+    candleSeries = chart.addCandlestickSeries({
+        upColor: '#00ffad', downColor: '#ff3a33',
+        borderVisible: false, wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
+    });
+
+    // Живые данные с Binance
+    const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
+    socket.onmessage = (e) => {
+        const d = JSON.parse(e.data).k;
+        lastPrice = parseFloat(d.c);
+        candleSeries.update({
+            time: d.t / 1000, open: parseFloat(d.o), high: parseFloat(d.h), low: parseFloat(d.l), close: lastPrice
+        });
+        document.getElementById('livePrice').innerText = lastPrice.toFixed(2);
+    };
     
-    <div class="trade-area">
-        <div class="input-group">
-            <span class="input-label">SUMMA ($)</span>
-            <input type="number" id="tradeAmount" class="trade-input" value="10">
-            <div class="quick-select">
-                <button class="btn-sm" onclick="setAmount(10)">10</button>
-                <button class="btn-sm" onclick="setAmount(20)">20</button>
-                <button class="btn-sm" onclick="setAmount(50)">50</button>
-                <button class="btn-sm" onclick="setAmount(100)">100</button>
-            </div>
-        </div>
+    window.addEventListener('resize', () => {
+        chart.applyOptions({ width: chartBox.clientWidth, height: chartBox.clientHeight });
+    });
+}
 
-        <div class="input-group">
-            <span class="input-label">VREMYA (MIN)</span>
-            <select id="expTime" class="trade-input">
-                <option value="1">1 MINUTA</option>
-                <option value="2">2 MINUTY</option>
-                <option value="5">5 MINUT</option>
-            </select>
-        </div>
+function setAmount(v) { document.getElementById('tradeAmount').value = v; }
 
-        <div style="margin-top: auto;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-                <span style="color: #848e9c;">Vyplata:</span>
-                <span style="color: var(--green);">82% ($<span id="payout">18.20</span>)</span>
-            </div>
-            <button class="action-btn btn-up" onclick="placeTrade('up')">Kupit ↑</button>
-            <button class="action-btn btn-down" onclick="placeTrade('down')">Prodat ↓</button>
-        </div>
-    </div>
-</div>
+function toggleProfile() { document.getElementById('profileMenu').classList.toggle('active'); }
 
-<div id="profileMenu" class="profile-menu">
-    <div style="padding: 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px;">
-        <div style="font-weight: bold;">Gost' #777</div>
-        <div style="font-size: 11px; color: var(--green);">Status: Online</div>
-    </div>
-    <div class="menu-item">📊 Istoriya sdelok</div>
-    <div class="menu-item">👥 Referaly</div>
-    <div class="menu-item">🌐 Yazyk: RU</div>
-    <div class="menu-item" style="color: var(--red);">Log Out</div>
-</div>
+function placeTrade(type) {
+    if (isTradeOpen) return;
+    const amount = parseFloat(document.getElementById('tradeAmount').value);
+    const duration = parseInt(document.getElementById('expTime').value) * 60;
+    
+    if (balance < amount) return alert("Недостаточно баланса!");
 
-<script src="app.js?v=3.0"></script>
-</body>
-</html>
+    isTradeOpen = true;
+    balance -= amount;
+    updateUI();
+
+    const entryPrice = lastPrice;
+    
+    // Рисуем линию сделки на графике
+    priceLine = candleSeries.createPriceLine({
+        price: entryPrice,
+        color: type === 'up' ? '#00ffad' : '#ff3a33',
+        lineWidth: 2,
+        lineStyle: 2,
+        title: ВХОД: ${type === 'up' ? 'ВВЕРХ' : 'ВНИЗ'},
+    });
+
+    document.getElementById('tradeTimer').style.display = 'block';
+    let timeLeft = duration;
+    
+    const timer = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        document.getElementById('timerSec').innerText = ${m}:${s < 10 ? '0'+s : s};
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            const win = (type === 'up' && lastPrice > entryPrice) || (type === 'down' && lastPrice < entryPrice);
+            candleSeries.removePriceLine(priceLine);
+            document.getElementById('tradeTimer').style.display = 'none';
+            
+            if (win) {
+                const profit = amount * 1.82;
+                balance += profit;
+                showResult(WIN: +$${profit.toFixed(2)}, '#00ffad');
+            } else {
+                showResult(LOSS: $0.00, '#ff3a33');
+            }
+            isTradeOpen = false;
+            updateUI();
+        }
+    }, 1000);
+}
+
+function showResult(text, color) {
+    const res = document.createElement('div');
+    res.style.cssText = position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:48px; font-weight:bold; z-index:10000; text-shadow: 2px 2px 10px #000;;
+    res.innerText = text;
+    document.body.appendChild(res);
+    setTimeout(() => res.remove(), 3000);
+}
+
+function updateUI() {
+    document.getElementById('topBalance').innerText = balance.toFixed(2) + " $";
+}
+
+window.onload = () => {
+    initChart();
+    updateUI();
+};
