@@ -1,127 +1,225 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OWNER-EX ELITE TERMINAL</title>
+    <title>OWNER-EX PRO TERMINAL</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --bg: #0b0e11; --panel: #161a1e; --accent: #00ffad; --red: #f6465d; --green: #0ecb81; --border: #2b2f36; }
         body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #eaecef; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* ВЕРХНЯЯ ПАНЕЛЬ */
-        header { height: 60px; background: var(--panel); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); gap: 10px; }
-        .controls-group { display: flex; align-items: center; gap: 10px; }
-        select, .btn-tool { background: #1e2329; color: white; border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        .btn-tool:hover { border-color: var(--accent); }
-        
-        .balance-toggle { display: flex; background: #000; border-radius: 6px; padding: 3px; border: 1px solid var(--border); }
-        .bal-btn { padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; color: gray; background: none; }
-        .bal-btn.active { background: var(--accent); color: black; font-weight: bold; }
+        /* AUTH BOX */
+        #authOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .auth-card { background: var(--panel); padding: 30px; border-radius: 12px; border: 1px solid var(--accent); width: 300px; text-align: center; }
+        .auth-card input { width: 90%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 4px; }
 
-        /* СЕТКА ТЕРМИНАЛА */
-        .terminal { display: grid; grid-template-columns: 60px 1fr 240px; height: calc(100vh - 60px); }
-        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
+        /* HEADER */
+        header { height: 60px; background: var(--panel); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); }
+        .tool-bar { display: flex; gap: 10px; align-items: center; }
+        select, .btn-small { background: #1e2329; color: white; border: 1px solid var(--border); padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         
-        /* ЦЕНТРАЛЬНАЯ ЧАСТЬ */
-        .main-view { display: flex; flex-direction: column; position: relative; border-right: 1px solid var(--border); }
+        .account-switcher { display: flex; background: #000; border-radius: 6px; padding: 2px; border: 1px solid var(--border); }
+        .acc-btn { padding: 4px 10px; border: none; background: none; color: #555; cursor: pointer; font-size: 11px; border-radius: 4px; }
+        .acc-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+
+        /* LAYOUT */
+        .main-container { display: grid; grid-template-columns: 50px 1fr 240px; height: calc(100vh - 60px); }
+        .sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 20px; }
+        
+        .chart-section { display: flex; flex-direction: column; position: relative; border-right: 1px solid var(--border); }
         #chart { flex: 1; }
-        .history-panel { height: 150px; background: var(--panel); border-top: 1px solid var(--border); overflow-y: auto; padding: 10px; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { color: #848e9c; padding-bottom: 8px; }
-        td { padding: 5px 0; border-bottom: 1px solid #222; }
+        .history-section { height: 160px; background: var(--panel); border-top: 1px solid var(--border); overflow-y: auto; padding: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+        th { color: #848e9c; border-bottom: 1px solid var(--border); padding: 5px; }
+        td { padding: 6px 5px; border-bottom: 1px solid #222; }
 
-        /* ПАНЕЛЬ ТОРГОВЛИ */
-        .trade-panel { padding: 20px; display: flex; flex-direction: column; gap: 15px; background: var(--panel); width: 240px; }
-        .input-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px; }
-        .input-box label { display: block; font-size: 10px; color: #848e9c; margin-bottom: 5px; }
-        .input-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 18px; font-weight: bold; }
+        /* TRADE PANEL */
+        .trade-side { padding: 15px; background: var(--panel); display: flex; flex-direction: column; gap: 12px; }
+        .input-group { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
+        .input-group label { display: block; font-size: 10px; color: #848e9c; }
+        .input-group input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 16px; font-weight: bold; }
 
-        .btn-trade { height: 60px; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .btn-up { background: var(--green); color: #000; }
-        .btn-down { background: var(--red); color: #fff; }
-        .btn-trade:disabled { opacity: 0.4; filter: grayscale(1); }
+        .trade-btn { height: 50px; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .up { background: var(--green); color: #000; }
+        .down { background: var(--red); color: #fff; }
+        .trade-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        #progress-bar { height: 4px; background: var(--accent); width: 0%; transition: linear; position: absolute; bottom: 150px; left: 0; z-index: 10; }
+        #progress { height: 3px; background: var(--accent); width: 0%; position: absolute; bottom: 160px; transition: linear; }
     </style>
 </head>
 <body>
 
+<div id="authOverlay">
+    <div class="auth-card" id="regForm">
+        <h3 style="color:var(--accent)">РЕГИСТРАЦИЯ</h3>
+        <input type="text" id="rUser" placeholder="Логин">
+        <input type="password" id="rPass" placeholder="Пароль">
+        <button class="trade-btn up" style="width:100%" onclick="auth('reg')">Создать аккаунт</button>
+        <p style="font-size:11px; cursor:pointer" onclick="showLogin(true)">Уже есть аккаунт? Войти</p>
+    </div>
+    <div class="auth-card" id="logForm" style="display:none">
+        <h3 style="color:var(--accent)">ВХОД</h3>
+        <input type="text" id="lUser" placeholder="Логин">
+        <input type="password" id="lPass" placeholder="Пароль">
+        <button class="trade-btn up" style="width:100%" onclick="auth('log')">Войти</button>
+        <p style="font-size:11px; cursor:pointer" onclick="showLogin(false)">Нет аккаунта? Регистрация</p>
+    </div>
+</div>
+
 <header>
-    <div class="controls-group">
-        <div style="font-weight: 900; color: var(--accent); margin-right: 15px;">OWNER-EX</div>
-        <select id="assetSelect" onchange="changeSymbol(this.value)">
-            <option value="BTCUSDT">BTC / USDT</option>
-            <option value="ETHUSDT">ETH / USDT</option>
-            <option value="SOLUSDT">SOL / USDT</option>
+    <div class="tool-bar">
+        <div style="font-weight:900; color:var(--accent); margin-right:10px;">OWNER-EX PRO</div>
+        <select id="asset" onchange="changeAsset(this.value)">
+            <option value="BTCUSDT">BTC/USDT</option>
+            <option value="ETHUSDT">ETH/USDT</option>
+            <option value="SOLUSDT">SOL/USDT</option>
         </select>
-        <select id="tfSelect" onchange="changeTF(this.value)">
-            <option value="1m">1 MIN</option>
-            <option value="5m">5 MIN</option>
-            <option value="15m">15 MIN</option>
-            <option value="1h">1 HOUR</option>
+        <select id="tf" onchange="changeTF(this.value)">
+            <option value="1m">1m</option>
+            <option value="5m">5m</option>
+            <option value="15m">15m</option>
         </select>
-        <button class="btn-tool" onclick="setChartType('candles')">🕯️ Свечи</button>
-        <button class="btn-tool" onclick="setChartType('area')">📈 Линия</button>
+        <button class="btn-small" onclick="setChartStyle('candles')">🕯️</button>
+        <button class="btn-small" onclick="setChartStyle('line')">📈</button>
     </div>
 
-    <div class="controls-group">
-        <div class="balance-toggle">
-            <button class="bal-btn active" id="demoBtn" onclick="switchAccount('demo')">DEMO</button>
-            <button class="bal-btn" id="realBtn" onclick="switchAccount('real')">REAL</button>
+    <div class="tool-bar">
+        <div class="account-switcher">
+            <button class="acc-btn active" id="btnDemo" onclick="switchAccount('demo')">DEMO</button>
+            <button class="acc-btn" id="btnReal" onclick="switchAccount('real')">REAL</button>
         </div>
-        <div id="balanceDisplay" style="font-weight: bold; color: var(--green); min-width: 100px;">$10,000.00</div>
+        <div id="displayBal" style="font-weight:bold; color:var(--green); min-width:80px;">$10,000.00</div>
     </div>
 </header>
 
-<div class="terminal">
+<div class="main-container">
     <div class="sidebar">
-        <div style="cursor:pointer">👤</div>
-        <div style="cursor:pointer">💳</div>
-        <div style="cursor:pointer">⚙️</div>
+        <div onclick="alert('Касса скоро будет')" style="cursor:pointer">💳</div>
+        <div onclick="alert('Профиль')" style="cursor:pointer">👤</div>
+        <div onclick="location.reload()" style="cursor:pointer">🚪</div>
     </div>
 
-    <div class="main-view">
+    <div class="chart-section">
         <div id="chart"></div>
-        <div id="progress-bar"></div>
-        <div class="history-panel">
+        <div id="progress"></div>
+        <div class="history-section">
             <table>
-                <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Вход</th><th>Выход</th><th>Результат</th></tr></thead>
-                <tbody id="historyList"></tbody>
+                <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Вход</th><th>Выход</th><th>Итог</th></tr></thead>
+                <tbody id="hList"></tbody>
             </table>
         </div>
     </div>
 
-    <div class="trade-panel">
-        <div class="input-box">
-            <label>СУММА СДЕЛКИ (USDT)</label>
-            <input type="number" id="tradeAmt" value="100">
-        </div>
-        <div class="input-box">
-            <label>ВРЕМЯ ЭКСПИРАЦИИ (СЕК)</label>
-            <input type="number" id="tradeTime" value="15">
-        </div>
-        <div style="text-align:center; color:var(--accent); font-size:26px; font-weight:900;">+85%</div>
-        <button class="btn-trade btn-up" id="upBtn" onclick="execTrade('CALL')">ВЫШЕ ↑</button>
-        <button class="btn-trade btn-down" id="downBtn" onclick="execTrade('PUT')">НИЖЕ ↓</button>
+    <div class="trade-side">
+        <div class="input-group"><label>СУММА (USDT)</label><input type="number" id="tAmt" value="100"></div>
+        <div class="input-group"><label>ВРЕМЯ (СЕК)</label><input type="number" id="tSec" value="15"></div>
+        <div style="text-align:center; color:var(--accent); font-size:22px; font-weight:bold;">+82%</div>
+        <button class="trade-btn up" id="uB" onclick="execTrade('CALL')">ВЫШЕ ↑</button>
+        <button class="trade-btn down" id="dB" onclick="execTrade('PUT')">НИЖЕ ↓</button>
     </div>
 </div>
 
 <script>
-    let chart, series, currentSymbol = 'BTCUSDT', currentTF = '1m', chartType = 'candles';
-    let balances = { demo: 10000, real: 0 };
-    let activeAcc = 'demo';
+    let chart, series, curSym = 'BTCUSDT', curTF = '1m', style = 'candles';
+    let bals = { demo: 10000, real: 0.00 };
+    let curAcc = 'demo';
     let lastPrice = 0;
 
-    function initChart() {
-        if (chart) { document.getElementById('chart').innerHTML = ''; }
+    // --- АВТОРИЗАЦИЯ ---
+    window.showLogin = (val) => {
+        document.getElementById('regForm').style.display = val ? 'none' : 'block';
+        document.getElementById('logForm').style.display = val ? 'block' : 'none';
+    };
+
+    window.auth = (mode) => {
+        if(mode === 'reg') {
+            const u = document.getElementById('rUser').value, p = document.getElementById('rPass').value;
+            if(u && p) { localStorage.setItem('u_'+u, p); alert('Готово! Теперь войдите.'); showLogin(true); }
+        } else {
+            const u = document.getElementById('lUser').value, p = document.getElementById('lPass').value;
+            if(localStorage.getItem('u_'+u) === p) { document.getElementById('authOverlay').style.display = 'none'; init(); }
+            else alert('Ошибка входа');
+        }
+    };
+
+    // --- ГРАФИК ---
+    function init() {
+        if(chart) document.getElementById('chart').innerHTML = '';
         chart = LightweightCharts.createChart(document.getElementById('chart'), {
             layout: { background: { color: '#0b0e11' }, textColor: '#848e9c' },
             grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { borderColor: '#2b2f36', timeVisible: true, secondsVisible: true }
+            timeScale: { borderColor: '#222', timeVisible: true, secondsVisible: true }
         });
 
-        if (chartType === 'candles') {
-            series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
-        } else {
-            series = chart.addAreaSeries({ lineColor: '#00ffad', topColor: 'rgba(0, 255, 173, 0.3)', bottomColor:
+        series = style === 'candles' 
+            ? chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' })
+            : chart.addAreaSeries({ lineColor: '#00ffad', topColor: 'rgba(0,255,173,0.2)', bottomColor: 'transparent' });
+
+        updateData();
+    }
+
+    async function updateData() {
+        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=${curTF}&limit=1000`);
+        const d = await r.json();
+        series.setData(d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4], value: +x[4] })));
+        
+        if(window.ws) window.ws.close();
+        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
+        window.ws.onmessage = e => {
+            const k = JSON.parse(e.data).k;
+            lastPrice = +k.c;
+            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice, value: lastPrice });
+        };
+    }
+
+    // --- КНОПКИ ИНТЕРФЕЙСА ---
+    window.setChartStyle = (s) => { style = s; init(); };
+    window.changeAsset = (a) => { curSym = a; init(); };
+    window.changeTF = (t) => { curTF = t; init(); };
+
+    window.switchAccount = (acc) => {
+        curAcc = acc;
+        document.getElementById('btnDemo').classList.toggle('active', acc === 'demo');
+        document.getElementById('btnReal').classList.toggle('active', acc === 'real');
+        updateBalUI();
+    };
+
+    function updateBalUI() { 
+        document.getElementById('displayBal').innerText = `$${bals[curAcc].toLocaleString()}`; 
+    }
+
+    // --- ТОРГОВЛЯ ---
+    window.execTrade = (type) => {
+        const amt = +document.getElementById('tAmt').value;
+        const sec = +document.getElementById('tSec').value;
+        if(bals[curAcc] < amt) return alert('Мало денег');
+
+        bals[curAcc] -= amt; updateBalUI();
+        const startPrice = lastPrice;
+        const line = series.createPriceLine({ price: startPrice, color: type==='CALL'?'#0ecb81':'#f6465d', lineWidth: 2, lineStyle: 2, title: 'ВХОД' });
+
+        document.getElementById('uB').disabled = document.getElementById('dB').disabled = true;
+        const prog = document.getElementById('progress');
+        prog.style.transition = 'none'; prog.style.width = '0%';
+        setTimeout(() => { prog.style.transition = `width ${sec}s linear`; prog.style.width = '100%'; }, 50);
+
+        setTimeout(() => {
+            const endPrice = lastPrice;
+            const win = (type==='CALL' && endPrice > startPrice) || (type==='PUT' && endPrice < startPrice);
+            const profit = win ? amt * 1.82 : 0;
+            bals[curAcc] += profit;
+
+            const row = `<tr><td>${curSym}</td><td style="color:${type==='CALL'?'#0ecb81':'#f6465d'}">${type}</td><td>$${amt}</td><td>${startPrice}</td><td>${endPrice}</td><td style="color:${win?'#0ecb81':'#f6465d'}">${win ? '+$'+(profit-amt).toFixed(2) : '-$'+amt}</td></tr>`;
+            document.getElementById('hList').insertAdjacentHTML('afterbegin', row);
+
+            series.removePriceLine(line);
+            document.getElementById('uB').disabled = document.getElementById('dB').disabled = false;
+            prog.style.width = '0%';
+            updateBalUI();
+        }, sec * 1000);
+    };
+
+</script>
+</body>
+</html>
