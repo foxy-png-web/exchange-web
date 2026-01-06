@@ -1,67 +1,72 @@
-var BTC_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
+<header>
+    <div class="logo">OWNER-EX PRO</div>
+    <div class="user-section">
+        <div class="balance-box">
+            <span style="font-size: 10px; color: #848e9c; display: block;">BALANS</span>
+            <span class="balance-info" id="topBalance">1000.00 $</span>
+        </div>
+        <div class="profile-icon" onclick="toggleProfile()">👤</div>
+    </div>
+</header>
 
-function startChart() {
-    var chartBox = document.getElementById('chartContainer');
-    if (!chartBox) return;
+<div class="chart-controls">
+    <button class="btn-sm active">BTC/USDT</button>
+    <button class="btn-sm">ETH/USDT</button>
+    <button class="btn-sm">SOL/USDT</button>
+    <div style="width:1px; background: var(--border); margin: 0 5px;"></div>
+    <button class="btn-sm active">1m</button>
+    <button class="btn-sm">5m</button>
+    <button class="btn-sm">15m</button>
+</div>
 
-    chartBox.innerHTML = ''; // Очистка старого мусора
-
-    // Создаем график по правилам версии 3.8
-    var chart = LightweightCharts.createChart(chartBox, {
-        width: chartBox.clientWidth,
-        height: 400,
-        layout: {
-            backgroundColor: '#181a20',
-            textColor: '#d1d4dc',
-        },
-        grid: {
-            vertLines: { color: '#2b3139' },
-            horzLines: { color: '#2b3139' },
-        },
-        crosshair: {
-            mode: LightweightCharts.CrosshairMode.Normal,
-        },
-        timeScale: {
-            timeVisible: true,
-            secondsVisible: false,
-        },
-    });
-
-    // В версии 3.8 это ОБЯЗАТЕЛЬНО сработает
-    var candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad',
-        downColor: '#ff3a33',
-        borderUpColor: '#00ffad',
-        borderDownColor: '#ff3a33',
-        wickUpColor: '#00ffad',
-        wickDownColor: '#ff3a33',
-    });
-
-    // Подключение к данным
-    var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
+<div class="main-layout">
+    <div class="chart-area" id="chartContainer">
+        <div id="tradeTimer">Time left: <span id="timerSec">00:00</span></div>
+    </div>
     
-    binanceSocket.onmessage = function(event) {
-        var data = JSON.parse(event.data);
-        var k = data.k;
-        candleSeries.update({
-            time: k.t / 1000,
-            open: parseFloat(k.o),
-            high: parseFloat(k.h),
-            low: parseFloat(k.l),
-            close: parseFloat(k.c)
-        });
-        var priceDiv = document.getElementById('livePrice');
-        if (priceDiv) priceDiv.innerText = parseFloat(k.c).toFixed(2);
-    };
+    <div class="trade-area">
+        <div class="input-group">
+            <span class="input-label">SUMMA ($)</span>
+            <input type="number" id="tradeAmount" class="trade-input" value="10">
+            <div class="quick-select">
+                <button class="btn-sm" onclick="setAmount(10)">10</button>
+                <button class="btn-sm" onclick="setAmount(20)">20</button>
+                <button class="btn-sm" onclick="setAmount(50)">50</button>
+                <button class="btn-sm" onclick="setAmount(100)">100</button>
+            </div>
+        </div>
 
-    // Чтобы график не ломался при повороте телефона
-    window.addEventListener('resize', function() {
-        chart.applyOptions({ width: chartBox.clientWidth });
-    });
-}
+        <div class="input-group">
+            <span class="input-label">VREMYA (MIN)</span>
+            <select id="expTime" class="trade-input">
+                <option value="1">1 MINUTA</option>
+                <option value="2">2 MINUTY</option>
+                <option value="5">5 MINUT</option>
+            </select>
+        </div>
 
-window.onload = function() {
-    startChart();
-    var qrImg = document.getElementById('qrCode');
-    if (qrImg) qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + BTC_ADDR;
-};
+        <div style="margin-top: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span style="color: #848e9c;">Vyplata:</span>
+                <span style="color: var(--green);">82% ($<span id="payout">18.20</span>)</span>
+            </div>
+            <button class="action-btn btn-up" onclick="placeTrade('up')">Kupit ↑</button>
+            <button class="action-btn btn-down" onclick="placeTrade('down')">Prodat ↓</button>
+        </div>
+    </div>
+</div>
+
+<div id="profileMenu" class="profile-menu">
+    <div style="padding: 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px;">
+        <div style="font-weight: bold;">Gost' #777</div>
+        <div style="font-size: 11px; color: var(--green);">Status: Online</div>
+    </div>
+    <div class="menu-item">📊 Istoriya sdelok</div>
+    <div class="menu-item">👥 Referaly</div>
+    <div class="menu-item">🌐 Yazyk: RU</div>
+    <div class="menu-item" style="color: var(--red);">Log Out</div>
+</div>
+
+<script src="app.js?v=3.0"></script>
+</body>
+</html>
