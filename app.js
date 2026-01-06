@@ -1,121 +1,90 @@
 let balance = 1000.00;
-let candleSeries;
 let lastPrice = 0;
-let isTradeActive = false;
-let tradeLine;
+let candleSeries;
+let isTrading = false;
 
-// Инициализация графиков
-function initTrading() {
-    const container = document.getElementById('chartBox');
-    if (!container) return;
-
-    const chart = LightweightCharts.createChart(container, {
-        layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#181a20' }, horzLines: { color: '#181a20' } },
-        width: container.clientWidth,
-        height: container.clientHeight,
+function initPocketApp() {
+    const chartDiv = document.getElementById('tradingView');
+    const chart = LightweightCharts.createChart(chartDiv, {
+        layout: { background: { color: '#040d08' }, textColor: '#90a4ae' },
+        grid: { vertLines: { color: '#0d2b1c' }, horzLines: { color: '#0d2b1c' } },
+        width: chartDiv.clientWidth,
+        height: chartDiv.clientHeight,
+        crosshair: { mode: 0 },
         timeScale: { timeVisible: true, secondsVisible: true }
     });
 
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', downColor: '#ff3a33',
-        borderVisible: false, wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
+        upColor: '#00e676', downColor: '#ff5252',
+        borderVisible: false, wickUpColor: '#00e676', wickDownColor: '#ff5252'
     });
 
-    // Получение цен BTC/USDT
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-    ws.onmessage = (e) => {
-        const k = JSON.parse(e.data).k;
+    const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
+    socket.onmessage = (res) => {
+        const k = JSON.parse(res.data).k;
         lastPrice = parseFloat(k.c);
         candleSeries.update({
             time: k.t / 1000,
-            open: parseFloat(k.o),
-            high: parseFloat(k.h),
-            low: parseFloat(k.l),
-            close: lastPrice
+            open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: lastPrice
         });
-        document.getElementById('priceDisplay').innerText = "BTC/USDT: " + lastPrice.toFixed(2);
     };
 
-    window.addEventListener('resize', () => {
-        chart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
-    });
+    window.onresize = () => chart.applyOptions({ width: chartDiv.clientWidth, height: chartDiv.clientHeight });
 }
 
-// Функции окон
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function changeAmount(val) {
+    let input = document.getElementById('amountInput');
+    let current = parseInt(input.value);
+    if (current + val >= 1) input.value = current + val;
+}
 
-// Логика сделки
-function startTrade(type) {
-    if (isTradeActive) return;
-    const amount = parseFloat(document.getElementById('amount').value);
-    const duration = parseInt(document.getElementById('time').value) * 60;
+function execTrade(type) {
+    if (isTrading) return;
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    if (balance < amount) return showNotify("Недостаточно средств!", "#ff5252");
 
-    if (balance < amount) return alert("Пополните баланс в Кассе!");
-
-    isTradeActive = true;
+    isTrading = true;
     balance -= amount;
-    updateBalance();
+    updateUI();
 
     const entryPrice = lastPrice;
-    
-    // Линия входа
-    tradeLine = candleSeries.createPriceLine({
+    const line = candleSeries.createPriceLine({
         price: entryPrice,
-        color: type === 'up' ? '#00ffad' : '#ff3a33',
+        color: type === 'up' ? '#00e676' : '#ff5252',
         lineWidth: 2,
         lineStyle: 2,
-        title: type === 'up' ? 'ВЫШЕ' : 'НИЖЕ'
+        title: 'СДЕЛКА'
     });
 
-    // Таймер
-    const timerBox = document.getElementById('tradeTimer');
-    const timerVal = document.getElementById('timerValue');
-    timerBox.style.display = 'block';
-    let timeLeft = duration;
-
-    const interval = setInterval(() => {
-        timeLeft--;
-        const m = Math.floor(timeLeft / 60);
-        const s = timeLeft % 60;
-        timerVal.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-
-        if (timeLeft <= 0) {
-            clearInterval(interval);
-            timerBox.style.display = 'none';
-            candleSeries.removePriceLine(tradeLine);
-            
-            const win = (type === 'up' && lastPrice > entryPrice) || (type === 'down' && lastPrice < entryPrice);
-            
-            if (win) {
-                const winAmt = amount * 1.82;
-                balance += winAmt;
-                alertResult("ВЫИГРЫШ: +$" + winAmt.toFixed(2), "#00ffad");
-            } else {
-                alertResult("ПРОИГРЫШ: $0.00", "#ff3a33");
-            }
-            
-            isTradeActive = false;
-            updateBalance();
+    // Имитация времени экспирации (10 секунд для наглядности)
+    setTimeout(() => {
+        const win = (type === 'up' && lastPrice > entryPrice) || (type === 'down' && lastPrice < entryPrice);
+        candleSeries.removePriceLine(line);
+        
+        if (win) {
+            const profit = amount * 1.82;
+            balance += profit;
+            showNotify(`ВЫИГРЫШ: +$${profit.toFixed(2)}`, "#00e676");
+        } else {
+            showNotify(`ПРОИГРЫШ: -$${amount.toFixed(2)}`, "#ff5252");
         }
-    }, 1000);
+        
+        isTrading = false;
+        updateUI();
+    }, 10000);
 }
 
-function alertResult(msg, color) {
-    const div = document.createElement('div');
-    div.style.cssText = `position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:50px; font-weight:bold; z-index:9999; text-shadow:0 0 20px #000;`;
-    div.innerText = msg;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+function showNotify(text, color) {
+    const n = document.getElementById('notify');
+    n.innerText = text;
+    n.style.background = color;
+    n.style.display = 'block';
+    setTimeout(() => n.style.display = 'none', 3000);
 }
 
-function updateBalance() {
-    document.getElementById('userBalance').innerText = balance.toFixed(2) + " $";
+function updateUI() {
+    document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
 }
 
-window.onload = () => {
-    initTrading();
-    updateBalance();
-};
+window.onload = initPocketApp;
 
