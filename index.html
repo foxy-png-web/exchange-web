@@ -1,72 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>OWNER-EX PRO</title>
+    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        :root { --green: #00ffad; --red: #ff3a33; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --yellow: #fcd535; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow: hidden; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--card); border-bottom: 1px solid var(--border); }
+        .balance-info { color: var(--green); font-weight: bold; font-size: 18px; }
+        .profile-icon { width: 35px; height: 35px; background: #2b3139; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+
+        .main-layout { display: grid; grid-template-columns: 1fr 300px; height: calc(100vh - 60px); }
+        .chart-area { position: relative; background: var(--bg); }
+        .trade-area { background: var(--card); padding: 20px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 20px; }
+
+        .trade-input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 16px; }
+        .btn-up { background: var(--green); color: black; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-down { background: var(--red); color: white; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        
+        #tradeTimer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--yellow); display: none; z-index: 100; color: var(--yellow); }
+        
+        .profile-menu { display: none; position: absolute; top: 60px; right: 20px; width: 250px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; z-index: 1000; padding: 15px; }
+        .profile-menu.active { display: block; }
+    </style>
+</head>
+<body>
+
 <header>
-    <div class="logo">OWNER-EX PRO</div>
-    <div class="user-section">
-        <div class="balance-box">
-            <span style="font-size: 10px; color: #848e9c; display: block;">BALANS</span>
-            <span class="balance-info" id="topBalance">1000.00 $</span>
-        </div>
+    <div style="font-weight: bold; color: var(--yellow);">OWNER-EX PRO</div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div id="livePrice" style="font-family: monospace; font-size: 18px;">0.00</div>
+        <div class="balance-info" id="topBalance">1000.00 $</div>
         <div class="profile-icon" onclick="toggleProfile()">👤</div>
     </div>
 </header>
 
-<div class="chart-controls">
-    <button class="btn-sm active">BTC/USDT</button>
-    <button class="btn-sm">ETH/USDT</button>
-    <button class="btn-sm">SOL/USDT</button>
-    <div style="width:1px; background: var(--border); margin: 0 5px;"></div>
-    <button class="btn-sm active">1m</button>
-    <button class="btn-sm">5m</button>
-    <button class="btn-sm">15m</button>
-</div>
-
 <div class="main-layout">
     <div class="chart-area" id="chartContainer">
-        <div id="tradeTimer">Time left: <span id="timerSec">00:00</span></div>
+        <div id="tradeTimer">Осталось: <span id="timerSec">00:00</span></div>
     </div>
     
     <div class="trade-area">
-        <div class="input-group">
-            <span class="input-label">SUMMA ($)</span>
+        <div>
+            <label style="font-size: 12px; color: #848e9c;">СУММА СДЕЛКИ ($)</label>
             <input type="number" id="tradeAmount" class="trade-input" value="10">
-            <div class="quick-select">
-                <button class="btn-sm" onclick="setAmount(10)">10</button>
-                <button class="btn-sm" onclick="setAmount(20)">20</button>
-                <button class="btn-sm" onclick="setAmount(50)">50</button>
-                <button class="btn-sm" onclick="setAmount(100)">100</button>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px;">
+                <button onclick="setAmount(10)" style="background:var(--border); color:white; border:none; padding:5px; cursor:pointer;">10</button>
+                <button onclick="setAmount(20)" style="background:var(--border); color:white; border:none; padding:5px; cursor:pointer;">20</button>
+                <button onclick="setAmount(50)" style="background:var(--border); color:white; border:none; padding:5px; cursor:pointer;">50</button>
+                <button onclick="setAmount(100)" style="background:var(--border); color:white; border:none; padding:5px; cursor:pointer;">100</button>
             </div>
         </div>
-
-        <div class="input-group">
-            <span class="input-label">VREMYA (MIN)</span>
+        <div>
+            <label style="font-size: 12px; color: #848e9c;">ВРЕМЯ (МИН)</label>
             <select id="expTime" class="trade-input">
-                <option value="1">1 MINUTA</option>
-                <option value="2">2 MINUTY</option>
-                <option value="5">5 MINUT</option>
+                <option value="1">1 МИНУТА</option>
+                <option value="2">2 МИНУТЫ</option>
+                <option value="5">5 МИНУТ</option>
             </select>
         </div>
 
         <div style="margin-top: auto;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-                <span style="color: #848e9c;">Vyplata:</span>
-                <span style="color: var(--green);">82% ($<span id="payout">18.20</span>)</span>
-            </div>
-            <button class="action-btn btn-up" onclick="placeTrade('up')">Kupit ↑</button>
-            <button class="action-btn btn-down" onclick="placeTrade('down')">Prodat ↓</button>
+            <button class="btn-up" onclick="placeTrade('up')">ВВЕРХ (+82%)</button>
+            <button class="btn-down" style="margin-top: 10px;" onclick="placeTrade('down')">ВНИЗ (+82%)</button>
         </div>
     </div>
 </div>
 
 <div id="profileMenu" class="profile-menu">
-    <div style="padding: 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px;">
-        <div style="font-weight: bold;">Gost' #777</div>
-        <div style="font-size: 11px; color: var(--green);">Status: Online</div>
-    </div>
-    <div class="menu-item">📊 Istoriya sdelok</div>
-    <div class="menu-item">👥 Referaly</div>
-    <div class="menu-item">🌐 Yazyk: RU</div>
-    <div class="menu-item" style="color: var(--red);">Log Out</div>
+    <h4 style="margin: 0 0 10px 0;">Профиль</h4>
+    <div style="font-size: 14px; color: #848e9c; margin-bottom: 15px;">ID: 77777 (Гость)</div>
+    <div style="cursor: pointer; padding: 8px 0; border-top: 1px solid var(--border);">📊 История сделок</div>
+    <div style="cursor: pointer; padding: 8px 0;">👥 Рефералы</div>
+    <div style="cursor: pointer; padding: 8px 0; color: var(--red);">Выход</div>
 </div>
 
-<script src="app.js?v=3.0"></script>
+<script src="app.js?v=4.0"></script>
 </body>
 </html>
