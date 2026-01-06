@@ -1,40 +1,42 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>OWNER-EX</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        body { background-color: #0b0e11; color: white; }
+        /* Принудительный темный дизайн, если внешние стили не подгрузятся */
+        body { background: #0b0e11 !important; color: #ffffff !important; font-family: sans-serif; margin: 0; padding: 20px; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .glass-card { background: #181a20; border-radius: 16px; border: 1px solid #2b3139; }
+        #trade { display: block; }
+        .card { background: #181a20; padding: 20px; border-radius: 15px; border: 1px solid #2b3139; margin-top: 20px; }
+        .btn-group { display: flex; gap: 10px; }
+        button { background: #2b3139; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #fcd535; color: black; }
+        #livePrice { color: #00ffad; font-weight: bold; font-size: 24px; }
     </style>
 </head>
-<body class="p-6">
-    <nav class="flex space-x-4 mb-6">
-        <div class="nav-item active cursor-pointer text-yellow-500" onclick="openTab('trade')">Биржа</div>
-        <div class="nav-item cursor-pointer" onclick="openTab('wallet')">Кошелек</div>
-    </nav>
+<body>
+    <div class="btn-group">
+        <button onclick="openTab('trade')">Биржа</button>
+        <button onclick="openTab('wallet')">Кошелек</button>
+    </div>
 
-    <div id="trade" class="tab-content active">
-        <div class="glass-card p-4">
-            <div class="text-2xl mb-2">BTC / USDT: <span id="livePrice" class="text-green-400">0.00</span></div>
-            <div id="chartContainer" style="height: 400px; width: 100%;"></div>
+    <div id="trade" class="tab-content">
+        <div class="card">
+            <div style="margin-bottom: 15px;">BTC / USDT: <span id="livePrice">0.00</span></div>
+            <div id="chartContainer" style="width: 100%; height: 400px;"></div>
         </div>
     </div>
 
     <div id="wallet" class="tab-content">
-        <div class="glass-card p-6 text-center">
-            <h2 class="text-xl mb-4">Пополнение баланса</h2>
-            <img id="qrCode" class="mx-auto mb-4 bg-white p-2" src="" alt="QR">
-            <p class="font-mono text-xs break-all" id="btcAddress">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+        <div class="card" style="text-align: center;">
+            <h2>Пополнение BTC</h2>
+            <img id="qrCode" style="background: white; padding: 10px; border-radius: 10px; margin: 20px 0;">
+            <p style="font-family: monospace; font-size: 14px; color: #848e9c;">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
-
