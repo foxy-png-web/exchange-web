@@ -1,80 +1,92 @@
+let chart, candleSeries;
 let balance = 10000.00;
-let lastPrice = 0;
-let candleSeries;
 
-// ПЕРЕКЛЮЧЕНИЕ ВХОД / РЕГИСТРАЦИЯ
-function switchAuth(mode) {
-    if (mode === 'login') {
-        document.getElementById('loginTab').classList.add('active');
-        document.getElementById('regTab').classList.remove('active');
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('regForm').style.display = 'none';
-    } else {
-        document.getElementById('regTab').classList.add('active');
-        document.getElementById('loginTab').classList.remove('active');
-        document.getElementById('regForm').style.display = 'block';
-        document.getElementById('loginForm').style.display = 'none';
-    }
-}
-
-// ВХОД В ТЕРМИНАЛ
-function startApp() {
-    const email = document.getElementById('logEmail').value || document.getElementById('regEmail').value || 'user@mail.ru';
-    document.getElementById('pEmail').innerText = email;
-    
-    document.getElementById('authPage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
+function login() {
+    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('terminal').style.display = 'flex';
     initChart();
 }
 
-// МОДАЛКИ
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-
-function showEdit() {
-    document.getElementById('profileView').style.display = 'none';
-    document.getElementById('profileEdit').style.display = 'block';
-}
-
-function saveProfile() {
-    document.getElementById('pName').innerText = document.getElementById('inName').value || 'Не указано';
-    document.getElementById('pPhone').innerText = document.getElementById('inPhone').value || 'Не указано';
-    document.getElementById('profileView').style.display = 'block';
-    document.getElementById('profileEdit').style.display = 'none';
-}
-
-// ГРАФИК
 function initChart() {
-    const container = document.getElementById('chartBox');
-    const chart = LightweightCharts.createChart(container, {
-        layout: { background: { color: '#000' }, textColor: '#94a3b8' },
-        grid: { vertLines: { color: '#0a1f14' }, horzLines: { color: '#0a1f14' } },
-        width: container.clientWidth,
-        height: container.clientHeight,
+    const chartElement = document.getElementById('chart');
+    
+    // Настройка самого ГРАФИКА (Цвета как на скрине)
+    chart = LightweightCharts.createChart(chartElement, {
+        layout: {
+            backgroundColor: '#000000',
+            textColor: '#94a3b8',
+            fontSize: 12,
+        },
+        grid: {
+            vertLines: { color: '#0a1f14' },
+            horzLines: { color: '#0a1f14' },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+            vertLine: { color: '#00ffad', labelBackgroundColor: '#00ffad' },
+            horzLine: { color: '#00ffad', labelBackgroundColor: '#00ffad' },
+        },
+        rightPriceScale: {
+            borderColor: '#1a3a2a',
+        },
+        timeScale: {
+            borderColor: '#1a3a2a',
+            timeVisible: true,
+            secondsVisible: true,
+        },
     });
-    candleSeries = chart.addCandlestickSeries({ upColor: '#00ffad', downColor: '#ff5252' });
 
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-    ws.onmessage = (e) => {
-        const k = JSON.parse(e.data).k;
-        lastPrice = parseFloat(k.c);
+    // Настройка СВЕЧЕЙ (Неоновый эффект)
+    candleSeries = chart.addCandlestickSeries({
+        upColor: '#00ffad',
+        downColor: '#ff5252',
+        borderVisible: false,
+        wickUpColor: '#00ffad',
+        wickDownColor: '#ff5252',
+    });
+
+    // Подключение реальных данных (Binance)
+    const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
+    
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const candle = data.k;
+        
         candleSeries.update({
-            time: k.t / 1000, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: lastPrice
+            time: candle.t / 1000,
+            open: parseFloat(candle.o),
+            high: parseFloat(candle.h),
+            low: parseFloat(candle.l),
+            close: parseFloat(candle.c)
         });
     };
-    window.onresize = () => chart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
+
+    // Авто-размер при изменении окна
+    window.addEventListener('resize', () => {
+        chart.applyOptions({ 
+            width: chartElement.clientWidth, 
+            height: chartElement.clientHeight 
+        });
+    });
 }
 
-// СДЕЛКА
-function makeTrade(type) {
-    const amt = parseFloat(document.getElementById('tradeAmt').value);
-    if (balance < amt) return alert("Мало денег!");
+function trade(type) {
+    const amt = parseFloat(document.getElementById('amount').value);
+    if (balance < amt) return alert("Недостаточно средств");
+    
     balance -= amt;
-    document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
+    document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
+    
+    // Имитация сделки
     setTimeout(() => {
-        balance += amt * 1.82; // Для теста всегда вин
-        document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
-        alert("Сделка завершена!");
+        const win = Math.random() > 0.45;
+        if(win) {
+            balance += amt * 1.82;
+            alert("Профит! +82%");
+        } else {
+            alert("Убыток");
+        }
+        document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
     }, 3000);
 }
 
