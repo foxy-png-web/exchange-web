@@ -1,4 +1,3 @@
-
 var OWNER_WALLET = "ВАШ_АДРЕС_METAMASK";
 var BTC_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
 
@@ -6,21 +5,30 @@ function startChart() {
     var chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    // Очищаем контейнер перед созданием, чтобы не было дублей
-    chartBox.innerHTML = '';
+    chartBox.innerHTML = ''; // Очистка
 
+    // Настройки для Lightweight Charts v4.0+
     var chart = LightweightCharts.createChart(chartBox, {
-        layout: { background: { color: '#181a20' }, textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#2b3139' }, horzLines: { color: '#2b3139' } },
+        layout: {
+            background: { color: '#181a20' },
+            textColor: '#d1d4dc',
+        },
+        grid: {
+            vertLines: { color: '#2b3139' },
+            horzLines: { color: '#2b3139' },
+        },
         width: chartBox.clientWidth,
-        height: 400
+        height: 400,
     });
 
-    // Универсальный метод добавления свечей (работает везде)
+    // В НОВОЙ ВЕРСИИ НЕТ СЛОВА "SERIES" В ЭТОМ МЕТОДЕ (или синтаксис изменился)
+    // Попробуем самый надежный вариант для v4:
     var candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', downColor: '#ff3a33',
-        borderUpColor: '#00ffad', borderDownColor: '#ff3a33',
-        wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
+        upColor: '#00ffad', 
+        downColor: '#ff3a33', 
+        borderVisible: false,
+        wickUpColor: '#00ffad', 
+        wickDownColor: '#ff3a33'
     });
 
     var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
