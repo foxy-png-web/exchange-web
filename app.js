@@ -8,7 +8,6 @@ function initChart() {
     const chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    // Создаем профессиональный график
     const chart = LightweightCharts.createChart(chartBox, {
         layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
         grid: { vertLines: { color: '#181a20' }, horzLines: { color: '#181a20' } },
@@ -22,7 +21,6 @@ function initChart() {
         borderVisible: false, wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
     });
 
-    // Живые данные с Binance
     const socket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
     socket.onmessage = (e) => {
         const d = JSON.parse(e.data).k;
@@ -32,22 +30,22 @@ function initChart() {
         });
         document.getElementById('livePrice').innerText = lastPrice.toFixed(2);
     };
-    
+
     window.addEventListener('resize', () => {
         chart.applyOptions({ width: chartBox.clientWidth, height: chartBox.clientHeight });
     });
 }
 
-function setAmount(v) { document.getElementById('tradeAmount').value = v; }
-
-function toggleProfile() { document.getElementById('profileMenu').classList.toggle('active'); }
+function toggleProfile() { 
+    document.getElementById('profileMenu').classList.toggle('active'); 
+}
 
 function placeTrade(type) {
     if (isTradeOpen) return;
     const amount = parseFloat(document.getElementById('tradeAmount').value);
     const duration = parseInt(document.getElementById('expTime').value) * 60;
     
-    if (balance < amount) return alert("Недостаточно баланса!");
+    if (balance < amount) return alert("Недостаточно средств!");
 
     isTradeOpen = true;
     balance -= amount;
@@ -55,13 +53,12 @@ function placeTrade(type) {
 
     const entryPrice = lastPrice;
     
-    // Рисуем линию сделки на графике
     priceLine = candleSeries.createPriceLine({
         price: entryPrice,
         color: type === 'up' ? '#00ffad' : '#ff3a33',
         lineWidth: 2,
         lineStyle: 2,
-        title: ВХОД: ${type === 'up' ? 'ВВЕРХ' : 'ВНИЗ'},
+        title: type === 'up' ? 'ВВЕРХ' : 'ВНИЗ',
     });
 
     document.getElementById('tradeTimer').style.display = 'block';
@@ -82,9 +79,9 @@ function placeTrade(type) {
             if (win) {
                 const profit = amount * 1.82;
                 balance += profit;
-                showResult(WIN: +$${profit.toFixed(2)}, '#00ffad');
+                showResult(ВЫИГРЫШ: +$${profit.toFixed(2)}, '#00ffad');
             } else {
-                showResult(LOSS: $0.00, '#ff3a33');
+                showResult(ПРОИГРЫШ: $0.00, '#ff3a33');
             }
             isTradeOpen = false;
             updateUI();
@@ -94,7 +91,7 @@ function placeTrade(type) {
 
 function showResult(text, color) {
     const res = document.createElement('div');
-    res.style.cssText = position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:48px; font-weight:bold; z-index:10000; text-shadow: 2px 2px 10px #000;;
+    res.style.cssText = position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:${color}; font-size:40px; font-weight:bold; z-index:10000; text-shadow: 2px 2px 10px #000; text-align:center; width:100%;;
     res.innerText = text;
     document.body.appendChild(res);
     setTimeout(() => res.remove(), 3000);
