@@ -1,37 +1,28 @@
+
 var OWNER_WALLET = "ВАШ_АДРЕС_METAMASK";
 var BTC_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
-
-var candleSeries;
 
 function startChart() {
     var chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    // Создаем график (настройки для версии 4.x)
+    // Очищаем контейнер перед созданием, чтобы не было дублей
+    chartBox.innerHTML = '';
+
     var chart = LightweightCharts.createChart(chartBox, {
-        layout: {
-            background: { color: '#181a20' },
-            textColor: '#d1d4dc',
-        },
-        grid: {
-            vertLines: { color: '#2b3139' },
-            horzLines: { color: '#2b3139' },
-        },
+        layout: { background: { color: '#181a20' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#2b3139' }, horzLines: { color: '#2b3139' } },
         width: chartBox.clientWidth,
-        height: 400,
+        height: 400
     });
 
-    // ИСПРАВЛЕННЫЙ МЕТОД:
-    candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad',
-        downColor: '#ff3a33',
-        borderUpColor: '#00ffad',
-        borderDownColor: '#ff3a33',
-        wickUpColor: '#00ffad',
-        wickDownColor: '#ff3a33',
+    // Универсальный метод добавления свечей (работает везде)
+    var candleSeries = chart.addCandlestickSeries({
+        upColor: '#00ffad', downColor: '#ff3a33',
+        borderUpColor: '#00ffad', borderDownColor: '#ff3a33',
+        wickUpColor: '#00ffad', wickDownColor: '#ff3a33'
     });
 
-    // Подключение к Binance
     var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
     
     binanceSocket.onmessage = function(event) {
@@ -45,14 +36,8 @@ function startChart() {
             close: parseFloat(k.c)
         });
         var priceDiv = document.getElementById('livePrice');
-        if (priceDiv) {
-            priceDiv.innerText = parseFloat(k.c).toFixed(2);
-        }
+        if (priceDiv) priceDiv.innerText = parseFloat(k.c).toFixed(2);
     };
-
-    window.addEventListener('resize', function() {
-        chart.applyOptions({ width: chartBox.clientWidth });
-    });
 }
 
 function openTab(name) {
@@ -66,7 +51,5 @@ function openTab(name) {
 window.onload = function() {
     startChart();
     var qrImg = document.getElementById('qrCode');
-    if (qrImg) {
-        qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + BTC_ADDR;
-    }
+    if (qrImg) qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + BTC_ADDR;
 };
