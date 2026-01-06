@@ -3,116 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OWNER-EX PRO | Trading Terminal</title>
+    <title>OWNER-EX | Pocket Edition</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        :root { --green: #00ffad; --red: #ff3a33; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --yellow: #fcd535; --text: #d1d4dc; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
+        :root { 
+            --bg-deep: #040d08; --panel-bg: #0a1f14; --item-bg: #0d2b1c;
+            --accent: #00e676; --accent-dark: #00c853; --red: #ff5252;
+            --border: #1a3a2a; --text: #90a4ae;
+        }
         
-        /* Шапка */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: var(--card); border-bottom: 1px solid var(--border); height: 60px; }
-        .logo { color: var(--yellow); font-weight: bold; font-size: 20px; letter-spacing: 1px; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
-        .balance-display { background: rgba(0,255,173,0.1); border: 1px solid var(--green); padding: 5px 15px; border-radius: 5px; color: var(--green); font-family: monospace; font-weight: bold; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg-deep); color: white; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
+
+        /* Левая панель - Узкая и стильная */
+        .sidebar { width: 50px; background: var(--panel-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; position: fixed; height: 100%; z-index: 100; }
+        .side-btn { width: 100%; padding: 15px 0; cursor: pointer; text-align: center; color: var(--text); font-size: 18px; transition: 0.2s; }
+        .side-btn:hover { color: var(--accent); background: var(--item-bg); }
+        .side-btn.active { color: var(--accent); border-left: 2px solid var(--accent); background: linear-gradient(90deg, rgba(0,230,118,0.1) 0%, transparent 100%); }
+
+        /* Верхний бар */
+        .top-header { height: 45px; background: var(--panel-bg); border-bottom: 1px solid var(--border); margin-left: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+        .asset-selector { background: var(--item-bg); border: 1px solid var(--border); padding: 4px 12px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+
+        /* Основной контент */
+        .viewport { margin-left: 50px; height: calc(100vh - 45px); display: flex; }
+        .chart-section { flex-grow: 1; position: relative; background: var(--bg-deep); }
         
-        /* Основной макет */
-        .main-container { display: grid; grid-template-columns: 240px 1fr 300px; height: calc(100vh - 60px); }
+        /* Правая торговая панель - Копия Pocket */
+        .trade-panel { width: 260px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         
-        /* Левая панель (Биржа / Рефералы) */
-        .left-panel { background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .nav-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.3s; color: var(--text); }
-        .nav-item:hover, .nav-item.active { background: var(--bg); color: var(--yellow); }
+        .control-block { background: var(--item-bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; position: relative; }
+        .label { font-size: 10px; color: var(--text); text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .row { display: flex; align-items: center; justify-content: space-between; }
+        .row input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; width: 80px; outline: none; text-align: center; }
+        .math-btn { color: var(--text); cursor: pointer; font-size: 20px; user-select: none; width: 30px; text-align: center; }
+        .math-btn:hover { color: white; }
 
-        /* Центр (График) */
-        .chart-section { position: relative; background: var(--bg); }
-        #tradeTimer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--yellow); color: var(--yellow); z-index: 10; display: none; font-weight: bold; }
+        /* Кнопки BUY/SELL */
+        .action-btn { height: 75px; border-radius: 6px; border: none; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; transition: 0.1s; }
+        .up-btn { background: var(--accent); color: #000; box-shadow: 0 4px 0 #009d51; }
+        .down-btn { background: var(--red); color: #fff; box-shadow: 0 4px 0 #b71c1c; margin-top: 5px; }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        .action-btn span { font-size: 24px; }
+        
+        .profit-label { text-align: center; font-size: 22px; color: var(--accent); font-weight: bold; margin: 10px 0; }
 
-        /* Правая панель (Касса / Сделки) */
-        .right-panel { background: var(--card); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .panel-title { font-size: 12px; color: #848e9c; text-transform: uppercase; margin-bottom: 10px; }
-        .trade-input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 16px; outline: none; }
-        .trade-input:focus { border-color: var(--yellow); }
-
-        /* Кнопки */
-        .btn-buy { background: var(--green); color: black; padding: 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-sell { background: var(--red); color: white; padding: 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-buy:active, .btn-sell:active { transform: scale(0.95); }
-
-        /* Профиль (Модальное окно) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); width: 350px; text-align: center; }
-        .close-btn { float: right; cursor: pointer; color: #848e9c; }
+        /* Плашка результата */
+        #notify { position: fixed; bottom: 20px; left: 70px; padding: 12px 25px; border-radius: 4px; display: none; font-weight: bold; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">OWNER-EX PRO</div>
-    <div class="header-right">
-        <div id="priceDisplay" style="font-family: monospace; color: #848e9c;">BTC/USDT: 0.00</div>
-        <div class="balance-display" id="userBalance">1000.00 $</div>
-        <button onclick="openModal('profileModal')" style="background:var(--border); color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Профиль 👤</button>
-    </div>
-</header>
+<div class="sidebar">
+    <div class="side-btn active">📊</div>
+    <div class="side-btn">💳</div>
+    <div class="side-btn">🏆</div>
+    <div class="side-btn">📢</div>
+    <div class="side-btn" style="margin-top: auto; border-top: 1px solid var(--border);">👤</div>
+</div>
 
-<div class="main-container">
-    <div class="left-panel">
-        <div class="nav-item active">📊 БИРЖА</div>
-        <div class="nav-item" onclick="alert('Касса временно на техобслуживании')">💳 КАССА</div>
-        <div class="nav-item" onclick="openModal('refModal')">👥 РЕФЕРАЛЫ</div>
-        <div class="nav-item" style="margin-top: auto; color: var(--red);" onclick="location.reload()">ВЫХОД ➔</div>
+<div class="top-header">
+    <div class="asset-selector">
+        <span style="color:var(--accent)">★</span> 
+        <b>BTC/USDT</b> 
+        <span style="background:var(--accent); color:black; font-size:9px; padding:1px 3px; border-radius:2px;">OTC</span>
     </div>
-
-    <div class="chart-section" id="chartBox">
-        <div id="tradeTimer">ВРЕМЯ: <span id="timerValue">00:00</span></div>
-    </div>
-
-    <div class="right-panel">
-        <div>
-            <div class="panel-title">Сумма сделки</div>
-            <input type="number" id="amount" class="trade-input" value="100">
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div style="text-align: right;">
+            <div style="font-size: 10px; color: var(--text);">Демо счёт</div>
+            <div id="balance" style="font-weight: bold; color: var(--accent);">$1,000.00</div>
         </div>
-        <div>
-            <div class="panel-title">Время экспирации</div>
-            <select id="time" class="trade-input">
-                <option value="1">1 МИНУТА</option>
-                <option value="2">2 МИНУТЫ</option>
-                <option value="5">5 МИНУТ</option>
-            </select>
+        <button style="background:var(--accent); border:none; padding:5px 12px; border-radius:3px; font-weight:bold; cursor:pointer;">Пополнить</button>
+    </div>
+</div>
+
+<div class="viewport">
+    <div class="chart-section" id="tradingView">
         </div>
-        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                <span style="color: #848e9c;">Доходность:</span>
-                <span style="color: var(--green);">+82%</span>
+    
+    <div class="trade-panel">
+        <div class="control-block">
+            <span class="label">Время</span>
+            <div class="row">
+                <span class="math-btn" onclick="changeTime(-1)">−</span>
+                <input type="text" id="timeInput" value="M1" readonly>
+                <span class="math-btn" onclick="changeTime(1)">+</span>
             </div>
-            <button class="btn-buy" onclick="startTrade('up')">ВЫШЕ ↑</button>
-            <button class="btn-sell" onclick="startTrade('down')">НИЖЕ ↓</button>
         </div>
+
+        <div class="control-block">
+            <span class="label">Сумма инвестиции</span>
+            <div class="row">
+                <span class="math-btn" onclick="changeAmount(-10)">−</span>
+                <input type="number" id="amountInput" value="10">
+                <span class="math-btn" onclick="changeAmount(10)">+</span>
+            </div>
+        </div>
+
+        <div class="profit-label">82%</div>
+
+        <button class="action-btn up-btn" onclick="execTrade('up')">
+            <span>↑</span>
+            ВЫШЕ
+        </button>
+
+        <button class="action-btn down-btn" onclick="execTrade('down')">
+            <span>↓</span>
+            НИЖЕ
+        </button>
     </div>
 </div>
 
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('profileModal')">✖</span>
-        <h3>Личный кабинет</h3>
-        <p style="color: #848e9c;">ID: 99821 (Хозяин)</p>
-        <hr border="0" style="border-top:1px solid var(--border); margin: 20px 0;">
-        <button class="trade-input" style="background: var(--border); cursor:pointer;">Сменить пароль</button>
-        <button class="trade-input" style="background: var(--red); margin-top:10px; cursor:pointer;" onclick="location.reload()">Выйти из аккаунта</button>
-    </div>
-</div>
+<div id="notify"></div>
 
-<div id="refModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('refModal')">✖</span>
-        <h3>Реферальная система</h3>
-        <p>Ваша ссылка:</p>
-        <input type="text" class="trade-input" value="owner-ex.pro/ref/777" readonly>
-        <p style="font-size: 12px; color: var(--green); margin-top: 15px;">Получайте 5% от каждой сделки партнера!</p>
-    </div>
-</div>
-
-<script src="app.js?v=9.0"></script>
+<script src="app.js?v=15.0"></script>
 </body>
 </html>
 
