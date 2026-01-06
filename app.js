@@ -1,36 +1,43 @@
-var OWNER_WALLET = "ВАШ_АДРЕС_METAMASK";
 var BTC_ADDR = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
 
 function startChart() {
     var chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    chartBox.innerHTML = ''; // Очистка
+    chartBox.innerHTML = ''; // Очистка старого мусора
 
-    // Настройки для Lightweight Charts v4.0+
+    // Создаем график по правилам версии 3.8
     var chart = LightweightCharts.createChart(chartBox, {
+        width: chartBox.clientWidth,
+        height: 400,
         layout: {
-            background: { color: '#181a20' },
+            backgroundColor: '#181a20',
             textColor: '#d1d4dc',
         },
         grid: {
             vertLines: { color: '#2b3139' },
             horzLines: { color: '#2b3139' },
         },
-        width: chartBox.clientWidth,
-        height: 400,
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: false,
+        },
     });
 
-    // В НОВОЙ ВЕРСИИ НЕТ СЛОВА "SERIES" В ЭТОМ МЕТОДЕ (или синтаксис изменился)
-    // Попробуем самый надежный вариант для v4:
+    // В версии 3.8 это ОБЯЗАТЕЛЬНО сработает
     var candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', 
-        downColor: '#ff3a33', 
-        borderVisible: false,
-        wickUpColor: '#00ffad', 
-        wickDownColor: '#ff3a33'
+        upColor: '#00ffad',
+        downColor: '#ff3a33',
+        borderUpColor: '#00ffad',
+        borderDownColor: '#ff3a33',
+        wickUpColor: '#00ffad',
+        wickDownColor: '#ff3a33',
     });
 
+    // Подключение к данным
     var binanceSocket = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
     
     binanceSocket.onmessage = function(event) {
@@ -46,14 +53,11 @@ function startChart() {
         var priceDiv = document.getElementById('livePrice');
         if (priceDiv) priceDiv.innerText = parseFloat(k.c).toFixed(2);
     };
-}
 
-function openTab(name) {
-    var tabs = document.getElementsByClassName('tab-content');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].style.display = 'none';
-    }
-    document.getElementById(name).style.display = 'block';
+    // Чтобы график не ломался при повороте телефона
+    window.addEventListener('resize', function() {
+        chart.applyOptions({ width: chartBox.clientWidth });
+    });
 }
 
 window.onload = function() {
