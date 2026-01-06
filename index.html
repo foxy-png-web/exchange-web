@@ -5,35 +5,38 @@
     <title>OWNER-EX</title>
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        /* Принудительный темный дизайн, если внешние стили не подгрузятся */
-        body { background: #0b0e11 !important; color: #ffffff !important; font-family: sans-serif; margin: 0; padding: 20px; }
+        /* Темная тема Хозяина */
+        body { background: #0b0e11 !important; color: white !important; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
         .tab-content { display: none; }
         #trade { display: block; }
-        .card { background: #181a20; padding: 20px; border-radius: 15px; border: 1px solid #2b3139; margin-top: 20px; }
-        .btn-group { display: flex; gap: 10px; }
-        button { background: #2b3139; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+        .card { background: #181a20; padding: 20px; border-radius: 12px; border: 1px solid #2b3139; margin-top: 15px; }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { background: #2b3139; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         button:hover { background: #fcd535; color: black; }
-        #livePrice { color: #00ffad; font-weight: bold; font-size: 24px; }
+        #livePrice { color: #00ffad; font-size: 28px; font-weight: bold; }
+        #qrCode { background: white; padding: 10px; border-radius: 8px; margin: 15px auto; display: block; width: 150px; height: 150px; }
     </style>
 </head>
 <body>
-    <div class="btn-group">
-        <button onclick="openTab('trade')">Биржа</button>
+    <div class="nav">
+        <button onclick="openTab('trade')">Торговля</button>
         <button onclick="openTab('wallet')">Кошелек</button>
     </div>
 
     <div id="trade" class="tab-content">
         <div class="card">
-            <div style="margin-bottom: 15px;">BTC / USDT: <span id="livePrice">0.00</span></div>
-            <div id="chartContainer" style="width: 100%; height: 400px;"></div>
+            <div>BTC / USDT</div>
+            <div id="livePrice">0.00</div>
+            <div id="chartContainer" style="width: 100%; height: 400px; margin-top: 15px;"></div>
         </div>
     </div>
 
     <div id="wallet" class="tab-content">
         <div class="card" style="text-align: center;">
-            <h2>Пополнение BTC</h2>
-            <img id="qrCode" style="background: white; padding: 10px; border-radius: 10px; margin: 20px 0;">
-            <p style="font-family: monospace; font-size: 14px; color: #848e9c;">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+            <h3>Пополнение депозита BTC</h3>
+            <p style="color: #848e9c; font-size: 14px;">Отправьте монеты на адрес ниже:</p>
+            <img id="qrCode" src="" alt="QR">
+            <code style="background: #0b0e11; padding: 10px; display: block; border-radius: 4px; font-size: 12px;">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</code>
         </div>
     </div>
 
