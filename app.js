@@ -7,28 +7,28 @@ function startChart() {
     var chartBox = document.getElementById('chartContainer');
     if (!chartBox) return;
 
-    // Создаем график по новым правилам библиотеки v4+
+    // Создаем график (настройки для версии 4.x)
     var chart = LightweightCharts.createChart(chartBox, {
-        layout: { 
-            background: { color: '#181a20' }, 
-            textColor: '#d1d4dc' 
+        layout: {
+            background: { color: '#181a20' },
+            textColor: '#d1d4dc',
         },
-        grid: { 
-            vertLines: { color: '#2b3139' }, 
-            horzLines: { color: '#2b3139' } 
+        grid: {
+            vertLines: { color: '#2b3139' },
+            horzLines: { color: '#2b3139' },
         },
         width: chartBox.clientWidth,
-        height: 400
+        height: 400,
     });
 
-    // ИСПРАВЛЕНИЕ: Новый метод добавления свечей
+    // ИСПРАВЛЕННЫЙ МЕТОД:
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', 
+        upColor: '#00ffad',
         downColor: '#ff3a33',
-        borderUpColor: '#00ffad', 
+        borderUpColor: '#00ffad',
         borderDownColor: '#ff3a33',
-        wickUpColor: '#00ffad', 
-        wickDownColor: '#ff3a33'
+        wickUpColor: '#00ffad',
+        wickDownColor: '#ff3a33',
     });
 
     // Подключение к Binance
