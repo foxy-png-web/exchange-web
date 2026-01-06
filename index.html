@@ -155,4 +155,32 @@
         const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1s');
         ws.onmessage = (e) => {
             const k = JSON.parse(e.data).k;
+            const t = Math.floor(k.t / 1000);
+            const blockStart = t - (t % AGG);
+            
+            if (!currentCandle || blockStart > currentCandle.time) {
+                currentCandle = { time: blockStart, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c) };
+            } else {
+                currentCandle.close = parseFloat(k.c);
+                if (parseFloat(k.h) > currentCandle.high) currentCandle.high = parseFloat(k.h);
+                if (parseFloat(k.l) < currentCandle.low) currentCandle.low = parseFloat(k.l);
+            }
+            candleSeries.update(currentCandle);
+        };
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
     
+    function cashAction(type) { alert(type + ': Система платежей временно на техобслуживании. Попробуйте позже.'); }
+    
+    function saveName() {
+        const name = document.getElementById('newName').value;
+        if(name) document.getElementById('curName').innerText = name;
+        document.getElementById('pEdit').style.display='none';
+        document.getElementById('pView').style.display='block';
+    }
+</script>
+</body>
+</html>
+
