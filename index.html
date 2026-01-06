@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OWNER-EX ELITE | NEXT GEN</title>
+    <title>OWNER-EX PRO | ELITE TERMINAL</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { 
@@ -10,251 +10,200 @@
             --red: #ff3b5c; --green: #00f08b; --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
         }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: 'Inter', 'Segoe UI', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
 
-        /* Верхняя панель в стиле Cyberpunk */
         header { 
-            height: 65px; background: var(--card); display: flex; align-items: center; 
+            height: 60px; background: var(--card); display: flex; align-items: center; 
             justify-content: space-between; padding: 0 25px; border-bottom: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-        .logo-glow { 
-            font-size: 22px; font-weight: 900; color: var(--accent); 
-            text-shadow: 0 0 15px var(--accent); letter-spacing: 2px;
-        }
+        .logo { font-size: 20px; font-weight: 900; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
 
-        .main-layout { display: flex; height: calc(100vh - 65px); padding: 10px; gap: 10px; }
+        .main-layout { display: flex; height: calc(100vh - 60px); padding: 10px; gap: 10px; }
 
-        /* Боковое меню с закруглением */
         .sidebar { 
             width: 70px; background: var(--card); border-radius: 20px; 
-            display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 30px;
+            display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 25px;
             border: 1px solid var(--border);
         }
         .nav-icon { 
             width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; transition: 0.3s; background: var(--glass);
         }
-        .nav-icon:hover { background: var(--accent); color: black; transform: scale(1.1); }
+        .nav-icon:hover { background: var(--accent); color: black; }
 
-        /* Центр: График в рамке */
-        .chart-wrapper { 
+        .chart-container { 
             flex: 1; display: flex; flex-direction: column; background: var(--card); 
-            border-radius: 24px; border: 1px solid var(--border); overflow: hidden;
-            position: relative;
+            border-radius: 24px; border: 1px solid var(--border); overflow: hidden; position: relative;
         }
         .chart-header { 
-            padding: 15px 25px; display: flex; gap: 20px; align-items: center;
-            background: rgba(255,255,255,0.02);
-        }
-        select, .btn-sm { 
-            background: var(--glass); border: 1px solid var(--border); color: white;
-            padding: 8px 15px; border-radius: 10px; cursor: pointer; outline: none;
+            padding: 10px 20px; display: flex; gap: 15px; align-items: center;
+            background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
         }
 
-        #chartView { flex: 1; width: 100%; }
+        #tvChart { flex: 1; width: 100%; }
 
-        /* Правая панель сделок */
-        .trade-card { 
-            width: 320px; background: var(--card); border-radius: 24px; 
-            border: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; gap: 20px;
+        .trade-panel { 
+            width: 300px; background: var(--card); border-radius: 24px; 
+            border: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px;
         }
-        .input-box { 
-            background: var(--glass); padding: 15px; border-radius: 15px; 
-            border: 1px solid var(--border); transition: 0.3s;
-        }
-        .input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,255,173,0.2); }
-        .input-box label { display: block; font-size: 11px; color: #848e9c; margin-bottom: 5px; }
-        .input-box input { 
-            background: transparent; border: none; color: white; font-size: 22px; 
-            font-weight: bold; width: 100%; outline: none; 
-        }
+        .input-box { background: var(--glass); padding: 12px; border-radius: 15px; border: 1px solid var(--border); }
+        .input-box label { display: block; font-size: 10px; color: #848e9c; margin-bottom: 4px; }
+        .input-box input { background: transparent; border: none; color: white; font-size: 20px; font-weight: bold; width: 100%; outline: none; }
 
-        .trade-btn { 
-            height: 80px; border-radius: 18px; border: none; font-weight: 900; 
-            font-size: 20px; cursor: pointer; color: white; transition: 0.2s;
-            text-transform: uppercase;
-        }
-        .up { background: linear-gradient(135deg, #00f08b, #00b368); box-shadow: 0 10px 20px rgba(0, 240, 139, 0.2); }
-        .down { background: linear-gradient(135deg, #ff3b5c, #d61f3e); box-shadow: 0 10px 20px rgba(255, 59, 92, 0.2); }
-        .trade-btn:active { transform: scale(0.95); }
+        .trade-btn { height: 70px; border-radius: 15px; border: none; font-weight: 900; font-size: 18px; cursor: pointer; color: white; transition: 0.2s; }
+        .up { background: var(--green); box-shadow: 0 4px 15px rgba(0, 240, 139, 0.2); }
+        .down { background: var(--red); box-shadow: 0 4px 15px rgba(255, 59, 92, 0.2); }
+        .trade-btn:active { transform: scale(0.96); }
 
-        /* Модальные окна */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
-            display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(10px);
-        }
-        .modal-body { 
-            background: var(--card); width: 450px; border-radius: 30px; 
-            padding: 40px; border: 1px solid var(--accent); position: relative;
-        }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--card); width: 400px; border-radius: 25px; padding: 30px; border: 1px solid var(--accent); }
 
-        /* Стильная полоса времени сделки */
-        .time-line {
-            position: absolute; bottom: 0; left: 0; height: 4px;
-            background: var(--accent); width: 0%; transition: linear;
-        }
+        .time-line { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent); }
+        
+        select { background: #1e2329; color: white; border: 1px solid var(--border); padding: 5px; border-radius: 5px; outline: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-glow">OWNER-EX PRO</div>
-    <div style="display: flex; gap: 30px;">
-        <div id="balance" style="font-size: 20px; font-weight: 800; color: var(--green);">$12,450.00</div>
-    </div>
+    <div class="logo">OWNER-EX PRO</div>
+    <div id="balanceDisplay" style="font-size: 18px; font-weight: bold; color: var(--green);">$10,000.00</div>
 </header>
 
 <div class="main-layout">
     <div class="sidebar">
-        <div class="nav-icon active" title="Торговля">📈</div>
-        <div class="nav-icon" title="Касса" onclick="openM('cashM')">💳</div>
-        <div class="nav-icon" title="Профиль" onclick="openM('profileM')">👤</div>
-        <div class="nav-icon" title="Настройки">⚙️</div>
+        <div class="nav-icon" onclick="location.reload()">📈</div>
+        <div class="nav-icon" onclick="openModal('cashModal')">💳</div>
+        <div class="nav-icon" onclick="openModal('profileModal')">👤</div>
     </div>
 
-    <div class="chart-wrapper">
+    <div class="chart-container">
         <div class="chart-header">
-            <select onchange="changeSymbol(this.value)">
-                <option value="btcusdt">BTC / USDT</option>
-                <option value="ethusdt">ETH / USDT</option>
-                <option value="solusdt">SOL / USDT</option>
+            <select onchange="window.currentSymbol = this.value; connectWS();">
+                <option value="btcusdt">BTC/USDT</option>
+                <option value="ethusdt">ETH/USDT</option>
             </select>
-            <select id="timeframe">
-                <option>10 сек</option>
-                <option selected>1 мин</option>
-                <option>5 мин</option>
-                <option>1 час</option>
-                <option>1 день</option>
-            </select>
-            <button class="btn-sm" onclick="setChartType('candles')">🕯 Свечи</button>
-            <button class="btn-sm" onclick="setChartType('area')">📈 Линия</button>
+            <span style="font-size: 12px; color: var(--accent);">Фиксация: 10 сек</span>
+            <button onclick="setChartStyle('candles')" style="cursor:pointer; background:none; border:1px solid var(--border); color:white; border-radius:4px;">🕯 Свечи</button>
+            <button onclick="setChartStyle('area')" style="cursor:pointer; background:none; border:1px solid var(--border); color:white; border-radius:4px;">📈 Линия</button>
         </div>
-        <div id="chartView"></div>
-        <div id="tradeProgress" class="time-line"></div>
+        <div id="tvChart"></div>
+        <div id="progressLine" class="time-line"></div>
     </div>
 
-    <div class="trade-card">
+    <div class="trade-panel">
         <div class="input-box">
-            <label>СУММА СДЕЛКИ</label>
-            <input type="number" id="sum" value="100">
+            <label>СУММА ИНВЕСТИЦИИ</label>
+            <input type="number" id="amount" value="100">
         </div>
         <div class="input-box">
-            <label>ВРЕМЯ (МИН)</label>
-            <input type="number" id="time" value="1" min="1" max="60">
+            <label>ВРЕМЯ СДЕЛКИ (СЕК)</label>
+            <input type="number" id="tradeSec" value="30">
         </div>
-        
-        <div style="text-align: center; margin: 10px 0;">
-            <div style="color: var(--accent); font-size: 40px; font-weight: 900;">+85%</div>
-            <div style="font-size: 12px; color: #848e9c;">Чистая прибыль</div>
-        </div>
-
-        <button class="trade-btn up" onclick="startTrade('UP')">Выше ↑</button>
-        <button class="trade-btn down" onclick="startTrade('DOWN')">Ниже ↓</button>
+        <div style="text-align: center; color: var(--accent); font-size: 32px; font-weight: 900;">+82%</div>
+        <button class="trade-btn up" onclick="execTrade('ВЫШЕ')">ВЫШЕ ↑</button>
+        <button class="trade-btn down" onclick="execTrade('НИЖЕ')">НИЖЕ ↓</button>
     </div>
 </div>
 
-<div id="profileM" class="modal">
-    <div class="modal-body">
-        <h2 style="color: var(--accent);">Личный кабинет</h2>
-        <div id="viewMode">
-            <p>Имя: <span id="uName">Хозяин</span></p>
-            <p>Телефон: <span id="uPhone">+7 (999) 000-00-00</span></p>
-            <button class="btn-sm" style="width: 100%; padding: 15px;" onclick="toggleEdit(true)">Изменить данные</button>
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color:var(--accent)">Профиль</h2>
+        <div id="profDisplay">
+            <p>Имя: <span id="dspName">Хозяин</span></p>
+            <p>Тел: <span id="dspPhone">+7 (000) 000-00-00</span></p>
+            <button class="trade-btn up" style="height:40px; width:100%; font-size:14px;" onclick="toggleEdit(true)">Изменить данные</button>
         </div>
-        <div id="editMode" style="display:none;">
-            <input type="text" id="newName" class="btn-sm" style="width:90%; margin-bottom:10px;" placeholder="Новое имя">
-            <input type="text" id="newPhone" class="btn-sm" style="width:90%; margin-bottom:10px;" placeholder="Новый телефон">
-            <button class="trade-btn up" style="height:50px; font-size:14px; width:100%;" onclick="saveData()">Сохранить</button>
+        <div id="profEdit" style="display:none;">
+            <input type="text" id="inpName" class="input-box" style="width:90%; margin-bottom:10px;" placeholder="Имя">
+            <input type="text" id="inpPhone" class="input-box" style="width:90%; margin-bottom:10px;" placeholder="Телефон">
+            <button class="trade-btn up" style="height:40px; width:100%; font-size:14px;" onclick="saveProfile()">Сохранить</button>
         </div>
-        <button onclick="closeM()" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Закрыть</button>
+        <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Закрыть</button>
     </div>
 </div>
 
-<div id="cashM" class="modal">
-    <div class="modal-body">
-        <h2 style="color: var(--accent);">Финансы</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="input-box" style="cursor:pointer; text-align:center;">
-                <h3>ДЕПОЗИТ</h3>
-                <small>Пополнить счет</small>
-            </div>
-            <div class="input-box" style="cursor:pointer; text-align:center;">
-                <h3>ВЫВОД</h3>
-                <small>Запросить средства</small>
-            </div>
-        </div>
-        <button onclick="closeM()" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Закрыть</button>
+<div id="cashModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color:var(--accent)">Касса</h2>
+        <div class="input-box" style="text-align:center; margin-bottom:10px; cursor:pointer;">ДЕПОЗИТ</div>
+        <div class="input-box" style="text-align:center; cursor:pointer;">ВЫВОД СРЕДСТВ</div>
+        <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Закрыть</button>
     </div>
 </div>
 
 <script>
-    let chart, candleSeries, areaSeries, currentSymbol = 'btcusdt';
-    let balance = 12450;
+    let chart, candleSeries, areaSeries;
+    let currentCandle = null;
+    let balance = 10000;
+    window.currentSymbol = 'btcusdt';
+    const AGGREGATION = 10; // 10 секунд
 
-    // Инициализация прогруженного графика
-    function init() {
-        const chartElement = document.getElementById('chartView');
-        chart = LightweightCharts.createChart(chartElement, {
+    function initChart() {
+        const container = document.getElementById('tvChart');
+        chart = LightweightCharts.createChart(container, {
             layout: { background: { color: '#0c1219' }, textColor: '#848e9c' },
             grid: { vertLines: { color: '#161c24' }, horzLines: { color: '#161c24' } },
-            timeScale: { borderColor: '#161c24', timeVisible: true, secondsVisible: true }
+            timeScale: { borderColor: '#161c24', timeVisible: true, secondsVisible: true },
         });
 
-        candleSeries = chart.addCandlestickSeries({ upColor: '#00f08b', downColor: '#ff3b5c' });
+        candleSeries = chart.addCandlestickSeries({ upColor: '#00f08b', downColor: '#ff3b5c', borderVisible: false });
         areaSeries = chart.addAreaSeries({ visible: false, lineColor: '#00ffad', topColor: 'rgba(0, 255, 173, 0.3)', bottomColor: 'transparent' });
 
         connectWS();
-        window.onresize = () => chart.applyOptions({ width: chartElement.clientWidth, height: chartElement.clientHeight });
+        window.addEventListener('resize', () => chart.applyOptions({ width: container.clientWidth, height: container.clientHeight }));
     }
 
     function connectWS() {
-        const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${currentSymbol}@kline_1m`);
-        ws.onmessage = (e) => {
+        if (window.ws) window.ws.close();
+        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${window.currentSymbol}@kline_1s`);
+        
+        window.ws.onmessage = (e) => {
             const k = JSON.parse(e.data).k;
-            const data = { time: k.t / 1000, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c) };
-            candleSeries.update(data);
-            areaSeries.update({ time: data.time, value: data.close });
+            const t = Math.floor(k.t / 1000);
+            const blockStart = t - (t % AGGREGATION);
+            
+            if (!currentCandle || blockStart > currentCandle.time) {
+                currentCandle = { time: blockStart, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c) };
+            } else {
+                currentCandle.close = parseFloat(k.c);
+                if (parseFloat(k.h) > currentCandle.high) currentCandle.high = parseFloat(k.h);
+                if (parseFloat(k.l) < currentCandle.low) currentCandle.low = parseFloat(k.l);
+            }
+            candleSeries.update(currentCandle);
+            areaSeries.update({ time: currentCandle.time, value: currentCandle.close });
         };
     }
 
-    function setChartType(t) {
-        candleSeries.applyOptions({ visible: t === 'candles' });
-        areaSeries.applyOptions({ visible: t === 'area' });
+    function setChartStyle(type) {
+        candleSeries.applyOptions({ visible: type === 'candles' });
+        areaSeries.applyOptions({ visible: type === 'area' });
     }
 
-    function startTrade(dir) {
-        const timeInput = document.getElementById('time').value;
-        const progress = document.getElementById('tradeProgress');
-        
-        progress.style.transition = 'none';
-        progress.style.width = '0%';
-        
+    function execTrade(dir) {
+        const sec = document.getElementById('tradeSec').value;
+        const bar = document.getElementById('progressLine');
+        bar.style.transition = 'none'; bar.style.width = '0%';
         setTimeout(() => {
-            progress.style.transition = `width ${timeInput * 60}s linear`;
-            progress.style.width = '100%';
+            bar.style.transition = `width ${sec}s linear`;
+            bar.style.width = '100%';
         }, 50);
-
-        setTimeout(() => {
-            alert("Время вышло! Результат сделки: В ПЛЮСЕ!");
-            progress.style.width = '0%';
-        }, timeInput * 60000);
+        setTimeout(() => { alert("Сделка завершена!"); bar.style.width = '0%'; }, sec * 1000);
     }
 
-    // Профиль функции
-    function openM(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeM() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
-    function toggleEdit(edit) {
-        document.getElementById('viewMode').style.display = edit ? 'none' : 'block';
-        document.getElementById('editMode').style.display = edit ? 'block' : 'none';
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    function toggleEdit(e) { 
+        document.getElementById('profDisplay').style.display = e ? 'none' : 'block'; 
+        document.getElementById('profEdit').style.display = e ? 'block' : 'none'; 
     }
-    function saveData() {
-        document.getElementById('uName').innerText = document.getElementById('newName').value || 'Хозяин';
-        document.getElementById('uPhone').innerText = document.getElementById('newPhone').value || '+7 (999) 000-00-00';
+    function saveProfile() {
+        document.getElementById('dspName').innerText = document.getElementById('inpName').value || 'Хозяин';
+        document.getElementById('dspPhone').innerText = document.getElementById('inpPhone').value || '+7 (000) 000-00-00';
         toggleEdit(false);
     }
 
-    init();
+    initChart();
 </script>
 </body>
 </html>
