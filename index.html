@@ -1,71 +1,123 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>OWNER-EX | Pocket Pro</title>
-    <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
-    <style>
-        :root { 
-            --bg-deep: #040d08; --panel-bg: #0a1f14; --item-bg: #0d2b1c;
-            --accent: #00e676; --red: #ff5252; --text: #90a4ae; --border: #1a3a2a;
-        }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg-deep); color: white; font-family: sans-serif; overflow: hidden; }
-        .sidebar { width: 50px; background: var(--panel-bg); border-right: 1px solid var(--border); position: fixed; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 15px; z-index: 100; }
-        .top-nav { height: 45px; background: var(--panel-bg); border-bottom: 1px solid var(--border); margin-left: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
-        .viewport { margin-left: 50px; height: calc(100vh - 45px); display: flex; }
-        .chart-section { flex-grow: 1; position: relative; }
-        .trade-panel { width: 260px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .control { background: var(--item-bg); border: 1px solid var(--border); padding: 8px; border-radius: 4px; }
-        .label { font-size: 10px; color: var(--text); text-transform: uppercase; }
-        .row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .math-btn { cursor: pointer; font-size: 20px; font-weight: bold; width: 30px; text-align: center; color: var(--accent); user-select: none; }
-        input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; width: 80px; text-align: center; outline: none; }
-        .action-btn { height: 70px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .up { background: var(--accent); color: black; }
-        .down { background: var(--red); color: white; }
-        .action-btn:active { transform: scale(0.96); }
-        #notify { position: fixed; bottom: 20px; left: 70px; padding: 10px 20px; border-radius: 4px; display: none; z-index: 1000; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div class="sidebar">
-    <div style="margin-bottom:20px; color:var(--accent)">📊</div>
-    <div style="margin-bottom:20px;">💰</div>
-    <div style="margin-bottom:20px;">👥</div>
-</div>
-
-<div class="top-nav">
-    <div style="background:var(--item-bg); padding:5px 10px; border-radius:3px; font-size:12px;">BTC/USDT <b>82%</b></div>
-    <div style="display:flex; gap:15px; align-items:center;">
-        <div style="text-align:right">
-            <div style="font-size:10px; color:var(--text)">Демо</div>
-            <div id="balance" style="color:var(--accent); font-weight:bold;">1000.00 $</div>
+<div id="authModal" class="auth-overlay">
+    <div class="auth-container">
+        <div class="auth-header">
+            <img src="https://cryptologos.cc/logos/crypto-com-coin-cro-logo.png" width="30">
+            <span>owner-ex.pro</span>
         </div>
-        <button style="background:var(--accent); border:none; padding:5px 10px; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
-    </div>
-</div>
 
-<div class="viewport">
-    <div class="chart-section" id="chart"></div>
-    <div class="trade-panel">
-        <div class="control">
-            <span class="label">Сумма</span>
-            <div class="row">
-                <span class="math-btn" id="minusAmt">−</span>
-                <input type="number" id="amount" value="10">
-                <span class="math-btn" id="plusAmt">+</span>
+        <div class="auth-content">
+            <div class="auth-tabs">
+                <button class="tab-btn" onclick="switchTab('login')">Вход</button>
+                <button class="tab-btn active" onclick="switchTab('reg')">Регистрация</button>
             </div>
+
+            <label class="input-label">Тип аккаунта</label>
+            <div class="account-types">
+                <div class="type-box active">
+                    <span>👤 Индивидуальный</span>
+                </div>
+                <div class="type-box">
+                    <span>🏛 Бизнес</span>
+                </div>
+            </div>
+
+            <label class="input-label">Адрес эл. почты</label>
+            <input type="email" class="auth-input" placeholder="Введите свой адрес эл. почты">
+
+            <div class="ref-code">Реферальный код (необязательно) ▾</div>
+
+            <div class="checkbox-row">
+                <input type="checkbox" id="news">
+                <label for="news">Я хочу получать эксклюзивные предложения и обновления от Owner-Ex</label>
+            </div>
+
+            <button class="main-auth-btn" onclick="closeAuth()">Создать аккаунт с электронной почтой</button>
+
+            <div class="divider"><span>или</span></div>
+
+            <button class="google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="18">
+                Продолжить с Google
+            </button>
+
+            <p class="auth-footer">
+                Отправляя свой адрес эл. почты, Вы подтверждаете, что прочли <a href="#">Уведомление о конфиденциальности</a>
+            </p>
         </div>
-        <div style="text-align:center; font-size:24px; color:var(--accent); font-weight:bold; margin:10px 0;">82%</div>
-        <button class="action-btn up" id="btnUp"><span>↑</span>ВЫШЕ</button>
-        <button class="action-btn down" id="btnDown"><span>↓</span>НИЖЕ</button>
     </div>
 </div>
 
-<div id="notify"></div>
+<style>
+    /* Стили окна как на скриншоте */
+    .auth-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); display: none; /* Скрыто по умолчанию */
+        justify-content: center; align-items: center; z-index: 9999;
+    }
 
-<script src="app.js?v=20.0"></script>
-</body>
-</html>
+    .auth-container {
+        width: 380px; background: #0f172a; border-radius: 20px;
+        border: 2px solid #00ffad; box-shadow: 0 0 20px rgba(0, 255, 173, 0.3);
+        overflow: hidden; animation: scaleIn 0.3s ease;
+    }
+
+    @keyframes scaleIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+    .auth-header {
+        background: linear-gradient(to bottom, #061c3a, #0f172a);
+        padding: 20px; text-align: center; border-bottom: 1px solid #1e293b;
+        color: white; font-weight: bold; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+
+    .auth-content { padding: 20px; }
+
+    .auth-tabs {
+        display: flex; background: #1e293b; border-radius: 10px; padding: 4px; margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        flex: 1; border: none; background: transparent; color: #94a3b8;
+        padding: 10px; cursor: pointer; border-radius: 8px; font-weight: bold;
+    }
+
+    .tab-btn.active { background: #2d3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    .input-label { color: #94a3b8; font-size: 12px; display: block; margin-bottom: 8px; }
+
+    .account-types { display: flex; gap: 10px; margin-bottom: 20px; }
+
+    .type-box {
+        flex: 1; padding: 12px; border: 1px solid #1e293b; border-radius: 10px;
+        text-align: center; color: white; cursor: pointer; font-size: 14px;
+    }
+
+    .type-box.active { background: #00ffad; color: black; font-weight: bold; }
+
+    .auth-input {
+        width: 100%; background: #1e293b; border: 1px solid #334155;
+        padding: 12px; border-radius: 10px; color: white; margin-bottom: 15px; box-sizing: border-box;
+    }
+
+    .ref-code { color: #94a3b8; font-size: 13px; cursor: pointer; margin-bottom: 15px; }
+
+    .checkbox-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 20px; }
+    .checkbox-row label { color: #94a3b8; font-size: 11px; line-height: 1.4; }
+
+    .main-auth-btn {
+        width: 100%; background: #00ffad; border: none; padding: 14px;
+        border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; margin-bottom: 15px;
+    }
+
+    .divider { text-align: center; border-bottom: 1px solid #1e293b; line-height: 0.1em; margin: 10px 0 20px; }
+    .divider span { background: #0f172a; padding: 0 10px; color: #64748b; font-size: 12px; }
+
+    .google-btn {
+        width: 100%; background: white; color: black; border: none; padding: 12px;
+        border-radius: 10px; font-weight: bold; cursor: pointer; display: flex;
+        align-items: center; justify-content: center; gap: 10px;
+    }
+
+    .auth-footer { color: #64748b; font-size: 10px; text-align: center; margin-top: 15px; line-height: 1.4; }
+    .auth-footer a { color: #3b82f6; text-decoration: none; }
+</style>
 
