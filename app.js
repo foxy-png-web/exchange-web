@@ -1,66 +1,58 @@
 let balance = 10000.00;
-let user = { email: '', name: 'Хозяин', surname: '', phone: '', bday: '' };
 let lastPrice = 0;
 let candleSeries;
 
-// СИСТЕМА ВХОДА
-function toggleAuth(type) {
-    const tabs = document.querySelectorAll('.tab');
-    tabs[0].classList.toggle('active', type === 'reg');
-    tabs[1].classList.toggle('active', type === 'login');
+// ПЕРЕКЛЮЧЕНИЕ ВХОД / РЕГИСТРАЦИЯ
+function switchAuth(mode) {
+    if (mode === 'login') {
+        document.getElementById('loginTab').classList.add('active');
+        document.getElementById('regTab').classList.remove('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('regForm').style.display = 'none';
+    } else {
+        document.getElementById('regTab').classList.add('active');
+        document.getElementById('loginTab').classList.remove('active');
+        document.getElementById('regForm').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+    }
 }
 
+// ВХОД В ТЕРМИНАЛ
 function startApp() {
-    user.email = document.getElementById('regEmail').value || 'guest@mail.ru';
-    document.getElementById('viewEmail').innerText = user.email;
+    const email = document.getElementById('logEmail').value || document.getElementById('regEmail').value || 'user@mail.ru';
+    document.getElementById('pEmail').innerText = email;
     
-    document.getElementById('authPage').style.opacity = '0';
-    setTimeout(() => {
-        document.getElementById('authPage').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        initChart();
-    }, 500);
+    document.getElementById('authPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    initChart();
 }
 
-// УПРАВЛЕНИЕ ДАННЫМИ ПРОФИЛЯ
-function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+// МОДАЛКИ
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
 
-function editData() {
-    document.getElementById('userDataView').style.display = 'none';
-    document.getElementById('userDataEdit').style.display = 'block';
+function showEdit() {
+    document.getElementById('profileView').style.display = 'none';
+    document.getElementById('profileEdit').style.display = 'block';
 }
 
-function saveData() {
-    user.name = document.getElementById('editName').value;
-    user.surname = document.getElementById('editSurname').value;
-    user.phone = document.getElementById('editPhone').value;
-    user.bday = document.getElementById('editBday').value;
-
-    document.getElementById('viewName').innerText = user.name || 'Не указано';
-    document.getElementById('viewSurname').innerText = user.surname || 'Не указано';
-    document.getElementById('viewPhone').innerText = user.phone || 'Не указано';
-    document.getElementById('viewBday').innerText = user.bday || 'Не указано';
-
-    document.getElementById('userDataView').style.display = 'block';
-    document.getElementById('userDataEdit').style.display = 'none';
+function saveProfile() {
+    document.getElementById('pName').innerText = document.getElementById('inName').value || 'Не указано';
+    document.getElementById('pPhone').innerText = document.getElementById('inPhone').value || 'Не указано';
+    document.getElementById('profileView').style.display = 'block';
+    document.getElementById('profileEdit').style.display = 'none';
 }
 
-// ГРАФИК В РАМКЕ
+// ГРАФИК
 function initChart() {
-    const chartDiv = document.getElementById('chartBox');
-    const chart = LightweightCharts.createChart(chartDiv, {
+    const container = document.getElementById('chartBox');
+    const chart = LightweightCharts.createChart(container, {
         layout: { background: { color: '#000' }, textColor: '#94a3b8' },
         grid: { vertLines: { color: '#0a1f14' }, horzLines: { color: '#0a1f14' } },
-        width: chartDiv.clientWidth,
-        height: chartDiv.clientHeight,
-        timeScale: { borderVisible: false, timeVisible: true }
+        width: container.clientWidth,
+        height: container.clientHeight,
     });
-
-    candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffad', downColor: '#ff5252', borderVisible: false,
-        wickUpColor: '#00ffad', wickDownColor: '#ff5252'
-    });
+    candleSeries = chart.addCandlestickSeries({ upColor: '#00ffad', downColor: '#ff5252' });
 
     const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
     ws.onmessage = (e) => {
@@ -69,30 +61,20 @@ function initChart() {
         candleSeries.update({
             time: k.t / 1000, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: lastPrice
         });
-        document.getElementById('priceLabel').innerText = "BTC/USDT: " + lastPrice.toFixed(2);
     };
-
-    window.onresize = () => chart.applyOptions({ width: chartDiv.clientWidth, height: chartDiv.clientHeight });
+    window.onresize = () => chart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
 }
 
-// ТОРГОВЛЯ
-function goTrade(type) {
-    const amount = parseFloat(document.getElementById('tradeAmt').value);
-    if (balance < amount) return alert("Недостаточно средств!");
-    
-    balance -= amount;
+// СДЕЛКА
+function makeTrade(type) {
+    const amt = parseFloat(document.getElementById('tradeAmt').value);
+    if (balance < amt) return alert("Мало денег!");
+    balance -= amt;
     document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
-    
-    // Эмуляция результата через 5 секунд
     setTimeout(() => {
-        const win = Math.random() > 0.5; // Просто для теста
-        if (win) {
-            balance += amount * 1.82;
-            alert("ВЫИГРЫШ!");
-        } else {
-            alert("ПРОИГРЫШ");
-        }
+        balance += amt * 1.82; // Для теста всегда вин
         document.getElementById('balanceDisp').innerText = "$" + balance.toFixed(2);
-    }, 5000);
+        alert("Сделка завершена!");
+    }, 3000);
 }
 
