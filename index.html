@@ -7,36 +7,26 @@
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { --green: #00ffad; --red: #ff3a33; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --yellow: #fcd535; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
-        
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--card); border-bottom: 1px solid var(--border); height: 50px; }
-        .balance-info { color: var(--green); font-weight: bold; font-family: monospace; font-size: 18px; }
-        .profile-icon { width: 32px; height: 32px; background: #2b3139; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
-
+        .balance-info { color: var(--green); font-weight: bold; font-size: 18px; }
         .main-layout { display: grid; grid-template-columns: 1fr 280px; height: calc(100vh - 50px); }
-        .chart-area { position: relative; background: var(--bg); }
+        .chart-area { position: relative; background: var(--bg); min-height: 300px; }
         .trade-area { background: var(--card); padding: 20px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
-
-        .trade-input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 16px; outline: none; }
-        .btn-up { background: var(--green); color: black; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-down { background: var(--red); color: white; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
-        
-        #tradeTimer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--yellow); display: none; z-index: 100; color: var(--yellow); font-weight: bold; }
-        
-        .profile-menu { display: none; position: absolute; top: 55px; right: 20px; width: 220px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; z-index: 1000; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .profile-menu.active { display: block; }
-        .menu-item { padding: 8px 0; cursor: pointer; font-size: 14px; border-bottom: 1px solid var(--border); }
-        .menu-item:last-child { border: none; }
+        .trade-input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 16px; }
+        .btn-up { background: var(--green); color: black; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-down { background: var(--red); color: white; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        #tradeTimer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--yellow); display: none; z-index: 100; color: var(--yellow); }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: bold; color: var(--yellow);">OWNER-EX <span style="font-size: 12px; color: #848e9c;">PRO</span></div>
+    <div style="font-weight: bold; color: var(--yellow);">OWNER-EX PRO</div>
     <div style="display: flex; align-items: center; gap: 15px;">
-        <div id="livePrice" style="color: #848e9c; font-family: monospace;">0.00</div>
+        <div id="livePrice" style="color: #848e9c; font-family: monospace;">Загрузка...</div>
         <div class="balance-info" id="topBalance">1000.00 $</div>
-        <div class="profile-icon" onclick="toggleProfile()">👤</div>
+        <div onclick="document.getElementById('profileMenu').classList.toggle('active')" style="cursor:pointer; background:#2b3139; padding:5px 10px; border-radius:5px;">Профиль 👤</div>
     </div>
 </header>
 
@@ -46,11 +36,6 @@
     </div>
     
     <div class="trade-area">
-        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-            <button style="flex:1; padding: 5px; background: var(--border); color: white; border: none; cursor:pointer; font-size:11px;">BTC/USDT</button>
-            <button style="flex:1; padding: 5px; background: var(--bg); color: #848e9c; border: none; cursor:pointer; font-size:11px;">ETH/USDT</button>
-        </div>
-
         <div>
             <label style="font-size: 11px; color: #848e9c;">СУММА ($)</label>
             <input type="number" id="tradeAmount" class="trade-input" value="10">
@@ -59,30 +44,27 @@
             <label style="font-size: 11px; color: #848e9c;">ВРЕМЯ</label>
             <select id="expTime" class="trade-input">
                 <option value="1">1 МИНУТА</option>
-                <option value="2">2 МИНУТЫ</option>
                 <option value="5">5 МИНУТ</option>
             </select>
         </div>
-
-        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>Доход:</span>
-                <span style="color: var(--green);">+82%</span>
-            </div>
-            <button class="btn-up" onclick="placeTrade('up')">КУПИТЬ ↑</button>
-            <button class="btn-down" onclick="placeTrade('down')">ПРОДАТЬ ↓</button>
+        <div style="margin-top: auto;">
+            <button class="btn-up" onclick="placeTrade('up')">ВВЕРХ ↑</button>
+            <button class="btn-down" style="margin-top:10px;" onclick="placeTrade('down')">ВНИЗ ↓</button>
         </div>
     </div>
 </div>
 
-<div id="profileMenu" class="profile-menu">
-    <div style="font-weight: bold; margin-bottom: 10px;">Мой Профиль</div>
-    <div class="menu-item">📊 История сделок</div>
-    <div class="menu-item">👥 Рефералы</div>
-    <div class="menu-item">🌐 Язык: RU</div>
-    <div class="menu-item" style="color: var(--red); margin-top: 10px;">Выйти</div>
+<div id="profileMenu" style="display:none; position:absolute; top:60px; right:20px; background:var(--card); padding:15px; border:1px solid var(--border); border-radius:10px; z-index:1000;">
+    <div style="margin-bottom:10px;"><b>Кабинет Хозяина</b></div>
+    <div style="font-size:14px;">История пуста</div>
 </div>
 
-<script src="app.js?v=5.0"></script>
+<script src="app.js?v=7.0"></script>
+<script>
+    function toggleProfile() {
+        const menu = document.getElementById('profileMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
 </body>
 </html>
