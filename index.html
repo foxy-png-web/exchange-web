@@ -2,120 +2,70 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OWNER-EX | Pocket Edition</title>
+    <title>OWNER-EX | Pocket Pro</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { 
             --bg-deep: #040d08; --panel-bg: #0a1f14; --item-bg: #0d2b1c;
-            --accent: #00e676; --accent-dark: #00c853; --red: #ff5252;
-            --border: #1a3a2a; --text: #90a4ae;
+            --accent: #00e676; --red: #ff5252; --text: #90a4ae; --border: #1a3a2a;
         }
-        
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg-deep); color: white; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
-
-        /* Левая панель - Узкая и стильная */
-        .sidebar { width: 50px; background: var(--panel-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; position: fixed; height: 100%; z-index: 100; }
-        .side-btn { width: 100%; padding: 15px 0; cursor: pointer; text-align: center; color: var(--text); font-size: 18px; transition: 0.2s; }
-        .side-btn:hover { color: var(--accent); background: var(--item-bg); }
-        .side-btn.active { color: var(--accent); border-left: 2px solid var(--accent); background: linear-gradient(90deg, rgba(0,230,118,0.1) 0%, transparent 100%); }
-
-        /* Верхний бар */
-        .top-header { height: 45px; background: var(--panel-bg); border-bottom: 1px solid var(--border); margin-left: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
-        .asset-selector { background: var(--item-bg); border: 1px solid var(--border); padding: 4px 12px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
-
-        /* Основной контент */
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg-deep); color: white; font-family: sans-serif; overflow: hidden; }
+        .sidebar { width: 50px; background: var(--panel-bg); border-right: 1px solid var(--border); position: fixed; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 15px; z-index: 100; }
+        .top-nav { height: 45px; background: var(--panel-bg); border-bottom: 1px solid var(--border); margin-left: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
         .viewport { margin-left: 50px; height: calc(100vh - 45px); display: flex; }
-        .chart-section { flex-grow: 1; position: relative; background: var(--bg-deep); }
-        
-        /* Правая торговая панель - Копия Pocket */
-        .trade-panel { width: 260px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        
-        .control-block { background: var(--item-bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; position: relative; }
-        .label { font-size: 10px; color: var(--text); text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .row { display: flex; align-items: center; justify-content: space-between; }
-        .row input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; width: 80px; outline: none; text-align: center; }
-        .math-btn { color: var(--text); cursor: pointer; font-size: 20px; user-select: none; width: 30px; text-align: center; }
-        .math-btn:hover { color: white; }
-
-        /* Кнопки BUY/SELL */
-        .action-btn { height: 75px; border-radius: 6px; border: none; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; transition: 0.1s; }
-        .up-btn { background: var(--accent); color: #000; box-shadow: 0 4px 0 #009d51; }
-        .down-btn { background: var(--red); color: #fff; box-shadow: 0 4px 0 #b71c1c; margin-top: 5px; }
-        .action-btn:active { transform: translateY(3px); box-shadow: none; }
-        .action-btn span { font-size: 24px; }
-        
-        .profit-label { text-align: center; font-size: 22px; color: var(--accent); font-weight: bold; margin: 10px 0; }
-
-        /* Плашка результата */
-        #notify { position: fixed; bottom: 20px; left: 70px; padding: 12px 25px; border-radius: 4px; display: none; font-weight: bold; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .chart-section { flex-grow: 1; position: relative; }
+        .trade-panel { width: 260px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .control { background: var(--item-bg); border: 1px solid var(--border); padding: 8px; border-radius: 4px; }
+        .label { font-size: 10px; color: var(--text); text-transform: uppercase; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .math-btn { cursor: pointer; font-size: 20px; font-weight: bold; width: 30px; text-align: center; color: var(--accent); user-select: none; }
+        input { background: transparent; border: none; color: white; font-size: 18px; font-weight: bold; width: 80px; text-align: center; outline: none; }
+        .action-btn { height: 70px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .up { background: var(--accent); color: black; }
+        .down { background: var(--red); color: white; }
+        .action-btn:active { transform: scale(0.96); }
+        #notify { position: fixed; bottom: 20px; left: 70px; padding: 10px 20px; border-radius: 4px; display: none; z-index: 1000; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="side-btn active">📊</div>
-    <div class="side-btn">💳</div>
-    <div class="side-btn">🏆</div>
-    <div class="side-btn">📢</div>
-    <div class="side-btn" style="margin-top: auto; border-top: 1px solid var(--border);">👤</div>
+    <div style="margin-bottom:20px; color:var(--accent)">📊</div>
+    <div style="margin-bottom:20px;">💰</div>
+    <div style="margin-bottom:20px;">👥</div>
 </div>
 
-<div class="top-header">
-    <div class="asset-selector">
-        <span style="color:var(--accent)">★</span> 
-        <b>BTC/USDT</b> 
-        <span style="background:var(--accent); color:black; font-size:9px; padding:1px 3px; border-radius:2px;">OTC</span>
-    </div>
-    <div style="display: flex; gap: 15px; align-items: center;">
-        <div style="text-align: right;">
-            <div style="font-size: 10px; color: var(--text);">Демо счёт</div>
-            <div id="balance" style="font-weight: bold; color: var(--accent);">$1,000.00</div>
+<div class="top-nav">
+    <div style="background:var(--item-bg); padding:5px 10px; border-radius:3px; font-size:12px;">BTC/USDT <b>82%</b></div>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <div style="text-align:right">
+            <div style="font-size:10px; color:var(--text)">Демо</div>
+            <div id="balance" style="color:var(--accent); font-weight:bold;">1000.00 $</div>
         </div>
-        <button style="background:var(--accent); border:none; padding:5px 12px; border-radius:3px; font-weight:bold; cursor:pointer;">Пополнить</button>
+        <button style="background:var(--accent); border:none; padding:5px 10px; border-radius:3px; cursor:pointer; font-weight:bold;">+</button>
     </div>
 </div>
 
 <div class="viewport">
-    <div class="chart-section" id="tradingView">
-        </div>
-    
+    <div class="chart-section" id="chart"></div>
     <div class="trade-panel">
-        <div class="control-block">
-            <span class="label">Время</span>
+        <div class="control">
+            <span class="label">Сумма</span>
             <div class="row">
-                <span class="math-btn" onclick="changeTime(-1)">−</span>
-                <input type="text" id="timeInput" value="M1" readonly>
-                <span class="math-btn" onclick="changeTime(1)">+</span>
+                <span class="math-btn" id="minusAmt">−</span>
+                <input type="number" id="amount" value="10">
+                <span class="math-btn" id="plusAmt">+</span>
             </div>
         </div>
-
-        <div class="control-block">
-            <span class="label">Сумма инвестиции</span>
-            <div class="row">
-                <span class="math-btn" onclick="changeAmount(-10)">−</span>
-                <input type="number" id="amountInput" value="10">
-                <span class="math-btn" onclick="changeAmount(10)">+</span>
-            </div>
-        </div>
-
-        <div class="profit-label">82%</div>
-
-        <button class="action-btn up-btn" onclick="execTrade('up')">
-            <span>↑</span>
-            ВЫШЕ
-        </button>
-
-        <button class="action-btn down-btn" onclick="execTrade('down')">
-            <span>↓</span>
-            НИЖЕ
-        </button>
+        <div style="text-align:center; font-size:24px; color:var(--accent); font-weight:bold; margin:10px 0;">82%</div>
+        <button class="action-btn up" id="btnUp"><span>↑</span>ВЫШЕ</button>
+        <button class="action-btn down" id="btnDown"><span>↓</span>НИЖЕ</button>
     </div>
 </div>
 
 <div id="notify"></div>
 
-<script src="app.js?v=15.0"></script>
+<script src="app.js?v=20.0"></script>
 </body>
 </html>
 
