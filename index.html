@@ -2,123 +2,114 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OWNER-EX | PRO TERMINAL</title>
+    <title>OWNER-EX PRO | Terminal</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root { 
-            --bg: #040d08; --panel: #0a1f14; --item: #112b1d;
-            --accent: #00ffad; --red: #ff5252; --text: #94a3b8; --border: #1a3a2a;
+            --neon-green: #00ffad; 
+            --deep-bg: #040d08; 
+            --panel-bg: #0a1f14;
+            --input-bg: #1e293b;
+            --text-gray: #94a3b8;
         }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
 
-        /* ОКНО ВХОДА (СНАЧАЛА ВХОД) */
-        #authPage { position: fixed; inset: 0; background: radial-gradient(circle, #0f172a 0%, #040d08 100%); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .auth-card { width: 360px; background: #0f172a; border-radius: 20px; border: 2px solid var(--accent); padding: 25px; box-shadow: 0 0 40px rgba(0, 255, 173, 0.2); }
-        .auth-tabs { display: flex; background: #1e293b; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text); cursor: pointer; border-radius: 8px; font-weight: bold; }
-        .tab.active { background: #2d3e50; color: white; }
-        
-        .auth-input { width: 100%; background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 10px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-        .main-btn { width: 100%; background: var(--accent); border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; color: black; font-size: 15px; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--deep-bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
 
-        /* ТЕРМИНАЛ */
-        #mainApp { display: none; height: 100vh; flex-direction: column; }
-        header { height: 50px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .layout { display: flex; flex: 1; }
-        .sidebar { width: 60px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 20px; }
-        .side-icon { cursor: pointer; color: var(--text); font-size: 20px; }
-        .side-icon.active { color: var(--accent); }
+        /* --- СТИЛЬ ФОРМЫ ВХОДА (ПО СКРИНШОТУ) --- */
+        #authOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .auth-card {
+            width: 380px; background: #0f172a; border-radius: 24px;
+            border: 2px solid var(--neon-green); padding: 25px;
+            box-shadow: 0 0 40px rgba(0, 255, 173, 0.2);
+        }
+        .auth-tabs { display: flex; background: #1e293b; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+        .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-gray); cursor: pointer; border-radius: 10px; font-weight: bold; }
+        .auth-tab.active { background: #2d3e50; color: white; }
+        
+        .type-select { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-box { flex: 1; padding: 12px; border: 1px solid #334155; border-radius: 12px; text-align: center; cursor: pointer; font-size: 14px; }
+        .type-box.active { background: var(--neon-green); color: black; font-weight: bold; box-shadow: 0 0 15px var(--neon-green); }
 
-        /* РАМКА ГРАФИКА */
-        .chart-frame { flex: 1; margin: 15px; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; overflow: hidden; }
-        .right-panel { width: 260px; background: var(--panel); padding: 20px; display: flex; flex-direction: column; gap: 15px; border-left: 1px solid var(--border); }
+        .auth-input { width: 100%; background: var(--input-bg); border: 1px solid #334155; padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        .auth-btn { width: 100%; background: var(--neon-green); border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+
+        /* --- СТИЛЬ ГРАФИКА И ТЕРМИНАЛА --- */
+        #terminal { display: none; height: 100vh; flex-direction: column; }
+        header { height: 60px; background: var(--panel-bg); border-bottom: 1px solid #1a3a2a; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
+
+        .workspace { display: flex; flex: 1; padding: 15px; gap: 15px; }
         
-        /* МОДАЛКИ */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 5000; }
-        .modal-content { background: #0f172a; border: 1px solid var(--accent); width: 400px; border-radius: 15px; padding: 25px; position: relative; }
+        /* Рамка для графика как на скриншоте */
+        .chart-container { 
+            flex: 1; 
+            background: #000; 
+            border: 1px solid #1a3a2a; 
+            border-radius: 16px; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .side-controls { width: 280px; background: var(--panel-bg); border-radius: 16px; border: 1px solid #1a3a2a; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
-        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .pay-card { background: var(--item); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); cursor: pointer; }
-        .pay-card img { height: 25px; display: block; margin: 0 auto 5px; }
+        .trade-input { background: #06140c; border: 1px solid #1a3a2a; padding: 15px; border-radius: 12px; }
+        .trade-label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .trade-val { background: transparent; border: none; color: white; font-size: 24px; font-weight: bold; width: 100%; outline: none; }
+
+        .btn { height: 75px; border-radius: 12px; border: none; font-weight: 800; font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .btn-up { background: var(--neon-green); color: black; }
+        .btn-down { background: #ff5252; color: white; }
+        .btn:active { transform: scale(0.97); }
+
     </style>
 </head>
 <body>
 
-<div id="authPage">
+<div id="authOverlay">
     <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://cryptologos.cc/logos/crypto-com-coin-cro-logo.png" width="40">
+            <h2 style="margin: 10px 0;">owner-ex.pro</h2>
+        </div>
         <div class="auth-tabs">
-            <button class="tab active" id="loginTab" onclick="switchAuth('login')">Вход</button>
-            <button class="tab" id="regTab" onclick="switchAuth('reg')">Регистрация</button>
+            <button class="auth-tab active">Регистрация</button>
+            <button class="auth-tab">Вход</button>
         </div>
-        
-        <div id="loginForm">
-            <input type="text" id="logEmail" class="auth-input" placeholder="Логин (Email)">
-            <input type="password" id="logPass" class="auth-input" placeholder="Пароль">
-            <button class="main-btn" onclick="startApp()">Войти</button>
+        <div class="type-select">
+            <div class="type-box active">👤 Индивидуальный</div>
+            <div class="type-box">🏛 Бизнес</div>
         </div>
-
-        <div id="regForm" style="display: none;">
-            <input type="email" id="regEmail" class="auth-input" placeholder="Email">
-            <input type="password" id="regPass" class="auth-input" placeholder="Пароль">
-            <input type="text" id="regPromo" class="auth-input" placeholder="Промокод">
-            <button class="main-btn" onclick="startApp()">Зарегистрироваться</button>
-        </div>
+        <input type="email" class="auth-input" placeholder="Введите адрес эл. почты">
+        <input type="password" class="auth-input" placeholder="Придумайте пароль">
+        <button class="auth-btn" onclick="login()">Создать аккаунт</button>
     </div>
 </div>
 
-<div id="mainApp">
+<div id="terminal">
     <header>
-        <div style="color: var(--accent); font-weight: bold;">OWNER-EX PRO</div>
-        <div id="balanceDisp" style="color: var(--accent); font-weight: bold;">$10,000.00</div>
+        <div style="color: var(--neon-green); font-weight: bold; font-size: 20px;">OWNER-EX PRO</div>
+        <div id="balance" style="font-size: 18px; font-weight: bold; color: var(--neon-green);">$10,000.00</div>
     </header>
 
-    <div class="layout">
-        <div class="sidebar">
-            <div class="side-icon active">📈</div>
-            <div class="side-icon" onclick="openModal('cashModal')">💳</div>
-            <div class="side-icon" onclick="openModal('profileModal')">👤</div>
-        </div>
-
-        <div class="chart-frame" id="chartBox"></div>
-
-        <div class="right-panel">
-            <div style="background: var(--item); padding: 10px; border-radius: 5px;">
-                <label style="font-size: 10px; color: var(--text);">СУММА</label>
-                <input type="number" id="tradeAmt" value="100" style="background:transparent; border:none; color:white; width:100%; font-size:18px; outline:none;">
+    <div class="workspace">
+        <div class="chart-container" id="chart">
             </div>
-            <button style="background:var(--accent); height:60px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;" onclick="makeTrade('up')">ВЫШЕ ↑</button>
-            <button style="background:var(--red); height:60px; border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer;" onclick="makeTrade('down')">НИЖЕ ↓</button>
-        </div>
-    </div>
-</div>
 
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <h2 style="color: var(--accent);">Профиль</h2>
-        <div id="profileView">
-            <p>Email: <span id="pEmail">admin@mail.ru</span></p>
-            <p>Имя: <span id="pName">Не указано</span></p>
-            <p>Тел: <span id="pPhone">Не указано</span></p>
-            <button class="main-btn" onclick="showEdit()">Изменить данные</button>
+        <div class="side-controls">
+            <div class="trade-input">
+                <span class="trade-label">Сумма инвестиции</span>
+                <input type="number" id="amount" class="trade-val" value="100">
+            </div>
+            <div style="text-align: center;">
+                <span style="color: var(--text-gray); font-size: 12px;">Доходность</span>
+                <div style="color: var(--neon-green); font-size: 32px; font-weight: bold;">+82%</div>
+            </div>
+            <button class="btn btn-up" onclick="trade('up')">ВЫШЕ ↑</button>
+            <button class="btn btn-down" onclick="trade('down')">НИЖЕ ↓</button>
         </div>
-        <div id="profileEdit" style="display:none;">
-            <input type="text" id="inName" class="auth-input" placeholder="Имя">
-            <input type="text" id="inPhone" class="auth-input" placeholder="Телефон">
-            <button class="main-btn" onclick="saveProfile()">Сохранить</button>
-        </div>
-        <button style="margin-top:10px; background:none; border:none; color:var(--text); cursor:pointer;" onclick="closeModals()">Закрыть</button>
-    </div>
-</div>
-
-<div id="cashModal" class="modal">
-    <div class="modal-content">
-        <h2 style="color: var(--accent);">Касса</h2>
-        <div class="pay-grid">
-            <div class="pay-card"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png">BTC</div>
-            <div class="pay-card"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png">USDT</div>
-            <div class="pay-card"><img src="https://img.icons8.com/color/48/visa.png">Карта</div>
-        </div>
-        <button style="margin-top:20px; background:none; border:none; color:var(--text); cursor:pointer;" onclick="closeModals()">Закрыть</button>
     </div>
 </div>
 
