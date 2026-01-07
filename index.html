@@ -446,19 +446,25 @@ let balances = { demo: 10000, real: 0 }; // Убираем localStorage для �
     if (!sessionUser) return;
 
     try {
-        // Запрос к вашему серверу на Render
+        // ИСПРАВЛЕНО: Добавлен знак ? перед email
         const response = await fetch(`${API_URL}/api/user/balance?email=${sessionUser}`);
+        
+        if (!response.ok) {
+            console.log("Ошибка сервера: " + response.status);
+            return;
+        }
+
         const data = await response.json();
 
         if (data && data.real_balance !== undefined) {
             balances.real = data.real_balance;
-            // Обновляем текст на экране
+            // Обновляем текст баланса на экране, если выбран REAL счет
             if (activeAcc === 'real') {
                 document.getElementById('mainBal').innerText = `$${balances.real.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             }
         }
     } catch (err) {
-        console.log("Сервер еще не проснулся...");
+        console.log("Сервер еще не проснулся или ошибка сети");
     }
 }
 
@@ -644,6 +650,7 @@ setInterval(syncWithServer, 3000);
 </script>
 </body>
 </html>
+
 
 
 
