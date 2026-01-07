@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OWNER-EX PRO TERMINAL</title>
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230ecb81%22/><text y=%22.9em%22 font-size=%2280%22 font-weight=%22900%22 x=%2250%%22 text-anchor=%22middle%22 fill=%22%23000%22>E</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%220%22 fill=%22%230ecb81%22/><text y=%22.9em%22 font-size=%2280%22 font-weight=%22900%22 x=%2250%%22 text-anchor=%22middle%22 fill=%22%23000%22>E</text></svg>">
     
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,310 +33,155 @@
             flex-direction: column;
         }
 
+        /* ЭКРАН РЕГИСТРАЦИИ */
+        #authOverlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .auth-card {
+            background: var(--panel); width: 350px; padding: 40px; border: 1px solid var(--border);
+            text-align: center;
+        }
+        .auth-card h2 { color: var(--accent); margin-bottom: 25px; font-weight: 900; }
+
         /* HEADER */
         header {
             height: 55px; background: var(--panel);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; z-index: 100;
+            padding: 0 15px;
         }
 
-        .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
-
-        /* ВЫПАДАЮЩИЕ СПИСКИ (ЕДИНЫЙ СТИЛЬ) */
-        .ui-dropdown-wrapper { position: relative; }
-        .ui-select-btn {
+        .ui-select-box {
             background: #000; border: 1px solid var(--border);
-            padding: 5px 12px; border-radius: 4px; cursor: pointer;
+            padding: 6px 12px; cursor: pointer; position: relative;
             font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px;
         }
-        .ui-select-btn:hover { border-color: var(--accent); }
-        
-        .ui-menu {
-            position: absolute; top: 110%; left: 0; width: 200px;
+        .ui-dropdown {
+            position: absolute; top: 100%; left: -1px; width: 200px;
             background: var(--panel); border: 1px solid var(--border);
-            border-radius: 4px; display: none; flex-direction: column; z-index: 2000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none; flex-direction: column; z-index: 2000;
         }
-        .ui-menu b { padding: 8px 12px; font-size: 10px; color: #555; text-transform: uppercase; background: #111; }
-        .ui-menu-item { padding: 10px 12px; border-bottom: 1px solid #222; transition: 0.2s; cursor: pointer; font-size: 13px; }
-        .ui-menu-item:hover { background: #2b2f36; color: var(--accent); }
+        .ui-item { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; }
+        .ui-item:hover { background: #2b2f36; color: var(--accent); }
 
-        /* ОСНОВНОЙ КОНТЕНТ */
-        .main-layout { display: grid; grid-template-columns: 50px 1fr 280px; flex: 1; min-height: 0; }
+        /* LAYOUT */
+        .main-container { display: grid; grid-template-columns: 60px 1fr 300px; flex: 1; min-height: 0; }
 
-        /* БОКОВАЯ ПАНЕЛЬ */
-        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 20px; }
-        .sidebar i { font-size: 18px; color: #848e9c; cursor: pointer; transition: 0.2s; }
-        .sidebar i:hover, .sidebar i.active { color: var(--accent); }
-
-        /* ЗОНА ГРАФИКА */
-        .chart-zone { display: flex; flex-direction: column; background: #000; position: relative; }
-        .chart-controls {
-            position: absolute; top: 10px; left: 10px; z-index: 10;
-            display: flex; gap: 8px;
+        .side-nav {
+            background: var(--panel); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 25px;
         }
-        .ctrl-btn { background: rgba(22,26,30,0.8); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-        .ctrl-btn:hover { background: var(--accent); color: #000; }
+        .side-nav i { font-size: 20px; color: #848e9c; cursor: pointer; }
+        .side-nav i.active, .side-nav i:hover { color: var(--accent); }
+
+        /* CHART AREA */
+        .chart-area { display: flex; flex-direction: column; background: #000; position: relative; }
+        .chart-toolbar {
+            position: absolute; top: 15px; left: 15px; z-index: 100;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toolbar-group { display: flex; gap: 5px; background: rgba(0,0,0,0.6); padding: 4px; }
+        
+        .tool-btn {
+            background: #161a1e; border: 1px solid var(--border); color: #fff;
+            padding: 5px 10px; font-size: 11px; cursor: pointer; font-weight: 700;
+        }
+        .tool-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
         #chart { flex: 1; }
 
-        /* ИСТОРИЯ СДЕЛОК */
-        .history-table-container { height: 160px; background: var(--panel); border-top: 1px solid var(--border); padding: 10px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th { text-align: left; color: #848e9c; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-        td { padding: 8px 0; border-bottom: 1px solid #222; }
+        /* TRADE PANEL */
+        .trade-panel { background: var(--panel); padding: 25px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 20px; }
+        .field { background: var(--bg); border: 1px solid var(--border); padding: 12px; }
+        .field label { font-size: 10px; color: #848e9c; display: block; margin-bottom: 5px; font-weight: 800; }
+        .field input { background: transparent; border: none; color: #fff; width: 100%; font-size: 20px; font-weight: 900; outline: none; }
 
-        /* ПАНЕЛЬ ТОРГОВЛИ */
-        .trade-sidebar { background: var(--panel); padding: 20px; display: flex; flex-direction: column; gap: 15px; border-left: 1px solid var(--border); }
-        .input-box { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 4px; }
-        .input-box label { font-size: 9px; color: #848e9c; display: block; margin-bottom: 4px; font-weight: 700; }
-        .input-box input { background: transparent; border: none; color: #fff; width: 100%; font-size: 18px; font-weight: 800; outline: none; }
+        .btn-exec { height: 60px; border: none; font-weight: 900; font-size: 18px; cursor: pointer; }
+        .btn-call { background: var(--green); color: #000; }
+        .btn-put { background: var(--red); color: #fff; }
 
-        .btn-action { height: 50px; border: none; border-radius: 4px; font-weight: 900; font-size: 15px; cursor: pointer; transition: 0.1s; }
-        .btn-up { background: var(--green); color: #000; }
-        .btn-down { background: var(--red); color: #fff; }
-        .btn-action:active { transform: scale(0.96); }
+        /* MODAL KASSA */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: var(--panel); width: 500px; border: 1px solid var(--border); padding: 0; overflow: hidden; }
+        .modal-header { display: flex; background: #000; }
+        .m-tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: 800; color: #555; }
+        .m-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--panel); }
 
-        /* МОДАЛЬНЫЕ ОКНА */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; }
-        .modal-content { background: var(--panel); width: 400px; padding: 25px; border-radius: 8px; border: 1px solid var(--border); }
-        .modal-tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
-        .tab { padding: 10px; cursor: pointer; color: gray; font-weight: 700; }
-        .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .m-content { padding: 30px; }
+        .wallet-card { background: #000; border: 1px solid var(--border); padding: 15px; margin-top: 15px; text-align: center; }
+        .wallet-addr { font-family: monospace; color: var(--accent); word-break: break-all; margin: 10px 0; font-size: 14px; }
 
-        /* КНОПКИ ДЕМО/РЕАЛ */
-        .acc-switcher { display: flex; background: #000; padding: 2px; border-radius: 4px; border: 1px solid var(--border); }
-        .as-btn { padding: 4px 12px; border: none; background: none; color: #848e9c; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .as-btn.active { background: var(--accent); color: #000; border-radius: 2px; }
+        /* TABLE */
+        .history-wrap { max-height: 300px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 10px; color: #848e9c; border-bottom: 1px solid var(--border); }
+        td { padding: 10px; border-bottom: 1px solid #222; }
 
-        footer { height: 30px; background: var(--panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 10px; color: #555; }
+        /* ACC SWITCH */
+        .acc-sw { display: flex; background: #000; border: 1px solid var(--border); padding: 2px; }
+        .sw-btn { padding: 5px 15px; border: none; background: none; color: #848e9c; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .sw-btn.active { background: var(--accent); color: #000; }
     </style>
 </head>
 <body>
 
+<div id="authOverlay">
+    <div class="auth-card">
+        <h2>OWNER-EX</h2>
+        <div class="field" style="margin-bottom:10px;"><input type="text" placeholder="Email / Логин"></div>
+        <div class="field" style="margin-bottom:20px;"><input type="password" placeholder="Пароль"></div>
+        <button class="btn-exec btn-call" style="width:100%; height:50px;" onclick="closeAuth()">ВОЙТИ / РЕГИСТРАЦИЯ</button>
+    </div>
+</div>
+
 <header>
-    <div class="header-left">
-        <div style="background:var(--accent); color:#000; padding:4px 8px; border-radius:4px; font-weight:900;">E</div>
-        <div style="font-weight:900; letter-spacing:1px;">OWNER-EX</div>
-        
-        <div class="ui-dropdown-wrapper">
-            <div class="ui-select-btn" onclick="toggleMenu('assetMenu')">
-                <span id="selectedAsset">BTC / USDT</span> <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="ui-menu" id="assetMenu">
-                <b>Криптовалюты</b>
-                <div class="ui-menu-item" onclick="setAsset('BTCUSDT')">BTC / USDT</div>
-                <div class="ui-menu-item" onclick="setAsset('ETHUSDT')">ETH / USDT</div>
-                <div class="ui-menu-item" onclick="setAsset('BNBUSDT')">BNB / USDT</div>
-                <b>Валютные пары</b>
-                <div class="ui-menu-item" onclick="setAsset('EURUSDT')">EUR / USD</div>
-                <div class="ui-menu-item" onclick="setAsset('GBPUSDT')">GBP / USD</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <span style="font-weight:900; color:var(--accent);">OWNER-EX PRO</span>
+        <div class="ui-select-box" onclick="toggleDrop('assetDrop')">
+            <span id="curAsset">BTC / USDT</span> <i class="fas fa-chevron-down"></i>
+            <div class="ui-dropdown" id="assetDrop">
+                <div class="ui-item" onclick="setAsset('BTCUSDT')">BTC / USDT</div>
+                <div class="ui-item" onclick="setAsset('ETHUSDT')">ETH / USDT</div>
+                <div class="ui-item" onclick="setAsset('SOLUSDT')">SOL / USDT</div>
             </div>
         </div>
     </div>
 
-    <div class="header-right">
-        <div class="ui-dropdown-wrapper">
-            <div class="ui-select-btn" onclick="toggleMenu('langMenu')">
-                <span id="selectedLang">РУС</span> <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="ui-menu" id="langMenu" style="width:100px;">
-                <div class="ui-menu-item" onclick="setLang('РУС')">РУС</div>
-                <div class="ui-menu-item" onclick="setLang('ENG')">ENG</div>
-            </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="acc-sw">
+            <button class="sw-btn active" id="demoBtn" onclick="setAcc('demo')">DEMO</button>
+            <button class="sw-btn" id="realBtn" onclick="setAcc('real')">REAL</button>
         </div>
-
-        <div class="acc-switcher">
-            <button class="as-btn active" id="demoMode" onclick="setAccount('demo')">DEMO</button>
-            <button class="as-btn" id="realMode" onclick="setAccount('real')">REAL</button>
-        </div>
-        <div id="balanceLabel" style="color:var(--green); font-weight:900; font-size:16px;">$10,000.00</div>
+        <div id="balance" style="color:var(--green); font-size:18px; font-weight:900;">$10,000.00</div>
     </div>
 </header>
 
-<div class="main-layout">
-    <div class="sidebar">
-        <i class="fas fa-chart-line active" title="График"></i>
-        <i class="fas fa-wallet" onclick="openModal('cashierModal')" title="Касса"></i>
-        <i class="fas fa-user" onclick="openModal('authModal')" title="Профиль/Регистрация"></i>
-        <i class="fas fa-history" title="История"></i>
-        <i class="fas fa-cog" title="Настройки"></i>
+<div class="main-container">
+    <div class="side-nav">
+        <i class="fas fa-chart-line active" onclick="closeModals()"></i>
+        <i class="fas fa-wallet" onclick="openModal('cashierModal')"></i>
+        <i class="fas fa-headset" onclick="window.open('https://t.me/owner_ex_admin')"></i>
     </div>
 
-    <div class="chart-zone">
-        <div class="chart-controls">
-            <button class="ctrl-btn" onclick="setPeriod('1m')">1M</button>
-            <button class="ctrl-btn" onclick="setPeriod('5m')">5M</button>
-            <button class="ctrl-btn" onclick="setPeriod('1h')">1H</button>
-            <span style="color:var(--border)">|</span>
-            <button class="ctrl-btn"><i class="fas fa-chart-area"></i></button>
-            <button class="ctrl-btn"><i class="fas fa-chart-bar"></i></button>
+    <div class="chart-area">
+        <div class="chart-toolbar">
+            <div class="toolbar-group">
+                <button class="tool-btn" onclick="setPeriod('10s', this)">10S</button>
+                <button class="tool-btn" onclick="setPeriod('30s', this)">30S</button>
+                <button class="tool-btn active" onclick="setPeriod('1m', this)">1M</button>
+                <button class="tool-btn" onclick="setPeriod('5m', this)">5M</button>
+                <button class="tool-btn" onclick="setPeriod('1h', this)">1H</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="tool-btn active" id="btnCandle" onclick="setChartType('candle')"><i class="fas fa-chart-line"></i> СВЕЧИ</button>
+                <button class="tool-btn" id="btnBar" onclick="setChartType('bar')"><i class="fas fa-chart-bar"></i> БАРЫ</button>
+                <button class="tool-btn" id="btnArea" onclick="setChartType('area')"><i class="fas fa-wave-square"></i> ЛИНИЯ</button>
+            </div>
         </div>
         <div id="chart"></div>
-        <div class="history-table-container">
-            <table>
-                <thead><tr><th>АКТИВ</th><th>ТИП</th><th>СУММА</th><th>ДОХОД</th><th>ВРЕМЯ</th></tr></thead>
-                <tbody id="tradeHistory"></tbody>
-            </table>
-        </div>
     </div>
 
-    <div class="trade-sidebar">
-        <div class="input-box"><label>ИНВЕСТИЦИЯ (USDT)</label><input type="number" id="tradeAmount" value="100"></div>
-        <div class="input-box"><label>ВРЕМЯ (СЕК)</label><input type="number" id="tradeTime" value="30"></div>
-        <button class="btn-action btn-up" onclick="placeTrade('CALL')">ВЫШЕ ↑</button>
-        <button class="btn-action btn-down" onclick="placeTrade('PUT')">НИЖЕ ↓</button>
-    </div>
-</div>
-
-<div id="cashierModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-tabs">
-            <div class="tab active" id="tabDep" onclick="setCashTab('dep')">ДЕПОЗИТ</div>
-            <div class="tab" id="tabWit" onclick="setCashTab('wit')">ВЫВОД</div>
-        </div>
-        <div id="cashBody">
-            <label style="font-size:12px;">Выберите метод:</label>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:15px 0;">
-                <button class="ctrl-btn" style="padding:10px;">USDT TRC20</button>
-                <button class="ctrl-btn" style="padding:10px;">TON</button>
-                <button class="ctrl-btn" style="padding:10px;">BITCOIN</button>
-                <button class="ctrl-btn" style="padding:10px;">SBP / CARD</button>
-            </div>
-            <input type="number" class="input-box" style="width:100%; box-sizing:border-box;" placeholder="Сумма ($)">
-            <button class="btn-action btn-up" style="width:100%; margin-top:15px;">ПРОДОЛЖИТЬ</button>
-        </div>
-        <p onclick="closeAll()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</p>
-    </div>
-</div>
-
-<div id="authModal" class="modal">
-    <div class="modal-content">
-        <h3 style="text-align:center;">РЕГИСТРАЦИЯ</h3>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-            <input type="text" class="input-box" placeholder="Email">
-            <input type="password" class="input-box" placeholder="Пароль">
-            <input type="password" class="input-box" placeholder="Повторите пароль">
-            <button class="btn-action btn-up">СОЗДАТЬ АККАУНТ</button>
-            <p style="font-size:11px; text-align:center; color:gray;">Уже есть аккаунт? <span style="color:var(--accent); cursor:pointer;">Войти</span></p>
-        </div>
-        <p onclick="closeAll()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</p>
-    </div>
-</div>
-
-<footer>
-    <span>СЛУЖБА ПОДДЕРЖКИ</span>
-    <span>FAQ</span>
-    <span>ПОЛИТИКА</span>
-</footer>
-
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true; s1.src='https://embed.tawk.to/677cc2034912b71220ad337e/1ihvj5tpe';
-s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-
-<script>
-    let chart, series, curSym = "BTCUSDT", lastP = 0, currentAcc = 'demo';
-    let bals = { demo: 10000, real: 0 };
-
-    function init() {
-        chart = LightweightCharts.createChart(document.getElementById('chart'), {
-            layout: { background: { color: '#000' }, textColor: '#848e9c' },
-            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { timeVisible: true, secondsVisible: true }
-        });
-        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
-        updateChart();
-    }
-
-    function updateChart() {
-        fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=1m&limit=500`)
-            .then(r => r.json()).then(d => {
-                series.setData(d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] })));
-                startSocket();
-            });
-    }
-
-    function startSocket() {
-        if(window.ws) window.ws.close();
-        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
-        window.ws.onmessage = e => {
-            const k = JSON.parse(e.data).k;
-            lastP = +k.c;
-            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastP });
-        };
-    }
-
-    function toggleMenu(id) {
-        const el = document.getElementById(id);
-        const isVisible = el.style.display === 'flex';
-        document.querySelectorAll('.ui-menu').forEach(m => m.style.display = 'none');
-        el.style.display = isVisible ? 'none' : 'flex';
-    }
-
-    function setAsset(s) {
-        curSym = s;
-        document.getElementById('selectedAsset').innerText = s.replace('USDT', ' / USDT');
-        document.getElementById('assetMenu').style.display = 'none';
-        updateChart();
-    }
-
-    function setLang(l) {
-        document.getElementById('selectedLang').innerText = l;
-        document.getElementById('langMenu').style.display = 'none';
-    }
-
-    function setAccount(a) {
-        currentAcc = a;
-        document.getElementById('demoMode').classList.toggle('active', a==='demo');
-        document.getElementById('realMode').classList.toggle('active', a==='real');
-        updateBal();
-    }
-
-    function updateBal() {
-        document.getElementById('balanceLabel').innerText = `$${bals[currentAcc].toLocaleString()}`;
-    }
-
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-
-    function setCashTab(t) {
-        document.getElementById('tabDep').classList.toggle('active', t==='dep');
-        document.getElementById('tabWit').classList.toggle('active', t==='wit');
-    }
-
-    function placeTrade(type) {
-        const amt = +document.getElementById('tradeAmount').value;
-        if(amt > bals[currentAcc]) return alert("Недостаточно средств");
-        bals[currentAcc] -= amt; updateBal();
-
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${curSym}</td><td style="color:${type==='CALL'?'#0ecb81':'#f6465d'}">${type}</td><td>$${amt}</td><td id="res">...</td><td>${new Date().toLocaleTimeString()}</td>`;
-        document.getElementById('tradeHistory').prepend(row);
-
-        setTimeout(() => {
-            const win = Math.random() > 0.5;
-            const resCell = row.querySelector('#res');
-            if(win) {
-                const profit = amt * 0.82;
-                bals[currentAcc] += amt + profit;
-                resCell.innerText = `+$${profit.toFixed(2)}`;
-                resCell.style.color = '#0ecb81';
-            } else {
-                resCell.innerText = `-$${amt}`;
-                resCell.style.color = '#f6465d';
-            }
-            updateBal();
-        }, 3000);
-    }
-
-    window.onload = init;
-</script>
-</body>
-</html>
+    <div class="trade-panel">
+        <div class="field"><label>СУММА (USDT)</label><input type="number" id="tAmt" value="100"></div>
+        <div class="field"><label>ВРЕМЯ
