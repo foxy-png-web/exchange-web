@@ -388,35 +388,59 @@ let balances = { demo: 10000, real: 0 }; // Убираем localStorage для �
         document.getElementById('authBtn').innerText = m === 'reg' ? 'ЗАРЕГИСТРИРОВАТЬСЯ' : 'ВОЙТИ В ТЕРМИНАЛ';
     }
 
-    function handleAuth() {
-        const e = document.getElementById('authEmail').value;
-        const p = document.getElementById('authPass').value;
-        if(!e || !p) return alert("Заполните поля!");
+// --- ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА И РЕГИСТРАЦИИ ---
+    async function handleAuth() {
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPass').value;
+        const isRegister = document.getElementById('tabRegister').classList.contains('active');
 
-        if(document.getElementById('tabRegister').classList.contains('active')) {
-            if(accounts[e]) return alert("Уже есть такой юзер!");
-            accounts[e] = { pass: p, nick: e.split('@')[0], name: '' };
-            localStorage.setItem('owner_accounts', JSON.stringify(accounts));
-            alert("Успех! Входите.");
-            switchAuth('login');
-        } else {
-            if(accounts[e] && accounts[e].pass === p) {
-                sessionUser = e;
-                localStorage.setItem('owner_session', e);
-                document.getElementById('authScreen').style.display = 'none';
-                startApp();
-            } else alert("Неверный логин или пароль!");
+        if (!email || !password) return alert("Заполните все поля!");
+
+        const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (isRegister) {
+                    alert("Регистрация успешна! Теперь войдите.");
+                    switchAuth('login');
+                } else {
+                    // Сохраняем сессию
+                    sessionUser = data.email;
+                    localStorage.setItem('owner_session', data.email);
+                    
+                    // Прячем окно входа и запускаем терминал
+                    document.getElementById('authScreen').style.display = 'none';
+                    startApp();
+                }
+            } else {
+                alert(data.error || "Ошибка доступа");
+            }
+        } catch (err) {
+            alert("Сервер не отвечает. Подождите 30 секунд, пока он проснется на Render.");
         }
     }
 
-    function logout() { localStorage.removeItem('owner_session'); location.reload(); }
-
-  function startApp() {
-    initChart();
-    syncWithServer(); // Добавили это
-    updateUI();
-    // ...
-}
+    function startApp() {
+        initChart();
+        // Заполняем профиль данными
+        document.getElementById('pMail').value = sessionUser;
+        
+        // Сразу запрашиваем баланс с сервера
+        syncWithServer();
+        
+        // Запускаем цикл обновления баланса
+        setInterval(syncWithServer, 5000);
+        
+        updateUI();
+    }
     
     async function syncWithServer() {
     if (!sessionUser) return;
@@ -620,6 +644,7 @@ setInterval(syncWithServer, 3000);
 </script>
 </body>
 </html>
+
 
 
 
