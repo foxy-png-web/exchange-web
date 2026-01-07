@@ -313,43 +313,31 @@
     }
 
     // --- ТОРГОВЛЯ ---
-    window.handleTrade = (type) => {
-        let amount = Math.abs(parseFloat(document.getElementById('tradeAmount').value));
-        let seconds = parseInt(document.getElementById('tradeTime').value);
-
-        if (isNaN(amount) || amount <= 0 || bals[currentAccount] < amount) {
-            return alert("Недостаточно средств или некорректная сумма!");
-        }
-
-        bals[currentAccount] -= amount;
+  window.handleTrade = (type) => {
+        let amt = parseFloat(document.getElementById('tradeAmount').value);
+        if (amt > bals[currentAccount] || amt <= 0) return alert("Недостаточно средств!");
+        
+        bals[currentAccount] -= amt; 
         updateUI();
         
-        const entryPrice = lastPrice;
-        const entryLine = series.createPriceLine({ 
-            price: entryPrice, 
-            color: type === 'CALL' ? '#0ecb81' : '#f6465d', 
-            title: `ВХОД ${type}` 
-        });
+        const startPrice = lastPrice;
 
-        sendTelegram(`🚀 <b>Сделка открыта!</b>\nТип: ${type}\nСумма: $${amount}\nАккаунт: ${currentAccount.toUpperCase()}`);
+        // УВЕДОМЛЕНИЕ ОБ ОТКРЫТИИ УДАЛЕНО
 
         setTimeout(() => {
-            const win = (type === 'CALL' && lastPrice > entryPrice) || (type === 'PUT' && lastPrice < entryPrice);
-            const profit = win ? amount * 1.82 : 0;
+            const win = (type === 'CALL' && lastPrice > startPrice) || (type === 'PUT' && lastPrice < startPrice);
+            const res = win ? `+$${(amt * 0.82).toFixed(2)}` : `-$${amt}`;
             
-            if (win) bals[currentAccount] += profit;
+            if (win) bals[currentAccount] += (amt * 1.82);
             
-            const resultStr = win ? `+$${(profit - amount).toFixed(2)}` : `-$${amount}`;
-            tHist.unshift({ s: currentSymbol, t: type, a: amount, i: entryPrice, o: lastPrice, r: resultStr });
-            
-            series.removePriceLine(entryLine);
-            saveAll();
+            tHist.unshift({ s: 'BTCUSDT', t: type, a: amt, r: res });
+            saveAll(); 
             updateUI();
-            
-            sendTelegram(`🏁 <b>Итог сделки:</b> ${win ? 'ВЫИГРЫШ ✅' : 'ПРОИГРЫШ ❌'}\nРезультат: ${resultStr}\nБаланс: $${bals[currentAccount].toFixed(2)}`);
-        }, seconds * 1000);
-    };
 
+            // УВЕДОМЛЕНИЕ О РЕЗУЛЬТАТЕ УДАЛЕНО
+            
+        }, parseInt(document.getElementById('tradeTime').value) * 1000);
+    };
     // --- КАССА И ПРОФИЛЬ ---
     window.switchAccount = (acc) => {
         currentAccount = acc;
@@ -450,4 +438,5 @@
 </script>
 </body>
 </html>
+
 
