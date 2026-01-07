@@ -2,356 +2,329 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OWNER-EX ULTIMATE PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWNER-EX ELITE TERMINAL</title>
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg: #0b0e11; --panel: #161a1e; --accent: #00ffad; --red: #f6465d; --green: #0ecb81; --border: #2b2f36; --radius: 10px; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #eaecef; font-family: 'Inter', sans-serif; overflow: hidden; }
+        :root {
+            --bg: #0b0e11; --panel: #161a1e; --accent: #00ffad;
+            --red: #f6465d; --green: #0ecb81; --border: #2b2f36;
+            --radius: 12px;
+        }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #eaecef; font-family: 'Inter', -apple-system, sans-serif; overflow: hidden; }
+
+        /* HEADER */
+        header { 
+            height: 65px; background: var(--panel); display: flex; align-items: center; 
+            justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--border);
+        }
+        .brand { font-weight: 900; color: var(--accent); font-size: 20px; letter-spacing: 1px; }
+        .header-tools { display: flex; align-items: center; gap: 15px; }
+
+        select, .btn-icon { 
+            background: #1e2329; color: white; border: 1px solid var(--border); 
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; outline: none; font-size: 13px;
+        }
+
+        .balance-card { display: flex; align-items: center; background: #000; border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
+        .acc-btn { padding: 6px 14px; border: none; background: none; color: #555; cursor: pointer; font-size: 11px; border-radius: 7px; font-weight: bold; transition: 0.3s; }
+        .acc-btn.active { background: var(--accent); color: #000; }
+
+        /* MAIN LAYOUT */
+        .terminal { display: grid; grid-template-columns: 70px 1fr 300px; height: calc(100vh - 65px); }
         
-        header { height: 60px; background: var(--panel); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); }
-        .controls { display: flex; gap: 10px; align-items: center; }
-        select, .btn-s { background: #1e2329; color: white; border: 1px solid var(--border); padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 25px; gap: 30px; }
+        .side-link { font-size: 22px; color: #848e9c; cursor: pointer; transition: 0.3s; }
+        .side-link:hover, .side-link.active { color: var(--accent); transform: scale(1.1); }
 
-        .acc-switcher { display: flex; background: #000; border-radius: 8px; padding: 2px; border: 1px solid var(--border); }
-        .acc-btn { padding: 4px 12px; border: none; background: none; color: #555; cursor: pointer; font-size: 12px; border-radius: 6px; }
-        .acc-btn.active { background: var(--accent); color: #000; font-weight: bold; }
-
-        .terminal { display: grid; grid-template-columns: 60px 1fr 260px; height: calc(100vh - 60px); }
-        .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; }
-        .side-icon { font-size: 20px; color: #848e9c; cursor: pointer; transition: 0.2s; }
-        .side-icon:hover { color: var(--accent); }
-
-        .main-view { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
+        .chart-container { display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; }
         #chart { flex: 1; }
-        .history-table-wrap { height: 180px; background: var(--panel); border-top: 1px solid var(--border); overflow-y: auto; padding: 10px; }
+        
+        .history-panel { height: 200px; background: var(--panel); border-top: 1px solid var(--border); padding: 15px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: #848e9c; border-bottom: 1px solid var(--border); padding: 8px; }
-        td { padding: 8px; border-bottom: 1px solid #222; }
+        th { text-align: left; color: #848e9c; padding-bottom: 10px; font-weight: 500; border-bottom: 1px solid var(--border); }
+        td { padding: 10px 5px; border-bottom: 1px solid #222; }
 
-        .trade-panel { padding: 15px; background: var(--panel); display: flex; flex-direction: column; gap: 15px; }
-        .in-group { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; }
-        .in-group label { display: block; font-size: 10px; color: gray; }
-        .in-group input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 18px; font-weight: bold; }
+        /* TRADE PANEL */
+        .trade-bar { padding: 25px; background: var(--panel); display: flex; flex-direction: column; gap: 20px; }
+        .input-box { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius); }
+        .input-box label { display: block; font-size: 11px; color: #848e9c; margin-bottom: 6px; }
+        .input-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 20px; font-weight: 700; }
 
-        .btn-trade { height: 55px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-up { background: var(--green); color: #000; }
-        .btn-down { background: var(--red); color: #fff; }
+        .trade-btn { height: 65px; border: none; border-radius: var(--radius); font-weight: 800; font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-call { background: var(--green); color: #000; }
+        .btn-put { background: var(--red); color: #fff; }
+        .trade-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .trade-btn:active { transform: translateY(0); }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-card { background: var(--panel); width: 400px; padding: 25px; border-radius: 15px; border: 1px solid var(--border); position: relative; }
-        .tab-nav { display: flex; gap: 15px; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
-        .tab-link { padding: 8px 0; cursor: pointer; color: gray; font-size: 13px; }
-        .tab-link.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
+        /* MODALS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--panel); width: 420px; padding: 30px; border-radius: 20px; border: 1px solid var(--border); position: relative; }
+        .tab-menu { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .tab-btn { padding: 10px 0; cursor: pointer; color: gray; font-size: 14px; transition: 0.3s; }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .tab-body { display: none; }
+        .tab-body.active { display: block; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="controls">
-        <div style="font-weight:900; color:var(--accent); margin-right:15px;">OWNER-EX PRO</div>
-        <select id="assetSelect" onchange="changeSymbol(this.value)">
-            <option value="BTCUSDT">BTC/USDT</option>
-            <option value="ETHUSDT">ETH/USDT</option>
-            <option value="SOLUSDT">SOL/USDT</option>
+    <div class="header-tools">
+        <div class="brand">OWNER-EX <span style="color:white">ELITE</span></div>
+        <select id="asset" onchange="changeSymbol(this.value)">
+            <option value="BTCUSDT">BTC / USDT</option>
+            <option value="ETHUSDT">ETH / USDT</option>
+            <option value="SOLUSDT">SOL / USDT</option>
         </select>
-        <select id="tfSelect" onchange="changeTF(this.value)" style="font-weight:bold; color:var(--accent);">
-    <optgroup label="Секунды" style="color: gray;">
-        <option value="1s">S10 (Live)</option>
-        <option value="1s">S15 (Live)</option>
-        <option value="1s">S30 (Live)</option>
-    </optgroup>
-    <optgroup label="Минуты" style="color: gray;">
-        <option value="1m" selected>M1</option>
-        <option value="5m">M5</option>
-        <option value="10m">M10</option>
-        <option value="30m">M30</option>
-    </optgroup>
-    <optgroup label="Часы" style="color: gray;">
-        <option value="1h">H1</option>
-        <option value="2h">H2</option>
-    </optgroup>
-</select>
-        <button class="btn-s" onclick="setChartType('candles')">🕯️</button>
-        <button class="btn-s" onclick="setChartType('line')">📈</button>
+        <select id="timeframe" onchange="changeTF(this.value)">
+            <optgroup label="Секунды">
+                <option value="1s">S10</option>
+                <option value="1s">S15</option>
+                <option value="1s">S30</option>
+            </optgroup>
+            <optgroup label="Минуты">
+                <option value="1m" selected>M1</option>
+                <option value="5m">M5</option>
+                <option value="30m">M30</option>
+            </optgroup>
+            <optgroup label="Часы">
+                <option value="1h">H1</option>
+                <option value="2h">H2</option>
+            </optgroup>
+        </select>
     </div>
 
-    <div class="controls">
-        <div class="acc-switcher">
+    <div class="header-tools">
+        <div class="balance-card">
             <button class="acc-btn active" id="btnDemo" onclick="switchAcc('demo')">DEMO</button>
             <button class="acc-btn" id="btnReal" onclick="switchAcc('real')">REAL</button>
         </div>
-        <div id="topBal" style="font-weight:bold; color:var(--green); min-width:80px;">$10,000.00</div>
+        <div id="displayBalance" style="font-weight:900; color:var(--green); font-size:18px; min-width:100px; text-align:right;">$10,000.00</div>
     </div>
 </header>
 
 <div class="terminal">
     <div class="sidebar">
-        <i class="fas fa-chart-line side-icon" onclick="closeModals()"></i>
-        <i class="fas fa-wallet side-icon" onclick="openModal('cashierModal')"></i>
-        <i class="fas fa-user-circle side-icon" onclick="openModal('profileModal')"></i>
-        <i class="fas fa-power-off side-icon" onclick="location.reload()" style="margin-top:auto"></i>
+        <i class="fas fa-chart-area side-link active" onclick="closeAll()"></i>
+        <i class="fas fa-wallet side-link" onclick="openM('cashierM')"></i>
+        <i class="fas fa-user-shield side-link" onclick="openM('profileM')"></i>
+        <i class="fas fa-history side-link" onclick="openM('cashierM', 2)"></i>
+        <i class="fas fa-sign-out-alt side-link" onclick="location.reload()" style="margin-top:auto; padding-bottom:20px;"></i>
     </div>
 
-    <div class="main-view">
+    <div class="chart-container">
         <div id="chart"></div>
-        <div class="history-table-wrap">
-            <h4 style="margin:0 0 10px 0; font-size:12px; color:var(--accent)">ИСТОРИЯ СДЕЛОК</h4>
+        <div class="history-panel">
+            <h4 style="margin:0 0 15px 0; color:var(--accent); font-size:13px; letter-spacing:1px;">ИСТОРИЯ ТОРГОВЛИ</h4>
             <table>
-                <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Вход</th><th>Выход</th><th>Итог</th></tr></thead>
-                <tbody id="tradeHistoryBody"></tbody>
+                <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Вход</th><th>Выход</th><th>Результат</th></tr></thead>
+                <tbody id="tradeLogs"></tbody>
             </table>
         </div>
     </div>
 
-    <div class="trade-panel">
-        <div class="in-group"><label>СУММА (USDT)</label><input type="number" id="tAmt" value="100"></div>
-        <div class="in-group"><label>ВРЕМЯ (СЕК)</label><input type="number" id="tSec" value="15"></div>
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:10px; color:gray">ДОХОД</div>
-            <div style="font-size:24px; font-weight:bold; color:var(--accent)">+82%</div>
+    <div class="trade-bar">
+        <div class="input-box"><label>СУММА СДЕЛКИ (USDT)</label><input type="number" id="tradeAmt" value="100" min="1"></div>
+        <div class="input-box"><label>ВРЕМЯ ЭКСПИРАЦИИ (СЕК)</label><input type="number" id="tradeTime" value="15" min="5"></div>
+        
+        <div style="text-align:center;">
+            <div style="color:gray; font-size:11px; margin-bottom:5px;">ВЫПЛАТА</div>
+            <div style="font-size:32px; font-weight:900; color:var(--accent);">82%</div>
         </div>
-        <button class="btn-trade btn-up" onclick="execTrade('CALL')">ВЫШЕ ↑</button>
-        <button class="btn-trade btn-down" onclick="execTrade('PUT')">НИЖЕ ↓</button>
+
+        <button class="trade-btn btn-call" onclick="execTrade('CALL')"><i class="fas fa-arrow-up"></i> ВЫШЕ</button>
+        <button class="trade-btn btn-put" onclick="execTrade('PUT')"><i class="fas fa-arrow-down"></i> НИЖЕ</button>
     </div>
 </div>
 
-<div id="cashierModal" class="modal">
-    <div class="modal-card">
-        <div class="tab-nav">
-            <div class="tab-link active" onclick="switchTab(event, 't-dep')">Пополнение</div>
-            <div class="tab-link" onclick="switchTab(event, 't-with')">Вывод</div>
-            <div class="tab-link" onclick="switchTab(event, 't-hist')">История</div>
+<div id="cashierM" class="modal">
+    <div class="modal-content">
+        <div class="tab-menu">
+            <div class="tab-btn active" onclick="st(event, 'dep-tab')">ДЕПОЗИТ</div>
+            <div class="tab-btn" onclick="st(event, 'with-tab')">ВЫВОД</div>
+            <div class="tab-btn" onclick="st(event, 'hist-tab')">ЛОГИ</div>
         </div>
-        <div id="t-dep" class="tab-pane active">
-            <select id="depMethod" style="margin-bottom:10px"><option>USDT TRC20</option><option>Карта РФ</option></select>
-            <input type="number" id="depAmt" placeholder="Сумма $" value="100">
-            <button class="btn-trade btn-up" style="width:100%; height:40px; margin-top:10px" onclick="doDeposit()">Пополнить</button>
+        <div id="dep-tab" class="tab-body active">
+            <select style="width:100%; margin-bottom:15px;"><option>USDT TRC20 (Fast)</option><option>VISA/Mastercard</option></select>
+            <input type="number" id="dInp" placeholder="Сумма пополнения $" style="width:100%; padding:12px; background:#000; border:1px solid var(--border); color:#fff; border-radius:10px;">
+            <button class="trade-btn btn-call" style="width:100%; height:50px; margin-top:20px;" onclick="doDep()">ПОПОЛНИТЬ</button>
         </div>
-        <div id="t-with" class="tab-pane">
-            <input type="text" id="withTarget" placeholder="Адрес кошелька / Карта" style="margin-bottom:10px">
-            <input type="number" id="withAmt" placeholder="Сумма вывода">
-            <button class="btn-trade btn-down" style="width:100%; height:40px; margin-top:10px" onclick="doWithdraw()">Вывести</button>
+        <div id="with-tab" class="tab-body">
+            <input type="text" id="wAddr" placeholder="Адрес кошелька / Карта" style="width:100%; padding:12px; background:#000; border:1px solid var(--border); color:#fff; border-radius:10px; margin-bottom:15px;">
+            <input type="number" id="wInp" placeholder="Сумма вывода $" style="width:100%; padding:12px; background:#000; border:1px solid var(--border); color:#fff; border-radius:10px;">
+            <button class="trade-btn btn-put" style="width:100%; height:50px; margin-top:20px;" onclick="doWith()">СОЗДАТЬ ЗАЯВКУ</button>
         </div>
-        <div id="t-hist" class="tab-pane">
-            <div style="max-height:200px; overflow-y:auto">
-                <table style="font-size:10px">
+        <div id="hist-tab" class="tab-body">
+            <div style="max-height:250px; overflow-y:auto;">
+                <table style="font-size:11px;">
                     <thead><tr><th>Дата</th><th>Тип</th><th>Сумма</th><th>Статус</th></tr></thead>
-                    <tbody id="cashierHistoryBody"></tbody>
+                    <tbody id="cashLogs"></tbody>
                 </table>
             </div>
         </div>
-        <button onclick="closeModals()" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%">Закрыть</button>
+        <button onclick="closeAll()" style="width:100%; margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">Закрыть</button>
     </div>
 </div>
 
-<div id="profileModal" class="modal">
-    <div class="modal-card" style="width:450px">
-        <h3>ПРОФИЛЬ</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-            <input type="text" id="pName" placeholder="Имя">
-            <input type="text" id="pSurname" placeholder="Фамилия">
-            <input type="text" id="pNick" placeholder="Никнейм">
-            <input type="date" id="pBirth">
-            <input type="text" id="pCountry" placeholder="Страна">
-            <input type="text" id="pCity" placeholder="Город">
-            <input type="text" id="pZip" placeholder="Индекс" maxlength="6">
-            <input type="text" id="pPromo" placeholder="Промокод">
+<div id="profileM" class="modal">
+    <div class="modal-content" style="width:500px;">
+        <h3 style="margin-top:0; color:var(--accent);">НАСТРОЙКИ АККАУНТА</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <div class="input-box"><label>ИМЯ</label><input type="text" id="p1"></div>
+            <div class="input-box"><label>ФАМИЛИЯ</label><input type="text" id="p2"></div>
+            <div class="input-box"><label>НИКНЕЙМ</label><input type="text" id="p3"></div>
+            <div class="input-box"><label>ДАТА РОЖДЕНИЯ</label><input type="date" id="p4" style="font-size:14px;"></div>
+            <div class="input-box"><label>СТРАНА</label><input type="text" id="p5"></div>
+            <div class="input-box"><label>ГОРОД</label><input type="text" id="p6"></div>
+            <div class="input-box"><label>ИНДЕКС</label><input type="text" id="p7" maxlength="6"></div>
+            <div class="input-box"><label>ПРОМОКОД</label><input type="text" id="p8"></div>
         </div>
-        <button class="btn-trade btn-up" style="width:100%; height:40px; margin-top:15px" onclick="saveProfile()">Сохранить</button>
-        <button onclick="closeModals()" style="margin-top:10px; background:none; border:none; color:gray; cursor:pointer; width:100%">Отмена</button>
+        <button class="trade-btn btn-call" style="width:100%; height:50px; margin-top:20px;" onclick="saveP()">СОХРАНИТЬ ДАННЫЕ</button>
+        <button onclick="closeAll()" style="width:100%; margin-top:10px; background:none; border:none; color:gray; cursor:pointer;">Отмена</button>
     </div>
 </div>
 
 <script>
-    // --- НАСТРОЙКИ ---
+    // --- CORE CONFIG ---
     const TG_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M"; 
-    const TG_USER_ID = "6426834853";
+    const TG_ID = "6426834853";
 
     let bals = JSON.parse(localStorage.getItem('bals')) || { demo: 10000, real: 0 };
-    let profile = JSON.parse(localStorage.getItem('profile')) || {};
-    let cHist = JSON.parse(localStorage.getItem('cash_hist')) || [];
-    let tHist = JSON.parse(localStorage.getItem('trade_hist')) || [];
-    let curAcc = 'demo', curSym = 'BTCUSDT', curTF = '1m', chartStyle = 'candles', lastPrice = 0;
-    let chart, series;
+    let prof = JSON.parse(localStorage.getItem('prof')) || {};
+    let tHist = JSON.parse(localStorage.getItem('t_hist')) || [];
+    let cHist = JSON.parse(localStorage.getItem('c_hist')) || [];
+    let curAcc = 'demo', curSym = 'BTCUSDT', curTF = '1m', lastPrice = 0, chart, series;
 
-    function save() {
+    const save = () => {
         localStorage.setItem('bals', JSON.stringify(bals));
-        localStorage.setItem('profile', JSON.stringify(profile));
-        localStorage.setItem('cash_hist', JSON.stringify(cHist));
-        localStorage.setItem('trade_hist', JSON.stringify(tHist));
-    }
-
-    async function sendTG(m) {
-        try {
-            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-                method: "POST", headers: {"Content-Type":"application/json"},
-                body: JSON.stringify({ chat_id: TG_USER_ID, text: m, parse_mode: "HTML" })
-            });
-        } catch(e) {}
-    }
-
-    // --- ИНТЕРФЕЙС ---
-    function updateUI() {
-        document.getElementById('topBal').innerText = `$${bals[curAcc].toLocaleString()}`;
-        renderTradeHist();
-        renderCashHist();
-    }
-
-    function renderTradeHist() {
-        document.getElementById('tradeHistoryBody').innerHTML = tHist.map(h => `
-            <tr><td>${h.s}</td><td style="color:${h.type==='CALL'?'#0ecb81':'#f6465d'}">${h.type}</td>
-            <td>$${h.amt}</td><td>${h.in}</td><td>${h.out}</td>
-            <td style="color:${h.res.includes('+')?'#0ecb81':'#f6465d'}">${h.res}</td></tr>
-        `).join('');
-    }
-
-    function renderCashHist() {
-        document.getElementById('cashierHistoryBody').innerHTML = cHist.map(h => `
-            <tr><td>${h.d}</td><td>${h.t}</td><td>${h.a}</td><td>${h.s}</td></tr>
-        `).join('');
-    }
-
-    window.openModal = (id) => { 
-        document.getElementById(id).style.display = 'flex'; 
-        if(id==='profileModal') {
-            const keys = ['pName','pSurname','pNick','pBirth','pCountry','pCity','pZip','pPromo'];
-            keys.forEach(k => document.getElementById(k).value = profile[k] || '');
-        }
+        localStorage.setItem('prof', JSON.stringify(prof));
+        localStorage.setItem('t_hist', JSON.stringify(tHist));
+        localStorage.setItem('c_hist', JSON.stringify(cHist));
     };
-    window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display='none');
-    window.switchTab = (e, id) => {
-        const p = e.target.parentElement;
-        p.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-        p.parentElement.querySelectorAll('.tab-pane').forEach(tp => tp.classList.remove('active'));
-        e.target.classList.add('active');
-        document.getElementById(id).classList.add('active');
+
+    const tg = async (m) => {
+        try { await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({chat_id: TG_ID, text: m, parse_mode:"HTML"})
+        }); } catch(e){}
     };
+
+    // --- UI ENGINE ---
+    const refreshUI = () => {
+        document.getElementById('displayBalance').innerText = `$${bals[curAcc].toLocaleString()}`;
+        document.getElementById('tradeLogs').innerHTML = tHist.map(h => `
+            <tr><td>${h.s}</td><td style="color:${h.t==='CALL'?'#0ecb81':'#f6465d'}">${h.t}</td>
+            <td>$${h.a}</td><td>${h.i}</td><td>${h.o}</td>
+            <td style="font-weight:bold; color:${h.r.includes('+')?'#0ecb81':'#f6465d'}">${h.r}</td></tr>
+        `).join('');
+        document.getElementById('cashLogs').innerHTML = cHist.map(h => `
+            <tr><td>${h.d}</td><td>${h.t}</td><td>${h.a}</td><td style="color:orange">${h.s}</td></tr>
+        `).join('');
+    };
+
     window.switchAcc = (a) => {
         curAcc = a;
         document.getElementById('btnDemo').classList.toggle('active', a==='demo');
         document.getElementById('btnReal').classList.toggle('active', a==='real');
-        updateUI();
+        refreshUI();
     };
 
-    // --- КАССА И ПРОФИЛЬ ---
-    window.doDeposit = () => {
-        const a = Math.abs(parseFloat(document.getElementById('depAmt').value));
-        if(a>0) {
-            bals.real += a;
-            cHist.unshift({ d: new Date().toLocaleDateString(), t: 'Депозит', a: '$'+a, s: 'Успех' });
-            save(); updateUI();
-            sendTG(`✅ <b>Пополнение:</b> $${a}\nНик: ${profile.pNick || 'Guest'}`);
-            alert("Пополнено!");
+    window.openM = (id, tabIndex = 0) => {
+        document.getElementById(id).style.display = 'flex';
+        if(id === 'profileM') {
+            ['p1','p2','p3','p4','p5','p6','p7','p8'].forEach((k, i) => document.getElementById(k).value = prof[k] || '');
         }
     };
-    window.doWithdraw = () => {
-        const a = Math.abs(parseFloat(document.getElementById('withAmt').value));
-        const t = document.getElementById('withTarget').value;
-        if(a > bals.real || !t) return alert("Ошибка данных или баланса");
-        bals.real -= a;
-        cHist.unshift({ d: new Date().toLocaleDateString(), t: 'Вывод', a: '$'+a, s: 'Ожидание' });
-        save(); updateUI();
-        sendTG(`💰 <b>Вывод:</b> $${a}\nКуда: ${t}\nНик: ${profile.pNick || 'Guest'}`);
-        alert("Заявка создана!");
-    };
-    window.saveProfile = () => {
-        const keys = ['pName','pSurname','pNick','pBirth','pCountry','pCity','pZip','pPromo'];
-        keys.forEach(k => profile[k] = document.getElementById(k).value);
-        save();
-        sendTG(`👤 <b>Профиль обновлен:</b> ${profile.pNick}\nИмя: ${profile.pName}`);
-        alert("Сохранено!");
+    window.closeAll = () => document.querySelectorAll('.modal').forEach(m => m.style.display='none');
+    window.st = (e, id) => {
+        const p = e.target.parentElement;
+        p.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        p.parentElement.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active'); document.getElementById(id).classList.add('active');
     };
 
-    // --- ГРАФИК ---
-    function initChart() {
-        if(chart) { document.getElementById('chart').innerHTML = ''; }
+    // --- LOGIC ---
+    window.doDep = () => {
+        const a = Math.abs(parseFloat(document.getElementById('dInp').value));
+        if(a > 0) {
+            bals.real += a;
+            cHist.unshift({ d: new Date().toLocaleDateString(), t: 'Депозит', a: '$'+a, s: 'Успех' });
+            save(); refreshUI(); tg(`💳 <b>ДЕПОЗИТ:</b> +$${a}\nUser: ${prof.p3 || 'Guest'}`);
+            alert("Баланс пополнен!"); closeAll();
+        }
+    };
+
+    window.doWith = () => {
+        const a = Math.abs(parseFloat(document.getElementById('wInp').value));
+        const addr = document.getElementById('wAddr').value;
+        if(a > bals.real || a <= 0 || !addr) return alert("Ошибка данных или баланса");
+        bals.real -= a;
+        cHist.unshift({ d: new Date().toLocaleDateString(), t: 'Вывод', a: '$'+a, s: 'В работе' });
+        save(); refreshUI(); tg(`💰 <b>ВЫВОД:</b> $${a}\nAddr: ${addr}\nUser: ${prof.p3 || 'Guest'}`);
+        alert("Заявка создана!"); closeAll();
+    };
+
+    window.saveP = () => {
+        const keys = ['p1','p2','p3','p4','p5','p6','p7','p8'];
+        keys.forEach(k => prof[k] = document.getElementById(k).value);
+        save(); tg(`👤 <b>ПРОФИЛЬ:</b> ${prof.p3}\nИмя: ${prof.p1} ${prof.p2}`);
+        alert("Данные сохранены!"); closeAll();
+    };
+
+    // --- CHART & TRADE ---
+    const initChart = () => {
+        if(chart) document.getElementById('chart').innerHTML = '';
         chart = LightweightCharts.createChart(document.getElementById('chart'), {
             layout: { background: { color: '#0b0e11' }, textColor: '#848e9c' },
-            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
+            grid: { vertLines: { color: '#161a1e' }, horzLines: { color: '#161a1e' } },
             timeScale: { timeVisible: true, secondsVisible: true }
         });
-        series = chartStyle === 'candles' ? chart.addCandlestickSeries() : chart.addAreaSeries({ lineColor: '#00ffad' });
-        loadData();
-    }
+        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
+        loadChartData();
+    };
 
-    async function loadData() {
-    // Определяем интервал для запроса к API
-    // Если выбрано 1s (секунды), берем 1m для базы и обновляем каждую секунду
-    let fetchTF = curTF === '1s' ? '1m' : curTF;
-    
-    try {
-        const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=${fetchTF}&limit=500`);
-        const d = await r.json();
-        
-        series.setData(d.map(x => ({ 
-            time: x[0]/1000, 
-            open: +x[1], 
-            high: +x[2], 
-            low: +x[3], 
-            close: +x[4], 
-            value: +x[4] 
-        })));
+    async function loadChartData() {
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=${curTF === '1s' ? '1m' : curTF}&limit=500`);
+        const data = await res.json();
+        series.setData(data.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] })));
         
         if(window.ws) window.ws.close();
-        
-        // Подключаем поток данных (Stream)
         window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
-        
         window.ws.onmessage = e => {
-            const k = JSON.parse(e.data).k;
-            lastPrice = +k.c;
-            
-            // Если выбран минутный или часовой ТФ, обновляем текущую свечу
-            // Если секундный — имитируем быстрое движение
-            series.update({ 
-                time: k.t/1000, 
-                open: +k.o, 
-                high: +k.h, 
-                low: +k.l, 
-                close: lastPrice, 
-                value: lastPrice 
-            });
+            const k = JSON.parse(e.data).k; lastPrice = +k.c;
+            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
         };
-    } catch (error) {
-        console.error("Ошибка загрузки данных биржи:", error);
     }
-}
 
-    window.changeSymbol = (s) => { curSym = s; initChart(); };
-    window.changeTF = (t) => { curTF = t; initChart(); };
-    window.setChartType = (t) => { chartStyle = t; initChart(); };
+    window.changeSymbol = (s) => { curSym = s; loadChartData(); };
+    window.changeTF = (t) => { curTF = t; loadChartData(); };
 
-    // --- ТОРГОВЛЯ ---
     window.execTrade = (type) => {
-        let amt = Math.abs(parseFloat(document.getElementById('tAmt').value));
-        let sec = parseInt(document.getElementById('tSec').value);
-        if(bals[curAcc] < amt || amt <= 0) return alert("Ошибка баланса или суммы");
+        let amt = Math.abs(parseFloat(document.getElementById('tradeAmt').value));
+        let time = parseInt(document.getElementById('tradeTime').value);
+        if(bals[curAcc] < amt || amt <= 0) return alert("Недостаточно средств");
 
-        bals[curAcc] -= amt; updateUI();
+        bals[curAcc] -= amt; refreshUI();
         const startP = lastPrice;
         const line = series.createPriceLine({ price: startP, color: type==='CALL'?'#0ecb81':'#f6465d', title: 'ВХОД' });
-        
-        sendTG(`🚀 <b>Сделка:</b> ${type} $${amt}\nСчет: ${curAcc}`);
+        tg(`🚀 <b>СДЕЛКА:</b> ${type} $${amt}\nSymbol: ${curSym}`);
 
         setTimeout(() => {
             const win = (type==='CALL' && lastPrice > startP) || (type==='PUT' && lastPrice < startP);
             const profit = win ? amt * 1.82 : 0;
             if(win) bals[curAcc] += profit;
             
-            const resStr = win ? `+$${(profit-amt).toFixed(2)}` : `-$${amt}`;
-            tHist.unshift({ s: curSym, type, amt: amt, in: startP, out: lastPrice, res: resStr });
-            
+            const res = win ? `+$${(profit-amt).toFixed(2)}` : `-$${amt}`;
+            tHist.unshift({ s: curSym, t: type, a: amt, i: startP, o: lastPrice, r: res });
             series.removePriceLine(line);
-            save(); updateUI();
-            sendTG(`🏁 <b>Итог:</b> ${win?'WIN ✅':'LOSS ❌'} (${resStr})`);
-        }, sec * 1000);
+            save(); refreshUI();
+            tg(`🏁 <b>ИТОГ:</b> ${win?'WIN ✅':'LOSS ❌'} (${res})`);
+        }, time * 1000);
     };
 
-    initChart();
-    updateUI();
+    initChart(); refreshUI();
 </script>
 </body>
 </html>
