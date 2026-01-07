@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         :root {
             --bg: #0b0e11;
@@ -16,7 +16,7 @@
             --red: #f6465d;
             --green: #0ecb81;
             --border: #2b2f36;
-            --radius: 12px;
+            --radius: 8px;
         }
 
         body, html {
@@ -26,16 +26,13 @@
             font-family: 'Inter', sans-serif;
             height: 100%;
             overflow: hidden;
-        }
-
-        .main-wrapper {
             display: flex;
             flex-direction: column;
-            height: 100vh;
         }
 
+        /* HEADER */
         header {
-            height: 65px;
+            height: 60px;
             background: var(--panel);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -43,64 +40,85 @@
             justify-content: space-between;
             padding: 0 20px;
             flex-shrink: 0;
-            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Зеленая иконка E */
         .logo-icon {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             background: var(--accent);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000;
             font-weight: 900;
-            font-size: 22px;
+            font-size: 20px;
         }
 
-        .logo-text {
-            font-weight: 900;
-            color: #fff;
-            font-size: 20px;
-            letter-spacing: 1px;
+        .asset-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
         }
+
+        select {
+            background: #000;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .payout-info {
+            line-height: 1;
+            text-align: center;
+        }
+
+        .payout-main { color: var(--accent); font-weight: 800; font-size: 14px; }
+        .payout-sub { color: #848e9c; font-size: 10px; margin-top: 2px; }
 
         .acc-toggle {
             display: flex;
             background: #000;
             border: 1px solid var(--border);
-            padding: 3px;
-            border-radius: 10px;
+            padding: 2px;
+            border-radius: 6px;
         }
 
         .acc-btn {
-            padding: 6px 15px;
+            padding: 4px 12px;
             border: none;
             background: none;
             color: #555;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            border-radius: 8px;
-            transition: 0.3s;
+            border-radius: 4px;
         }
 
-        .acc-btn.active {
-            background: var(--accent);
-            color: #000;
-        }
+        .acc-btn.active { background: var(--accent); color: #000; }
 
+        #balanceDisplay { font-weight: 800; color: var(--green); font-size: 17px; margin-left: 15px; }
+
+        /* MAIN LAYOUT */
         .terminal-container {
             display: grid;
-            grid-template-columns: 70px 1fr 300px;
+            grid-template-columns: 60px 1fr 280px;
             flex: 1;
             min-height: 0;
         }
@@ -111,98 +129,111 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 25px 0;
-            gap: 30px;
+            padding: 20px 0;
+            gap: 25px;
         }
 
         .nav-item {
-            font-size: 22px;
+            font-size: 20px;
             color: #848e9c;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
         }
 
-        .nav-item:hover {
-            color: var(--accent);
-        }
+        .nav-item:hover { color: var(--accent); }
 
         .chart-section {
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border);
-            background: #000;
+            position: relative;
         }
 
-        #chart { flex: 1; }
+        .chart-controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            display: flex;
+            gap: 5px;
+        }
 
-        .history-section {
-            height: 200px;
+        .chart-btn {
+            background: rgba(22, 26, 30, 0.8);
+            border: 1px solid var(--border);
+            color: #848e9c;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .chart-btn.active { color: var(--accent); border-color: var(--accent); }
+
+        #chart { flex: 1; background: #000; }
+
+        .history-table-container {
+            height: 180px;
             background: var(--panel);
             border-top: 1px solid var(--border);
             overflow-y: auto;
-            padding: 15px;
+            padding: 10px;
         }
 
-        .history-section h4 {
-            margin: 0 0 10px 0;
-            font-size: 12px;
-            color: var(--accent);
-            text-transform: uppercase;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th { text-align: left; color: #848e9c; padding: 8px; border-bottom: 1px solid var(--border); }
         td { padding: 8px; border-bottom: 1px solid #222; }
 
+        /* RIGHT PANEL */
         .trade-panel {
-            padding: 25px;
+            padding: 20px;
             background: var(--panel);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .input-group {
             background: var(--bg);
             border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: var(--radius);
+            padding: 10px;
+            border-radius: 6px;
         }
 
-        .input-group label {
-            display: block;
-            font-size: 11px;
-            color: #848e9c;
-            margin-bottom: 5px;
-        }
-
-        .input-group input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            width: 100%;
-            font-size: 20px;
-            font-weight: bold;
-            outline: none;
-        }
+        .input-group label { display: block; font-size: 10px; color: #848e9c; margin-bottom: 4px; }
+        .input-group input { background: transparent; border: none; color: #fff; width: 100%; font-size: 18px; font-weight: 700; outline: none; }
 
         .btn-exec {
-            height: 60px;
+            height: 50px;
             border: none;
-            border-radius: var(--radius);
+            border-radius: 6px;
             font-weight: 800;
-            font-size: 18px;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.2s;
+            text-transform: uppercase;
         }
 
-        .btn-call { background: var(--green); color: #000; margin-bottom: 10px; }
+        .btn-call { background: var(--green); color: #000; }
         .btn-put { background: var(--red); color: #fff; }
+        .btn-exec:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* FOOTER */
+        footer {
+            height: 35px;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            font-size: 11px;
+            color: #848e9c;
+            flex-shrink: 0;
+        }
+
+        footer span { cursor: pointer; }
+        footer span:hover { color: var(--accent); }
 
         /* MODALS */
         .modal-overlay {
@@ -213,14 +244,14 @@
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
         }
 
         .modal-box {
             background: var(--panel);
-            width: 550px;
-            padding: 30px;
-            border-radius: 20px;
+            width: 480px;
+            padding: 25px;
+            border-radius: 12px;
             border: 1px solid var(--border);
         }
 
@@ -228,96 +259,120 @@
             background: #0b0e11;
             border: 1px solid var(--border);
             color: #fff;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             width: 100%;
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
+
+        .cashier-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <header>
-        <div class="header-left">
-            <div class="logo-box">
-                <div class="logo-icon">E</div>
-                <div class="logo-text">OWNER-EX</div>
-            </div>
-            <select id="assetSelect" onchange="changeSymbol(this.value)" style="background:#000; color:#fff; border:1px solid var(--border); padding:5px; border-radius:5px;">
+<header>
+    <div class="header-left">
+        <div class="logo-box">
+            <div class="logo-icon">E</div>
+            <div style="font-weight: 900; font-size: 18px;">OWNER-EX</div>
+        </div>
+        <div class="asset-box">
+            <select id="assetSelect" onchange="changeSymbol(this.value)">
                 <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="BNBUSDT">BNB/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="ADAUSDT">ADA/USDT</option>
+                <option value="DOGEUSDT">DOGE/USDT</option>
             </select>
-        </div>
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <div class="acc-toggle">
-                <button class="acc-btn active" id="demoBtn" onclick="switchAccount('demo')">DEMO</button>
-                <button class="acc-btn" id="realBtn" onclick="switchAccount('real')">REAL</button>
-            </div>
-            <div id="balanceDisplay" style="font-weight: 900; color: var(--green); font-size: 20px;">$10,000.00</div>
-        </div>
-    </header>
-
-    <div class="terminal-container">
-        <div class="side-nav">
-            <i class="fas fa-chart-area nav-item" onclick="closeModals()"></i>
-            <i class="fas fa-wallet nav-item" onclick="openModal('cashierModal')"></i>
-            <i class="fas fa-user-circle nav-item" onclick="openModal('profileModal')"></i>
-        </div>
-
-        <div class="chart-section">
-            <div id="chart"></div>
-            <div class="history-section">
-                <h4>ИСТОРИЯ ТОРГОВЛИ</h4>
-                <table>
-                    <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Доход</th></tr></thead>
-                    <tbody id="tradeHistoryBody"></tbody>
-                </table>
+            <div class="payout-info">
+                <div class="payout-main">82%</div>
+                <div class="payout-sub">79%</div>
             </div>
         </div>
-
-        <div class="trade-panel">
-            <div class="input-group"><label>СУММА ИНВЕСТИЦИИ (USDT)</label><input type="number" id="tradeAmount" value="100"></div>
-            <div class="input-group"><label>ВРЕМЯ ЭКСПИРАЦИИ (СЕК)</label><input type="number" id="tradeTime" value="30"></div>
-            <div style="text-align: center; margin: 10px 0;">
-                <div style="color: gray; font-size: 12px;">ВЫПЛАТА</div>
-                <div style="font-size: 32px; font-weight: 900; color: var(--accent);">82%</div>
-            </div>
-            <button class="btn-exec btn-call" onclick="handleTrade('CALL')">ВЫШЕ ↑</button>
-            <button class="btn-exec btn-put" onclick="handleTrade('PUT')">НИЖЕ ↓</button>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="acc-toggle">
+            <button class="acc-btn active" id="demoBtn" onclick="switchAccount('demo')">DEMO</button>
+            <button class="acc-btn" id="realBtn" onclick="switchAccount('real')">REAL</button>
         </div>
+        <div id="balanceDisplay">$10,000.00</div>
+    </div>
+</header>
+
+<div class="terminal-container">
+    <div class="side-nav">
+        <i class="fas fa-chart-line nav-item" title="График" onclick="closeModals()"></i>
+        <i class="fas fa-wallet nav-item" title="Касса" onclick="openModal('cashierModal')"></i>
+        <i class="fas fa-user-circle nav-item" title="Профиль" onclick="openModal('profileModal')"></i>
+    </div>
+
+    <div class="chart-section">
+        <div class="chart-controls">
+            <button class="chart-btn active">M1</button>
+            <button class="chart-btn">M5</button>
+            <button class="chart-btn">M15</button>
+            <button class="chart-btn">H1</button>
+        </div>
+        <div id="chart"></div>
+        <div class="history-table-container">
+            <table id="tradeHistoryTable">
+                <thead><tr><th>Актив</th><th>Тип</th><th>Сумма</th><th>Доход</th></tr></thead>
+                <tbody id="tradeHistoryBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="trade-panel">
+        <div class="input-group"><label>СУММА (USDT)</label><input type="number" id="tradeAmount" value="100"></div>
+        <div class="input-group"><label>ВРЕМЯ (СЕК)</label><input type="number" id="tradeTime" value="30"></div>
+        <button class="btn-exec btn-call" onclick="handleTrade('CALL')">ВЫШЕ ↑</button>
+        <button class="btn-exec btn-put" onclick="handleTrade('PUT')">НИЖЕ ↓</button>
     </div>
 </div>
 
+<footer>
+    <span onclick="alert('Частые вопросы')">Частые вопросы</span>
+    <span onclick="alert('Условия конфиденциальности')">Условия конфиденциальности</span>
+    <span onclick="alert('Политика')">Политика</span>
+</footer>
+
 <div id="profileModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="color: #fff; text-align: center; margin-bottom: 25px;">ПРОФИЛЬ</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <h3 style="text-align: center; margin-bottom: 20px;">ЛИЧНЫЕ ДАННЫЕ</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <input type="text" id="p_name" class="custom-input" placeholder="Имя">
             <input type="text" id="p_surname" class="custom-input" placeholder="Фамилия">
             <input type="text" id="p_nick" class="custom-input" placeholder="Никнейм">
-            <input type="text" id="p_birth" class="custom-input" placeholder="ДД.ММ.ГГГГ">
+            <input type="text" id="p_birth" class="custom-input" placeholder="Дата рождения">
             <input type="text" id="p_country" class="custom-input" placeholder="Страна">
             <input type="text" id="p_city" class="custom-input" placeholder="Город">
             <input type="text" id="p_zip" class="custom-input" placeholder="Индекс">
             <input type="text" id="p_promo" class="custom-input" placeholder="Промокод">
         </div>
-        <button onclick="saveProfile()" class="btn-exec btn-call" style="width:100%; height:50px; margin-top:20px;">СОХРАНИТЬ</button>
-        <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:15px;">Отмена</div>
+        <button onclick="saveProfile()" class="btn-exec btn-call" style="width:100%; margin-top:10px;">СОХРАНИТЬ</button>
+        <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:10px; font-size:12px;">Закрыть</div>
     </div>
 </div>
 
 <div id="cashierModal" class="modal-overlay">
-    <div class="modal-box" style="width: 400px;">
-        <h3 style="text-align:center;">КАССА</h3>
-        <input type="number" id="depositInput" class="custom-input" placeholder="Сумма пополнения $">
-        <button onclick="processDeposit()" class="btn-exec btn-call" style="width:100%; height:50px;">ПОПОЛНИТЬ</button>
-        <button onclick="closeModals()" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Закрыть</button>
+    <div class="modal-box">
+        <h3 style="text-align:center;">КАССА И ОПЕРАЦИИ</h3>
+        <div class="cashier-btns">
+            <button onclick="alert('Выберите метод пополнения')" class="btn-exec btn-call" style="height:40px; font-size:12px;">ДЕПОЗИТ</button>
+            <button onclick="alert('Вывод доступен от $50')" class="btn-exec btn-put" style="height:40px; font-size:12px;">ВЫВОД</button>
+        </div>
+        <div style="background:#000; border-radius:6px; padding:10px; height:150px; overflow-y:auto;">
+            <div style="font-size:11px; color:gray; margin-bottom:8px; border-bottom:1px solid #222;">ИСТОРИЯ ОПЕРАЦИЙ</div>
+            <div id="cashierHistory" style="font-size:11px; color:#555; text-align:center; margin-top:40px;">Транзакции отсутствуют</div>
+        </div>
+        <button onclick="closeModals()" style="width:100%; background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Назад</button>
     </div>
 </div>
 
 <script>
-    // ДАННЫЕ ВСТАВЛЕНЫ НАПРЯМУЮ
     const TG_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M";
     const TG_USER_ID = 6426834853;
 
@@ -361,9 +416,8 @@
             p_zip: document.getElementById('p_zip').value, p_promo: document.getElementById('p_promo').value
         };
         saveAll();
-        // Уведомление только при сохранении профиля для теста связи
-        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Профиль обновлен: ${profile.p_nick}`).catch(()=>{});
-        alert("Данные сохранены!"); closeModals();
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Профиль: ${profile.p_nick}`).catch(()=>{});
+        alert("Сохранено!"); closeModals();
     };
 
     window.handleTrade = (type) => {
@@ -371,14 +425,11 @@
         if (amt > bals[currentAccount] || amt <= 0) return alert("Недостаточно средств!");
         bals[currentAccount] -= amt; updateUI();
         const startPrice = lastPrice;
-
-        // УВЕДОМЛЕНИЯ О СДЕЛКАХ ОТКЛЮЧЕНЫ
-        
         setTimeout(() => {
             const win = (type === 'CALL' && lastPrice > startPrice) || (type === 'PUT' && lastPrice < startPrice);
             const res = win ? `+$${(amt * 0.82).toFixed(2)}` : `-$${amt}`;
             if (win) bals[currentAccount] += (amt * 1.82);
-            tHist.unshift({ s: 'BTCUSDT', t: type, a: amt, r: res });
+            tHist.unshift({ s: document.getElementById('assetSelect').value.replace('USDT',''), t: type, a: amt, r: res });
             saveAll(); updateUI();
         }, parseInt(document.getElementById('tradeTime').value) * 1000);
     };
@@ -390,31 +441,30 @@
         updateUI();
     };
 
-    window.processDeposit = () => {
-        let amt = parseFloat(document.getElementById('depositInput').value);
-        if (amt > 0) {
-            bals.real += amt; saveAll(); updateUI();
-            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=💳 Депозит: +$${amt}`).catch(()=>{});
-            alert("Пополнено!"); closeModals();
-        }
-    };
-
     function initChart() {
         chart = LightweightCharts.createChart(document.getElementById('chart'), {
             layout: { background: { color: '#000' }, textColor: '#848e9c' },
             grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { timeVisible: true, secondsVisible: true }
+            timeScale: { timeVisible: true, secondsVisible: true },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal }
         });
-        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
-        fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=500`)
+        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false, wickUpColor: '#0ecb81', wickDownColor: '#f6465d' });
+        updateChartData('BTCUSDT');
+    }
+
+    function updateChartData(symbol) {
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=500`)
             .then(r => r.json()).then(d => series.setData(d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] }))));
-        const ws = new WebSocket(`wss://stream.binance.com:9443/ws/btcusdt@kline_1s`);
-        ws.onmessage = e => { 
+        if (window.binanceSocket) window.binanceSocket.close();
+        window.binanceSocket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_1s`);
+        window.binanceSocket.onmessage = e => {
             const k = JSON.parse(e.data).k;
-            lastPrice = +k.c; 
-            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice }); 
+            lastPrice = +k.c;
+            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
         };
     }
+
+    window.changeSymbol = (val) => updateChartData(val);
 
     initChart(); updateUI();
 </script>
