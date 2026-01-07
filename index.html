@@ -41,171 +41,154 @@
             padding: 0 15px; z-index: 100;
         }
 
-        .asset-selector {
+        /* УНИФИЦИРОВАННЫЙ ДИЗАЙН ВЫБОРА (АКТИВ / ЯЗЫК) */
+        .ui-select {
             background: #000; border: 1px solid var(--border);
-            padding: 6px 15px; border-radius: 4px; cursor: pointer;
-            position: relative; font-size: 14px; font-weight: 800;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            position: relative; font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
         }
-
-        .asset-list {
-            position: absolute; top: 100%; left: 0; width: 220px;
+        .ui-select:hover { border-color: var(--accent); }
+        .ui-dropdown {
+            position: absolute; top: 110%; left: 0; width: 190px;
             background: var(--panel); border: 1px solid var(--border);
-            display: none; flex-direction: column; z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border-radius: 4px; display: none; flex-direction: column; z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
-        .asset-list b { padding: 10px; font-size: 10px; color: #555; text-transform: uppercase; }
-        .asset-option { padding: 12px; border-bottom: 1px solid #222; transition: 0.2s; }
-        .asset-option:hover { background: #2b2f36; color: var(--accent); }
+        .ui-dropdown b { padding: 8px 12px; font-size: 10px; color: #555; text-transform: uppercase; background: #111; }
+        .ui-item { padding: 10px 12px; border-bottom: 1px solid #222; transition: 0.2s; }
+        .ui-item:hover { background: #2b2f36; color: var(--accent); }
 
-        /* CHART & SIDEBAR */
-        .main-content {
+        /* LAYOUT */
+        .terminal-main {
             display: grid; grid-template-columns: 60px 1fr 300px;
             flex: 1; min-height: 0;
         }
-
-        .side-bar {
+        .side-nav {
             background: var(--panel); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; align-items: center;
-            padding: 20px 0; gap: 30px;
+            padding: 20px 0; gap: 25px;
         }
-        .side-bar i { font-size: 20px; color: #848e9c; cursor: pointer; transition: 0.2s; }
-        .side-bar i:hover, .side-bar i.active { color: var(--accent); }
+        .side-nav i { font-size: 20px; color: #848e9c; cursor: pointer; transition: 0.2s; }
+        .side-nav i:hover, .side-nav i.active { color: var(--accent); }
 
-        .chart-area { display: flex; flex-direction: column; background: #000; position: relative; }
+        .chart-container { display: flex; flex-direction: column; background: #000; position: relative; border-right: 1px solid var(--border); }
         #chart { flex: 1; }
 
-        .trade-history {
-            height: 200px; background: var(--panel);
-            border-top: 1px solid var(--border);
-            padding: 15px; overflow-y: auto;
-        }
+        /* ИСТОРИЯ СДЕЛОК */
+        .history-panel { height: 180px; background: var(--panel); border-top: 1px solid var(--border); padding: 15px; overflow-y: auto; }
+        .history-panel h4 { margin: 0 0 10px 0; font-size: 11px; color: var(--accent); letter-spacing: 1px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { text-align: left; color: #848e9c; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        td { padding: 9px 0; border-bottom: 1px solid #222; }
 
         /* TRADE PANEL */
-        .right-panel { background: var(--panel); padding: 25px; display: flex; flex-direction: column; gap: 20px; }
-        .input-box { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 4px; }
-        .input-box span { font-size: 10px; color: #848e9c; display: block; margin-bottom: 5px; font-weight: 700; }
-        .input-box input { background: transparent; border: none; color: #fff; width: 100%; font-size: 20px; font-weight: 800; outline: none; }
+        .trade-panel { background: var(--panel); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .input-card { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 4px; }
+        .input-card label { font-size: 10px; color: #848e9c; display: block; margin-bottom: 5px; font-weight: 700; }
+        .input-card input { background: transparent; border: none; color: #fff; width: 100%; font-size: 22px; font-weight: 900; outline: none; }
 
-        .btn-trade { height: 60px; border: none; border-radius: 4px; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.1s; }
-        .btn-up { background: var(--green); color: #000; }
-        .btn-down { background: var(--red); color: #fff; }
-        .btn-trade:active { transform: scale(0.97); }
+        .trade-btn { height: 60px; border: none; border-radius: 4px; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.1s; }
+        .trade-btn:active { transform: scale(0.98); }
+        .btn-call { background: var(--green); color: #000; }
+        .btn-put { background: var(--red); color: #fff; }
 
         /* MODALS */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
-        .modal-content { background: var(--panel); width: 450px; padding: 30px; border-radius: 8px; border: 1px solid var(--border); }
-        
-        .pay-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .pay-btn { background: #0b0e11; border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center; cursor: pointer; }
-        .pay-btn.active { border-color: var(--accent); color: var(--accent); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: var(--panel); width: 420px; padding: 30px; border-radius: 8px; border: 1px solid var(--border); }
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .pay-card { background: #0b0e11; border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center; cursor: pointer; }
+        .pay-card.active { border-color: var(--accent); color: var(--accent); }
 
-        /* UTILS */
-        .acc-switch { display: flex; background: #000; border-radius: 4px; padding: 2px; border: 1px solid var(--border); }
-        .sw-btn { padding: 5px 15px; border: none; background: none; color: #848e9c; font-size: 11px; font-weight: 800; cursor: pointer; }
-        .sw-btn.active { background: var(--accent); color: #000; border-radius: 3px; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: #848e9c; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        td { padding: 10px 0; border-bottom: 1px solid #222; }
+        /* ACC SWITCH */
+        .acc-toggle { display: flex; background: #000; padding: 2px; border-radius: 4px; border: 1px solid var(--border); }
+        .acc-btn { padding: 5px 15px; border: none; background: none; color: #848e9c; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .acc-btn.active { background: var(--accent); color: #000; border-radius: 2px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="display:flex; align-items:center; gap:20px;">
-        <h2 style="color:var(--accent); margin:0; font-weight:900;">OWNER-EX</h2>
-        <div class="asset-selector" onclick="document.getElementById('assetDrop').style.display='flex'">
-            <span id="curAsset">BTC / USDT</span>
-            <div class="asset-list" id="assetDrop">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <div style="background:var(--accent); color:#000; padding:5px 10px; border-radius:4px; font-weight:900;">OWNER-EX</div>
+        
+        <div class="ui-select" onclick="toggleUI('assetDrop')">
+            <span id="curAsset">BTC / USDT</span> <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+            <div class="ui-dropdown" id="assetDrop">
                 <b>Криптовалюты</b>
-                <div class="asset-option" onclick="selectSymbol('BTCUSDT')">BTC / USDT</div>
-                <div class="asset-option" onclick="selectSymbol('ETHUSDT')">ETH / USDT</div>
-                <div class="asset-option" onclick="selectSymbol('SOLUSDT')">SOL / USDT</div>
+                <div class="ui-item" onclick="changeAsset('BTCUSDT')">BTC / USDT</div>
+                <div class="ui-item" onclick="changeAsset('ETHUSDT')">ETH / USDT</div>
+                <div class="ui-item" onclick="changeAsset('BNBUSDT')">BNB / USDT</div>
                 <b>Валютные пары</b>
-                <div class="asset-option" onclick="selectSymbol('EURUSDT')">EUR / USD</div>
-                <div class="asset-option" onclick="selectSymbol('GBPUSDT')">GBP / USD</div>
+                <div class="ui-item" onclick="changeAsset('EURUSDT')">EUR / USD</div>
+                <div class="ui-item" onclick="changeAsset('GBPUSDT')">GBP / USD</div>
+            </div>
+        </div>
+
+        <div class="ui-select" onclick="toggleUI('langDrop')">
+            <span id="curLang">RU</span> <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+            <div class="ui-dropdown" id="langDrop" style="width:80px;">
+                <div class="ui-item" onclick="changeLang('RU')">RU</div>
+                <div class="ui-item" onclick="changeLang('EN')">EN</div>
             </div>
         </div>
     </div>
 
     <div style="display:flex; align-items:center; gap:20px;">
-        <div class="acc-switch">
-            <button class="sw-btn active" id="demoBtn" onclick="toggleAcc('demo')">DEMO</button>
-            <button class="sw-btn" id="realBtn" onclick="toggleAcc('real')">REAL</button>
+        <div class="acc-toggle">
+            <button class="acc-btn active" id="demoMode" onclick="setAccount('demo')">DEMO</button>
+            <button class="acc-btn" id="realMode" onclick="setAccount('real')">REAL</button>
         </div>
-        <div id="mainBalance" style="color:var(--green); font-size:20px; font-weight:900;">$10,000.00</div>
+        <div id="balanceDisp" style="color:var(--green); font-size:20px; font-weight:900;">$10,000.00</div>
     </div>
 </header>
 
-<div class="main-content">
-    <div class="side-bar">
-        <i class="fas fa-chart-line active" onclick="closeAllModals()"></i>
+<div class="terminal-main">
+    <div class="side-nav">
+        <i class="fas fa-chart-line active" onclick="closeModals()"></i>
         <i class="fas fa-wallet" onclick="openModal('cashierModal')"></i>
         <i class="fas fa-user-circle" onclick="openModal('profileModal')"></i>
-        <i class="fas fa-history" onclick="alert('История транзакций пуста')"></i>
+        <i class="fas fa-headset" onclick="window.open('https://t.me/owner_ex_admin')"></i>
     </div>
 
-    <div class="chart-area">
+    <div class="chart-container">
         <div id="chart"></div>
-        <div class="trade-history">
-            <h4 style="margin:0 0 15px 0; font-size:12px; color:var(--accent);">ЖУРНАЛ СДЕЛОК</h4>
+        <div class="history-panel">
+            <h4>RECENT TRADES</h4>
             <table>
-                <thead><tr><th>АКТИВ</th><th>ТИП</th><th>СУММА</th><th>РЕЗУЛЬТАТ</th><th>ВРЕМЯ</th></tr></thead>
-                <tbody id="historyBody"></tbody>
+                <thead><tr><th>ASSET</th><th>TYPE</th><th>AMOUNT</th><th>RESULT</th><th>TIME</th></tr></thead>
+                <tbody id="tradeLogs"></tbody>
             </table>
         </div>
     </div>
 
-    <div class="right-panel">
-        <div class="input-box"><span>ИНВЕСТИЦИЯ (USDT)</span><input type="number" id="tradeAmt" value="100"></div>
-        <div class="input-box"><span>ВРЕМЯ (СЕК)</span><input type="number" id="tradeTime" value="30"></div>
-        <button class="btn-trade btn-up" onclick="execTrade('CALL')">ВЫШЕ ↑</button>
-        <button class="btn-trade btn-down" onclick="execTrade('PUT')">НИЖЕ ↓</button>
+    <div class="trade-panel">
+        <div class="input-card"><label>INVESTMENT (USDT)</label><input type="number" id="tradeAmt" value="100"></div>
+        <div class="input-card"><label>EXPIRATION (SEC)</label><input type="number" id="tradeTime" value="30"></div>
+        <button class="trade-btn btn-call" onclick="executeTrade('CALL')">ВЫШЕ ↑</button>
+        <button class="trade-btn btn-put" onclick="executeTrade('PUT')">НИЖЕ ↓</button>
     </div>
 </div>
 
 <div id="cashierModal" class="modal">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-around; margin-bottom:25px;">
-            <h3 id="tabDep" onclick="setCashMode('dep')" style="color:var(--accent); cursor:pointer;">ДЕПОЗИТ</h3>
-            <h3 id="tabWit" onclick="setCashMode('wit')" style="color:gray; cursor:pointer;">ВЫВОД</h3>
+    <div class="modal-box">
+        <h3 style="text-align:center; margin-bottom:20px;">CASHIER</h3>
+        <div class="pay-grid">
+            <div class="pay-card active" onclick="setMethod(this, 'USDT')">USDT (TRC20)</div>
+            <div class="pay-card" onclick="setMethod(this, 'TON')">TON / USDT</div>
+            <div class="pay-card" onclick="setMethod(this, 'TG')">TG PAY (BOT)</div>
+            <div class="pay-card" onclick="setMethod(this, 'SBP')">СБП / КАРТА</div>
+        </div>
+        <input type="number" id="depositAmt" class="input-card" style="width:100%; box-sizing:border-box; margin-bottom:15px;" placeholder="Amount ($)">
+        <button onclick="startAutoPay()" class="trade-btn btn-call" style="width:100%;">PROCEED</button>
+        
+        <div id="autoPayInfo" style="display:none; margin-top:20px; text-align:center; background:#000; padding:15px; border-radius:4px;">
+            <p id="payLabel" style="font-size:12px; margin-bottom:10px;"></p>
+            <div id="addrBox" style="color:var(--accent); font-family:monospace; word-break:break-all; font-size:14px;"></div>
+            <p style="font-size:10px; color:gray; margin-top:10px;">Checking transaction status...</p>
         </div>
         
-        <div id="paySelect">
-            <div class="pay-method-grid">
-                <div class="pay-btn active" onclick="setPayMethod(this, 'USDT TRC20')">USDT (TRC20)</div>
-                <div class="pay-btn" onclick="setPayMethod(this, 'TON')">TON / USDT</div>
-                <div class="pay-btn" onclick="setPayMethod(this, 'BTC')">BITCOIN</div>
-                <div class="pay-btn" onclick="setPayMethod(this, 'TELEGRAM')">TELEGRAM PAY ⚡</div>
-            </div>
-            <input type="number" id="cashAmt" class="input-box" style="width:100%; box-sizing:border-box; margin-bottom:15px;" placeholder="Сумма пополнения ($)">
-            <button onclick="startPayment()" class="btn-trade btn-up" style="width:100%;">ПРОДОЛЖИТЬ</button>
-        </div>
-
-        <div id="payDetails" style="display:none; text-align:center;">
-            <p>ПЕРЕВЕДИТЕ СРЕДСТВА НА АДРЕС:</p>
-            <div id="walletAddr" style="background:#000; padding:15px; border-radius:4px; font-family:monospace; color:var(--accent); margin:15px 0; word-break:break-all;"></div>
-            <p style="font-size:11px; color:gray;">После подтверждения в блокчейне баланс зачислится автоматически.</p>
-            <button onclick="backToPaySelect()" class="sw-btn" style="margin-top:10px;">Назад</button>
-        </div>
-        
-        <p onclick="closeAllModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</p>
-    </div>
-</div>
-
-<div id="profileModal" class="modal">
-    <div class="modal-content">
-        <h3 style="text-align:center;">ВАШ ПРОФИЛЬ</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="input-box"><span>ИМЯ</span><input type="text" id="p_n"></div>
-            <div class="input-box"><span>ФАМИЛИЯ</span><input type="text" id="p_s"></div>
-            <div class="input-box"><span>НИКНЕЙМ</span><input type="text" id="p_nk"></div>
-            <div class="input-box"><span>ТЕЛЕФОН</span><input type="text" id="p_t"></div>
-            <div class="input-box"><span>EMAIL</span><input type="text" id="p_e"></div>
-            <div class="input-box"><span>ПРОМОКОД</span><input type="text" id="p_p"></div>
-        </div>
-        <button onclick="alert('Данные сохранены')" class="btn-trade btn-up" style="width:100%; margin-top:20px;">СОХРАНИТЬ</button>
-        <p onclick="closeAllModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:15px;">ЗАКРЫТЬ</p>
+        <p onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">CLOSE</p>
     </div>
 </div>
 
@@ -213,127 +196,122 @@
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true; s1.src='https://embed.tawk.to/YOUR_ID/default';
+s1.async=true; s1.src='https://embed.tawk.to/677cc2034912b71220ad337e/1ihvj5tpe';
 s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 
 <script>
+    const BOT_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M";
     let chart, series, curSym = "BTCUSDT", lastPrice = 0, currentAcc = 'demo';
-    let bals = { demo: 10000, real: 0 };
-    let activeMethod = 'USDT TRC20';
+    let balances = { demo: 10000, real: 0 };
+    let activeMethod = 'USDT';
 
     function initTerminal() {
-        const container = document.getElementById('chart');
-        chart = LightweightCharts.createChart(container, {
+        chart = LightweightCharts.createChart(document.getElementById('chart'), {
             layout: { background: { color: '#000' }, textColor: '#848e9c' },
             grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { timeVisible: true, secondsVisible: true },
+            timeScale: { timeVisible: true, secondsVisible: true }
         });
-        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false, wickUpColor: '#0ecb81', wickDownColor: '#f6465d' });
-        
-        loadChartData();
+        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
+        loadHistory();
     }
 
-    function loadChartData() {
+    function loadHistory() {
         fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=1m&limit=500`)
             .then(r => r.json()).then(data => {
-                const formatted = data.map(d => ({
+                series.setData(data.map(d => ({
                     time: d[0]/1000, open: +d[1], high: +d[2], low: +d[3], close: +d[4]
-                }));
-                series.setData(formatted);
-                connectSocket();
+                })));
+                connectWS();
             });
     }
 
-    function connectSocket() {
+    function connectWS() {
         if(window.ws) window.ws.close();
         window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
         window.ws.onmessage = e => {
             const k = JSON.parse(e.data).k;
             lastPrice = +k.c;
-            series.update({
-                time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice
-            });
+            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
         };
     }
 
-    function selectSymbol(s) {
-        curSym = s;
-        document.getElementById('curAsset').innerText = s.replace('USDT', ' / USDT');
-        document.getElementById('assetDrop').style.display = 'none';
-        loadChartData();
+    function toggleUI(id) {
+        const el = document.getElementById(id);
+        const isOpen = el.style.display === 'flex';
+        document.querySelectorAll('.ui-dropdown').forEach(d => d.style.display = 'none');
+        el.style.display = isOpen ? 'none' : 'flex';
     }
 
-    function toggleAcc(a) {
-        currentAcc = a;
-        document.getElementById('demoBtn').classList.toggle('active', a==='demo');
-        document.getElementById('realBtn').classList.toggle('active', a==='real');
+    function changeAsset(s) {
+        curSym = s;
+        document.getElementById('curAsset').innerText = s.replace('USDT', ' / USDT');
+        loadHistory();
+    }
+
+    function changeLang(l) {
+        document.getElementById('curLang').innerText = l;
+    }
+
+    function setAccount(type) {
+        currentAcc = type;
+        document.getElementById('demoMode').classList.toggle('active', type==='demo');
+        document.getElementById('realMode').classList.toggle('active', type==='real');
         updateBalance();
     }
 
     function updateBalance() {
-        document.getElementById('mainBalance').innerText = `$${bals[currentAcc].toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('balanceDisp').innerText = `$${balances[currentAcc].toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
 
-    function setPayMethod(el, name) {
-        document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+    function setMethod(el, m) {
+        document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        activeMethod = name;
+        activeMethod = m;
     }
 
-    function startPayment() {
-        const amt = document.getElementById('cashAmt').value;
-        if(amt < 10) return alert("Минимальная сумма $10");
+    function startAutoPay() {
+        const amt = document.getElementById('depositAmt').value;
+        if(amt < 10) return alert("Min deposit $10");
 
-        if(activeMethod === 'TELEGRAM') {
-            window.open('https://t.me/OWNER_PAY_BOT'); // Ссылка на вашего бота
+        if(activeMethod === 'TG') {
+            window.open(`https://t.me/payerowbot?start=pay_${amt}`);
             return;
         }
 
-        document.getElementById('paySelect').style.display = 'none';
-        document.getElementById('payDetails').style.display = 'block';
-        
-        const wallets = {
-            'USDT TRC20': 'TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7',
-            'TON': 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa',
-            'BTC': 'bc1qvf4wevx5lyjsz5l6mtpq9rs6qehssf5rmzfv4t'
-        };
-        document.getElementById('walletAddr').innerText = wallets[activeMethod];
+        document.getElementById('autoPayInfo').style.display = 'block';
+        const wallets = { 'USDT': 'TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7', 'TON': 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa' };
+        document.getElementById('payLabel').innerText = `TRANSFER ${amt} USDT TO:`;
+        document.getElementById('addrBox').innerText = wallets[activeMethod] || 'Use TG Bot for SBP';
     }
 
-    function backToPaySelect() {
-        document.getElementById('paySelect').style.display = 'block';
-        document.getElementById('payDetails').style.display = 'none';
-    }
-
-    function execTrade(type) {
+    function executeTrade(type) {
         const amt = +document.getElementById('tradeAmt').value;
-        if(amt > bals[currentAcc]) return alert("Недостаточно средств");
+        if(amt > balances[currentAcc]) return alert("Insufficient funds");
         
-        bals[currentAcc] -= amt;
+        balances[currentAcc] -= amt;
         updateBalance();
 
         const row = document.createElement('tr');
-        const startTime = new Date().toLocaleTimeString();
-        row.innerHTML = `<td>${curSym}</td><td style="color:${type==='CALL'?'var(--green)':'var(--red)'}">${type}</td><td>$${amt}</td><td id="res">...</td><td>${startTime}</td>`;
-        document.getElementById('historyBody').prepend(row);
+        row.innerHTML = `<td>${curSym}</td><td style="color:${type==='CALL'?'#0ecb81':'#f6465d'}">${type}</td><td>$${amt}</td><td id="res">...</td><td>${new Date().toLocaleTimeString()}</td>`;
+        document.getElementById('tradeLogs').prepend(row);
 
         setTimeout(() => {
-            const win = Math.random() > 0.45;
-            const resCell = row.querySelector('#res');
+            const win = Math.random() > 0.48;
+            const res = row.querySelector('#res');
             if(win) {
                 const profit = amt * 1.82;
-                bals[currentAcc] += profit;
-                resCell.innerText = `+$${(amt*0.82).toFixed(2)}`;
-                resCell.style.color = 'var(--green)';
+                balances[currentAcc] += profit;
+                res.innerText = `+$${(amt*0.82).toFixed(2)}`;
+                res.style.color = 'var(--green)';
             } else {
-                resCell.innerText = `-$${amt}`;
-                resCell.style.color = 'var(--red)';
+                res.innerText = `-$${amt}`;
+                res.style.color = 'var(--red)';
             }
             updateBalance();
         }, 3000);
