@@ -47,7 +47,7 @@
 
         /* HEADER */
         header {
-            height: 50px; background: var(--panel);
+            height: 55px; background: var(--panel);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; flex-shrink: 0; z-index: 100;
@@ -61,19 +61,17 @@
         }
         .logo-text { font-weight: 800; font-size: 18px; letter-spacing: 0.5px; }
 
-        /* ВЫБОР АКТИВОВ БЕЗ СТРЕЛОЧКИ */
         .asset-select-container {
             background: #000; border: 1px solid var(--border);
             border-radius: 4px; padding: 0 10px;
         }
         select#assetSelect {
             background: transparent; color: #fff; border: none;
-            padding: 5px 0; font-size: 13px; font-weight: 600;
-            outline: none; cursor: pointer; min-width: 150px;
-            appearance: none; /* Убирает стрелочку */
+            padding: 6px 0; font-size: 13px; font-weight: 600;
+            outline: none; cursor: pointer; min-width: 160px;
+            appearance: none;
         }
 
-        /* НОВЫЙ ДИЗАЙН REAL/DEMO */
         .acc-toggle {
             display: flex; background: #000; border: 1px solid var(--border);
             padding: 2px; border-radius: 6px; margin-left: 20px;
@@ -84,7 +82,7 @@
             font-weight: 800; border-radius: 4px; transition: 0.2s;
             text-transform: uppercase;
         }
-        .acc-btn.active { background: #2b2f36; color: var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .acc-btn.active { background: #2b2f36; color: var(--accent); }
         #balanceDisplay { font-weight: 800; color: var(--green); font-size: 18px; margin-left: 15px; }
 
         /* LAYOUT */
@@ -98,7 +96,7 @@
             padding: 20px 0; gap: 25px;
         }
         .nav-item { font-size: 20px; color: #848e9c; cursor: pointer; transition: 0.2s; }
-        .nav-item:hover { color: var(--accent); }
+        .nav-item:hover, .nav-item.active { color: var(--accent); }
 
         .chart-section { display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; background: #000; }
         .chart-overlay { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
@@ -107,10 +105,10 @@
 
         #chart { flex: 1; }
 
-        .history-table { height: 160px; background: var(--panel); border-top: 1px solid var(--border); overflow-y: auto; padding: 12px; }
+        .history-table { height: 180px; background: var(--panel); border-top: 1px solid var(--border); overflow-y: auto; padding: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #848e9c; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-        td { padding: 8px 0; border-bottom: 1px solid #222; }
+        td { padding: 10px 0; border-bottom: 1px solid #222; }
 
         /* TRADE PANEL */
         .trade-panel { padding: 25px; background: var(--panel); display: flex; flex-direction: column; gap: 15px; }
@@ -118,30 +116,31 @@
         .input-group label { display: block; font-size: 10px; color: #848e9c; margin-bottom: 5px; text-transform: uppercase; }
         .input-group input { background: transparent; border: none; color: #fff; width: 100%; font-size: 18px; font-weight: 700; outline: none; }
 
-        .btn-exec { height: 50px; border: none; border-radius: var(--radius); font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.1s; }
+        .btn-exec { height: 55px; border: none; border-radius: var(--radius); font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.1s; }
         .btn-call { background: var(--green); color: #000; }
         .btn-put { background: var(--red); color: #fff; }
         .btn-exec:active { transform: scale(0.97); }
 
         /* FOOTER */
-        footer { height: 32px; background: var(--panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 11px; color: #848e9c; }
+        footer { height: 35px; background: var(--panel); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 11px; color: #848e9c; }
         footer span { cursor: pointer; }
         footer span:hover { color: #fff; }
 
         /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: var(--panel); width: 420px; padding: 30px; border-radius: 12px; border: 1px solid var(--border); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--panel); width: 450px; padding: 30px; border-radius: 12px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         .custom-input { background: #0b0e11; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 4px; width: 100%; box-sizing: border-box; margin-bottom: 12px; font-size: 14px; outline: none; }
-        .custom-input:focus { border-color: var(--accent); }
-
-        /* КАССА ДИЗАЙН */
+        
+        /* КАССА ОПЛАТА */
         .pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .pay-item { background: #0b0e11; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .pay-item.active { border-color: var(--accent); background: #1c2127; }
-        .pay-item i { color: var(--accent); margin-bottom: 8px; display: block; font-size: 18px; }
+        .pay-item { background: #0b0e11; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .pay-item:hover, .pay-item.active { border-color: var(--accent); background: #1c2127; }
+        .pay-item i { color: var(--accent); margin-bottom: 8px; display: block; font-size: 20px; }
         
         #paymentInfoPage { display: none; text-align: center; }
-        .requisites-box { background: #000; padding: 15px; border-radius: 6px; font-family: monospace; margin: 15px 0; font-size: 12px; word-break: break-all; color: var(--accent); border: 1px dashed var(--border); }
+        .qr-box { background: #fff; width: 150px; height: 150px; margin: 15px auto; padding: 10px; border-radius: 8px; }
+        .qr-box img { width: 100%; height: 100%; }
+        .requisites-box { background: #000; padding: 15px; border-radius: 6px; font-family: monospace; margin: 15px 0; font-size: 13px; word-break: break-all; color: var(--accent); border: 1px dashed var(--accent); }
     </style>
 </head>
 <body>
@@ -164,10 +163,16 @@
         </div>
         <div class="asset-select-container">
             <select id="assetSelect" onchange="updateSymbol(this.value)">
-                <option value="BTCUSDT">₿ BITCOIN / USDT</option>
-                <option value="ETHUSDT">Ξ ETHEREUM / USDT</option>
-                <option value="SOLUSDT">◎ SOLANA / USDT</option>
-                <option value="BNBUSDT">◈ BINANCE / USDT</option>
+                <optgroup label="Криптовалюты" style="background: #161a1e;">
+                    <option value="BTCUSDT">₿ BITCOIN / USDT</option>
+                    <option value="ETHUSDT">Ξ ETHEREUM / USDT</option>
+                    <option value="SOLUSDT">◎ SOLANA / USDT</option>
+                </optgroup>
+                <optgroup label="Валютные пары" style="background: #161a1e;">
+                    <option value="EURUSDT">€ EUR / USD</option>
+                    <option value="GBPUSDT">£ GBP / USD</option>
+                    <option value="AUDUSDT">A$ AUD / USD</option>
+                </optgroup>
             </select>
         </div>
     </div>
@@ -182,10 +187,10 @@
 
 <div class="terminal-container">
     <div class="side-nav">
-        <i class="fas fa-chart-line nav-item" onclick="closeModals()"></i>
+        <i class="fas fa-chart-line nav-item active" onclick="closeModals()"></i>
         <i class="fas fa-wallet nav-item" onclick="openModal('cashierModal')"></i>
         <i class="fas fa-user-circle nav-item" onclick="openModal('profileModal')"></i>
-        <i class="fas fa-headset nav-item" onclick="alert('Техподдержка OWNER-EX: @owner_ex_admin')"></i>
+        <i class="fas fa-headset nav-item" onclick="openSupport()"></i>
     </div>
 
     <div class="chart-section">
@@ -211,9 +216,9 @@
 </div>
 
 <footer>
-    <span onclick="alert('Support: @owner_ex_support')">СЛУЖБА ПОДДЕРЖКИ</span>
-    <span onclick="alert('Частые вопросы и ответы')">FAQ</span>
-    <span onclick="alert('Лицензионное соглашение терминала')">ПОЛИТИКА</span>
+    <span onclick="openSupport()">СЛУЖБА ПОДДЕРЖКИ</span>
+    <span onclick="alert('Раздел FAQ в разработке')">FAQ</span>
+    <span onclick="alert('OWNER-EX Trading Agreement v2.4')">ПОЛИТИКА</span>
 </footer>
 
 <div id="profileModal" class="modal-overlay">
@@ -242,33 +247,42 @@
                 <h3 id="tabWit" style="cursor:pointer; color:gray" onclick="switchTab('wit')">ВЫВОД</h3>
             </div>
             
-            <p style="font-size:12px; color:gray; margin-bottom:15px;">Выберите способ оплаты:</p>
+            <p style="font-size:12px; color:gray; margin-bottom:15px;">Выберите способ:</p>
             <div class="pay-methods">
-                <div class="pay-item active" onclick="selectPay(this, 'USDT (TRC20)')"><i class="fab fa-ethereum"></i><span>USDT TRC20</span></div>
-                <div class="pay-item" onclick="selectPay(this, 'TON / USDT TON')"><i class="fas fa-gem"></i><span>TON / USDT</span></div>
+                <div class="pay-item active" onclick="selectPay(this, 'USDT (TRC20)')"><i class="fas fa-coins"></i><span>USDT TRC20</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'TON')"><i class="fas fa-gem"></i><span>TON</span></div>
                 <div class="pay-item" onclick="selectPay(this, 'Bitcoin')"><i class="fab fa-bitcoin"></i><span>Bitcoin</span></div>
                 <div class="pay-item" onclick="selectPay(this, 'Ethereum')"><i class="fab fa-ethereum"></i><span>Ethereum</span></div>
-                <div class="pay-item" onclick="selectPay(this, 'Карта')"><i class="fas fa-credit-card"></i><span>Банковская карта</span></div>
-                <div class="pay-item" onclick="selectPay(this, 'СБП')"><i class="fas fa-mobile-alt"></i><span>СБП</span></div>
             </div>
 
-            <input type="number" id="cashAmount" class="custom-input" placeholder="Сумма пополнения ($)">
-            <input type="text" id="cashWallet" class="custom-input" placeholder="Реквизиты для вывода" style="display:none;">
+            <input type="number" id="cashAmount" class="custom-input" placeholder="Сумма ($)">
+            <input type="text" id="cashWallet" class="custom-input" placeholder="Ваш адрес кошелька для вывода" style="display:none;">
 
-            <button id="cashBtn" onclick="processCashier()" class="btn-exec btn-call" style="width:100%;">ПОПОЛНИТЬ</button>
+            <button id="cashBtn" onclick="processCashier()" class="btn-exec btn-call" style="width:100%;">ПРОДОЛЖИТЬ</button>
         </div>
 
         <div id="paymentInfoPage">
-            <h3 style="color:var(--accent)">РЕКВИЗИТЫ ДЛЯ ОПЛАТЫ</h3>
-            <p id="selectedMethodDisplay" style="font-size:14px; margin-bottom:10px;"></p>
+            <h3 style="color:var(--accent)">РЕКВИЗИТЫ ОПЛАТЫ</h3>
+            <p id="selectedMethodDisplay" style="font-size:14px;"></p>
+            <div class="qr-box"><img id="qrImg" src="" alt="QR"></div>
             <div class="requisites-box" id="adminRequisites"></div>
-            <p style="font-size:11px; color:gray; margin-bottom:15px;">Переведите точную сумму на указанный адрес. После оплаты нажмите кнопку ниже.</p>
+            <p style="font-size:11px; color:gray; margin-bottom:15px;">После перевода нажмите "Я ОПЛАТИЛ"</p>
             <button onclick="confirmPayment()" class="btn-exec btn-call" style="width:100%;">Я ОПЛАТИЛ</button>
-            <button onclick="backToCashier()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; font-size:12px;">Назад к выбору</button>
+            <button onclick="backToCashier()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; font-size:12px;">Назад</button>
         </div>
         <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ КАССУ</div>
     </div>
 </div>
+
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true; s1.src='https://embed.tawk.to/677cc2034912b71220ad337e/1ihvj5tpe';
+    s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+</script>
 
 <script>
     const TG_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M";
@@ -297,99 +311,100 @@
         `).join('');
     }
 
-    // CASHIER LOGIC
-    window.switchTab = (tab) => {
+    function switchTab(tab) {
         currentTab = tab;
         document.getElementById('tabDep').style.color = tab === 'dep' ? 'var(--accent)' : 'gray';
         document.getElementById('tabWit').style.color = tab === 'wit' ? 'var(--accent)' : 'gray';
-        document.getElementById('cashBtn').innerText = tab === 'dep' ? 'ПОПОЛНИТЬ' : 'ВЫВЕСТИ';
+        document.getElementById('cashBtn').innerText = tab === 'dep' ? 'ПРОДОЛЖИТЬ' : 'ВЫВЕСТИ';
         document.getElementById('cashWallet').style.display = tab === 'wit' ? 'block' : 'none';
-    };
+    }
 
-    window.selectPay = (el, name) => {
+    function selectPay(el, name) {
         document.querySelectorAll('.pay-item').forEach(p => p.classList.remove('active'));
         el.classList.add('active'); selectedMethod = name;
-    };
+    }
 
-    window.processCashier = () => {
+    function processCashier() {
         const amt = document.getElementById('cashAmount').value;
         if(!amt || amt < 10) return alert("Минимальная сумма $10");
 
         if(currentTab === 'dep') {
-            if(selectedMethod === 'Карта' || selectedMethod === 'СБП') {
-                return alert("Техническая ошибка, попробуйте позже");
-            }
             document.getElementById('cashierMain').style.display = 'none';
             document.getElementById('paymentInfoPage').style.display = 'block';
-            document.getElementById('selectedMethodDisplay').innerText = `Метод: ${selectedMethod} | Сумма: $${amt}`;
+            document.getElementById('selectedMethodDisplay').innerText = `${selectedMethod} | $${amt}`;
             
             const reqs = {
                 'USDT (TRC20)': 'TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7',
-                'TON / USDT TON': 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa',
+                'TON': 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa',
                 'Bitcoin': 'bc1qvf4wevx5lyjsz5l6mtpq9rs6qehssf5rmzfv4t',
                 'Ethereum': '0x9De3fd62a718EE7eA1C7a5c25F4f2648aEE07083'
             };
-            document.getElementById('adminRequisites').innerText = reqs[selectedMethod];
+            const addr = reqs[selectedMethod];
+            document.getElementById('adminRequisites').innerText = addr;
+            document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${addr}`;
         } else {
             const wallet = document.getElementById('cashWallet').value;
-            if(!wallet) return alert("Введите реквизиты!");
-            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=📤 ВЫВОД: $${amt} | Метод: ${selectedMethod} | Реквизиты: ${wallet}`).catch(()=>{});
-            alert("Заявка на вывод отправлена!"); closeModals();
+            if(!wallet) return alert("Введите адрес для вывода!");
+            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=📤 ВЫВОД: $${amt} | Метод: ${selectedMethod} | Адрес: ${wallet}`).catch(()=>{});
+            alert("Заявка на вывод принята!"); closeModals();
         }
-    };
+    }
 
-    window.backToCashier = () => {
-        document.getElementById('cashierMain').style.display = 'block';
-        document.getElementById('paymentInfoPage').style.display = 'none';
-    };
-
-    window.confirmPayment = () => {
+    function confirmPayment() {
         const amt = document.getElementById('cashAmount').value;
         fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=💸 ДЕПОЗИТ: $${amt} | Метод: ${selectedMethod}`).catch(()=>{});
-        alert("Заявка отправлена. Ожидайте пополнения баланса.");
+        alert("Оплата проверяется! Баланс пополнится автоматически.");
         closeModals(); backToCashier();
-    };
+    }
 
-    window.openModal = (id) => {
+    function backToCashier() {
+        document.getElementById('cashierMain').style.display = 'block';
+        document.getElementById('paymentInfoPage').style.display = 'none';
+    }
+
+    function openModal(id) {
         document.getElementById(id).style.display = 'flex';
         if(id === 'profileModal') {
             const keys = ['p_name','p_surname','p_nick','p_birth','p_country','p_phone','p_email','p_promo'];
             keys.forEach(k => document.getElementById(k).value = profile[k] || '');
         }
-    };
+    }
 
-    window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
 
-    window.saveProfile = () => {
+    function saveProfile() {
         const keys = ['p_name','p_surname','p_nick','p_birth','p_country','p_phone','p_email','p_promo'];
         keys.forEach(k => profile[k] = document.getElementById(k).value);
         saveAll();
-        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Обновлен профиль: ${profile.p_nick}`).catch(()=>{});
-        alert("Профиль успешно сохранен!"); closeModals();
-    };
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Профиль: ${profile.p_nick} (${profile.p_name})`).catch(()=>{});
+        alert("Профиль сохранен!"); closeModals();
+    }
 
-    window.handleTrade = (type) => {
+    function openSupport() { if(window.Tawk_API) window.Tawk_API.maximize(); }
+
+    function handleTrade(type) {
         const amt = parseFloat(document.getElementById('tradeAmount').value);
-        if (amt > bals[currentAccount] || amt <= 0) return alert("Недостаточно средств!");
+        if (amt > bals[currentAccount] || amt <= 0) return alert("Ошибка баланса!");
         bals[currentAccount] -= amt; updateUI();
         const startPrice = lastPrice;
-        const symbol = document.getElementById('assetSelect').value.split(' ')[1];
+        const sym = document.getElementById('assetSelect').value;
+        
         setTimeout(() => {
             const win = (type === 'CALL' && lastPrice > startPrice) || (type === 'PUT' && lastPrice < startPrice);
             const resVal = win ? (amt * 0.82) : -amt;
             const resText = win ? `+$${resVal.toFixed(2)}` : `-$${amt.toFixed(2)}`;
             if (win) bals[currentAccount] += (amt + resVal);
-            tHist.unshift({ s: symbol, t: type, a: amt, r: resText });
+            tHist.unshift({ s: sym.split('USDT')[0], t: type, a: amt, r: resText });
             saveAll(); updateUI();
         }, parseInt(document.getElementById('tradeTime').value) * 1000);
-    };
+    }
 
-    window.switchAccount = (acc) => {
+    function switchAccount(acc) {
         currentAccount = acc;
         document.getElementById('demoBtn').classList.toggle('active', acc === 'demo');
         document.getElementById('realBtn').classList.toggle('active', acc === 'real');
         updateUI();
-    };
+    }
 
     function initChart() {
         const chart = LightweightCharts.createChart(document.getElementById('chart'), {
@@ -397,7 +412,8 @@
             grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
             timeScale: { timeVisible: true, secondsVisible: true }
         });
-        const series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false, wickUpColor: '#0ecb81', wickDownColor: '#f6465d' });
+        const series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
+        
         window.updateSymbol = (sym) => {
             document.getElementById('chartSymbol').innerText = sym.replace('USDT', ' / USDT');
             fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1m&limit=500`)
