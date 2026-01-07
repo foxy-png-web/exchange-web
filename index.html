@@ -34,21 +34,16 @@
             flex-direction: column;
         }
 
-        /* AUTH SCREEN - НОВЫЙ ДИЗАЙН ИЗ ВАШИХ СКРИНШОТОВ */
+        /* AUTH SCREEN */
         #authScreen {
             position: fixed; inset: 0; background: var(--bg); z-index: 9999;
             display: flex; align-items: center; justify-content: center;
         }
         .auth-card {
-            background: var(--panel); padding: 30px; border-radius: 15px;
-            width: 320px; border: 1px solid var(--accent); text-align: center;
-            box-shadow: 0 0 20px rgba(14, 203, 129, 0.1);
+            background: var(--panel); padding: 40px; border-radius: 12px;
+            width: 350px; border: 1px solid var(--border); text-align: center;
         }
-        .auth-logo { margin-bottom: 20px; font-weight: 800; font-size: 18px; color: var(--accent); letter-spacing: 1px; }
-        
-        .auth-tabs { display: flex; background: #222; border-radius: 8px; margin-bottom: 20px; padding: 3px; }
-        .auth-tab { flex: 1; padding: 8px; font-size: 12px; cursor: pointer; border-radius: 6px; transition: 0.3s; color: #848e9c; }
-        .auth-tab.active { background: var(--accent); color: #000; font-weight: 700; }
+        .auth-logo { margin-bottom: 25px; font-weight: 900; font-size: 28px; color: var(--accent); }
 
         /* HEADER */
         header {
@@ -57,23 +52,14 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; flex-shrink: 0; z-index: 100;
         }
-        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
         .logo-box { display: flex; align-items: center; gap: 10px; }
         .logo-icon {
             width: 28px; height: 28px; background: var(--accent);
             border-radius: 5px; display: flex; align-items: center; justify-content: center;
             color: #000; font-weight: 900; font-size: 18px;
         }
-        .logo-text { font-weight: 800; font-size: 18px; }
-
-        /* ТАЙМФРЕЙМЫ И ВЫБОР ГРАФИКА */
-        .chart-controls { display: flex; gap: 8px; margin-left: 15px; }
-        .ctrl-btn {
-            background: #222; border: 1px solid var(--border); color: #848e9c;
-            padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700;
-            cursor: pointer; transition: 0.2s;
-        }
-        .ctrl-btn:hover, .ctrl-btn.active { border-color: var(--accent); color: #fff; }
+        .logo-text { font-weight: 800; font-size: 18px; letter-spacing: 0.5px; }
 
         .asset-select-container {
             background: #000; border: 1px solid var(--border);
@@ -82,7 +68,8 @@
         select#assetSelect {
             background: transparent; color: #fff; border: none;
             padding: 6px 0; font-size: 13px; font-weight: 600;
-            outline: none; cursor: pointer; min-width: 140px; appearance: none;
+            outline: none; cursor: pointer; min-width: 160px;
+            appearance: none;
         }
 
         .acc-toggle {
@@ -92,7 +79,8 @@
         .acc-btn {
             padding: 4px 14px; border: none; background: none;
             color: #848e9c; cursor: pointer; font-size: 11px;
-            font-weight: 800; border-radius: 4px; text-transform: uppercase;
+            font-weight: 800; border-radius: 4px; transition: 0.2s;
+            text-transform: uppercase;
         }
         .acc-btn.active { background: #2b2f36; color: var(--accent); }
         #balanceDisplay { font-weight: 800; color: var(--green); font-size: 18px; margin-left: 15px; }
@@ -109,7 +97,6 @@
         }
         .nav-item { font-size: 20px; color: #848e9c; cursor: pointer; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { color: var(--accent); }
-        .logout-item { margin-top: auto; color: #f6465d; margin-bottom: 20px; }
 
         .chart-section { display: flex; flex-direction: column; border-right: 1px solid var(--border); position: relative; background: #000; }
         .chart-overlay { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
@@ -141,8 +128,14 @@
 
         /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: var(--panel); width: 450px; padding: 30px; border-radius: 12px; border: 1px solid var(--border); }
+        .modal-box { background: var(--panel); width: 450px; padding: 30px; border-radius: 12px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         .custom-input { background: #0b0e11; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 4px; width: 100%; box-sizing: border-box; margin-bottom: 12px; font-size: 14px; outline: none; }
+        
+        /* КАССА ОПЛАТА */
+        .pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .pay-item { background: #0b0e11; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .pay-item:hover, .pay-item.active { border-color: var(--accent); background: #1c2127; }
+        .pay-item i { color: var(--accent); margin-bottom: 8px; display: block; font-size: 20px; }
         
         #paymentInfoPage { display: none; text-align: center; }
         .qr-box { background: #fff; width: 150px; height: 150px; margin: 15px auto; padding: 10px; border-radius: 8px; }
@@ -155,13 +148,10 @@
 <div id="authScreen">
     <div class="auth-card">
         <div class="auth-logo">OWNER-EX</div>
-        <div class="auth-tabs">
-            <div class="auth-tab" id="tabRegister" onclick="switchAuthMode('reg')">Регистрация</div>
-            <div class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">Вход</div>
-        </div>
-        <input type="email" id="authEmail" class="custom-input" placeholder="Email">
-        <input type="password" id="authPass" class="custom-input" placeholder="Пароль">
-        <button id="authBtn" onclick="handleAuth()" class="btn-exec btn-call" style="width:100%; font-size: 14px;">Начать торговать</button>
+        <input type="text" class="custom-input" placeholder="Логин">
+        <input type="password" class="custom-input" placeholder="Пароль">
+        <button onclick="login()" class="btn-exec btn-call" style="width:100%;">ВОЙТИ</button>
+        <p style="font-size: 12px; color: gray; margin-top: 20px; cursor: pointer;">Создать аккаунт</p>
     </div>
 </div>
 
@@ -174,23 +164,16 @@
         <div class="asset-select-container">
             <select id="assetSelect" onchange="updateSymbol(this.value)">
                 <optgroup label="Криптовалюты" style="background: #161a1e;">
-                    <option value="BTCUSDT">BTC / USDT</option>
-                    <option value="ETHUSDT">ETH / USDT</option>
-                    <option value="SOLUSDT">SOL / USDT</option>
-                    <option value="BNBUSDT">BNB / USDT</option>
+                    <option value="BTCUSDT">₿ BITCOIN / USDT</option>
+                    <option value="ETHUSDT">Ξ ETHEREUM / USDT</option>
+                    <option value="SOLUSDT">◎ SOLANA / USDT</option>
                 </optgroup>
                 <optgroup label="Валютные пары" style="background: #161a1e;">
-                    <option value="EURUSDT">EUR / USD</option>
-                    <option value="GBPUSDT">GBP / USD</option>
-                    <option value="AUDUSDT">AUD / USD</option>
+                    <option value="EURUSDT">€ EUR / USD</option>
+                    <option value="GBPUSDT">£ GBP / USD</option>
+                    <option value="AUDUSDT">A$ AUD / USD</option>
                 </optgroup>
             </select>
-        </div>
-        <div class="chart-controls">
-            <button class="ctrl-btn" onclick="changeInterval('1m')">M1</button>
-            <button class="ctrl-btn active" onclick="changeInterval('1h')">H1</button>
-            <button class="ctrl-btn" onclick="toggleChartType('area')"><i class="fas fa-chart-area"></i></button>
-            <button class="ctrl-btn" onclick="toggleChartType('candles')"><i class="fas fa-chart-bar"></i></button>
         </div>
     </div>
     <div style="display: flex; align-items: center;">
@@ -208,7 +191,6 @@
         <i class="fas fa-wallet nav-item" onclick="openModal('cashierModal')"></i>
         <i class="fas fa-user-circle nav-item" onclick="openModal('profileModal')"></i>
         <i class="fas fa-headset nav-item" onclick="openSupport()"></i>
-        <i class="fas fa-sign-out-alt nav-item logout-item" onclick="logout()"></i>
     </div>
 
     <div class="chart-section">
@@ -234,21 +216,25 @@
 </div>
 
 <footer>
-    <span onclick="openSupport()">ПОДДЕРЖКА</span>
-    <span onclick="alert('FAQ')">FAQ</span>
-    <span onclick="alert('ПОЛИТИКА')">ПОЛИТИКА</span>
+    <span onclick="openSupport()">СЛУЖБА ПОДДЕРЖКИ</span>
+    <span onclick="alert('Раздел FAQ в разработке')">FAQ</span>
+    <span onclick="alert('OWNER-EX Trading Agreement v2.4')">ПОЛИТИКА</span>
 </footer>
 
 <div id="profileModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="text-align: center; margin-bottom: 20px;">ПРОФИЛЬ</h3>
+        <h3 style="text-align: center; margin-bottom: 20px;">ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <input type="text" id="p_name" class="custom-input" placeholder="Имя">
+            <input type="text" id="p_surname" class="custom-input" placeholder="Фамилия">
             <input type="text" id="p_nick" class="custom-input" placeholder="Никнейм">
-            <input type="text" id="p_email_display" class="custom-input" disabled>
+            <input type="text" id="p_birth" class="custom-input" placeholder="Дата рождения">
+            <input type="text" id="p_country" class="custom-input" placeholder="Страна">
+            <input type="text" id="p_phone" class="custom-input" placeholder="Номер телефона">
+            <input type="text" id="p_email" class="custom-input" placeholder="Эл. почта">
             <input type="text" id="p_promo" class="custom-input" placeholder="Промокод">
         </div>
-        <button onclick="saveProfile()" class="btn-exec btn-call" style="width:100%; margin-top:10px;">СОХРАНИТЬ</button>
+        <button onclick="saveProfile()" class="btn-exec btn-call" style="width:100%; margin-top:10px;">СОХРАНИТЬ ДАННЫЕ</button>
         <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</div>
     </div>
 </div>
@@ -260,17 +246,31 @@
                 <h3 id="tabDep" style="cursor:pointer; color:var(--accent)" onclick="switchTab('dep')">ДЕПОЗИТ</h3>
                 <h3 id="tabWit" style="cursor:pointer; color:gray" onclick="switchTab('wit')">ВЫВОД</h3>
             </div>
+            
+            <p style="font-size:12px; color:gray; margin-bottom:15px;">Выберите способ:</p>
+            <div class="pay-methods">
+                <div class="pay-item active" onclick="selectPay(this, 'USDT (TRC20)')"><i class="fas fa-coins"></i><span>USDT TRC20</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'TON')"><i class="fas fa-gem"></i><span>TON</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'Bitcoin')"><i class="fab fa-bitcoin"></i><span>Bitcoin</span></div>
+                <div class="pay-item" onclick="selectPay(this, 'Ethereum')"><i class="fab fa-ethereum"></i><span>Ethereum</span></div>
+            </div>
+
             <input type="number" id="cashAmount" class="custom-input" placeholder="Сумма ($)">
-            <button onclick="processCashier()" class="btn-exec btn-call" style="width:100%;">ПРОДОЛЖИТЬ</button>
+            <input type="text" id="cashWallet" class="custom-input" placeholder="Ваш адрес кошелька для вывода" style="display:none;">
+
+            <button id="cashBtn" onclick="processCashier()" class="btn-exec btn-call" style="width:100%;">ПРОДОЛЖИТЬ</button>
         </div>
+
         <div id="paymentInfoPage">
-            <h3 style="color:var(--accent)">РЕКВИЗИТЫ</h3>
+            <h3 style="color:var(--accent)">РЕКВИЗИТЫ ОПЛАТЫ</h3>
+            <p id="selectedMethodDisplay" style="font-size:14px;"></p>
             <div class="qr-box"><img id="qrImg" src="" alt="QR"></div>
-            <div class="requisites-box" id="adminRequisites">TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7</div>
+            <div class="requisites-box" id="adminRequisites"></div>
+            <p style="font-size:11px; color:gray; margin-bottom:15px;">После перевода нажмите "Я ОПЛАТИЛ"</p>
             <button onclick="confirmPayment()" class="btn-exec btn-call" style="width:100%;">Я ОПЛАТИЛ</button>
             <button onclick="backToCashier()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer; font-size:12px;">Назад</button>
         </div>
-        <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ</div>
+        <div onclick="closeModals()" style="text-align:center; color:gray; cursor:pointer; margin-top:20px; font-size:12px;">ЗАКРЫТЬ КАССУ</div>
     </div>
 </div>
 
@@ -289,56 +289,21 @@
     const TG_USER_ID = 6426834853;
 
     let bals = JSON.parse(localStorage.getItem('bals')) || { demo: 10000, real: 0 };
-    let users = JSON.parse(localStorage.getItem('owner_users')) || {};
-    let currentUser = localStorage.getItem('owner_current_user') || null;
+    let profile = JSON.parse(localStorage.getItem('profile')) || {};
     let tHist = JSON.parse(localStorage.getItem('tradeHistory')) || [];
-    
-    let chart, series, currentAccount = 'demo', lastPrice = 0, currentMode = 'login', currentInterval = '1h';
+    let currentAccount = 'demo', lastPrice = 0, currentTab = 'dep', selectedMethod = 'USDT (TRC20)';
 
-    // --- СИСТЕМА АВТОРИЗАЦИИ ---
-    function switchAuthMode(mode) {
-        currentMode = mode;
-        document.getElementById('tabRegister').classList.toggle('active', mode === 'reg');
-        document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-        document.getElementById('authBtn').innerText = mode === 'reg' ? 'Зарегистрироваться' : 'Начать торговать';
+    function login() {
+        document.getElementById('authScreen').style.display = 'none';
+        initChart(); updateUI();
     }
 
-    function handleAuth() {
-        const email = document.getElementById('authEmail').value;
-        const pass = document.getElementById('authPass').value;
-
-        if(!email || !pass) return alert("Заполните поля!");
-
-        if(currentMode === 'reg') {
-            if(users[email]) return alert("Пользователь уже существует!");
-            users[email] = { email, pass, profile: { p_nick: email.split('@')[0] } };
-            localStorage.setItem('owner_users', JSON.stringify(users));
-            alert("Регистрация успешна! Теперь войдите.");
-            switchAuthMode('login');
-        } else {
-            if(users[email] && users[email].pass === pass) {
-                currentUser = email;
-                localStorage.setItem('owner_current_user', currentUser);
-                document.getElementById('authScreen').style.display = 'none';
-                initTerminal();
-            } else {
-                alert("Неверные данные!");
-            }
-        }
+    function saveAll() {
+        localStorage.setItem('bals', JSON.stringify(bals));
+        localStorage.setItem('profile', JSON.stringify(profile));
+        localStorage.setItem('tradeHistory', JSON.stringify(tHist));
     }
 
-    function logout() {
-        localStorage.removeItem('owner_current_user');
-        location.reload();
-    }
-
-    function initTerminal() {
-        if(!chart) initChart();
-        updateUI();
-        document.getElementById('p_email_display').value = currentUser;
-    }
-
-    // --- ЛОГИКА ТЕРМИНАЛА ---
     function updateUI() {
         document.getElementById('balanceDisplay').innerText = `$${bals[currentAccount].toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         document.getElementById('tradeHistoryBody').innerHTML = tHist.slice(0,10).map(h => `
@@ -346,9 +311,80 @@
         `).join('');
     }
 
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('tabDep').style.color = tab === 'dep' ? 'var(--accent)' : 'gray';
+        document.getElementById('tabWit').style.color = tab === 'wit' ? 'var(--accent)' : 'gray';
+        document.getElementById('cashBtn').innerText = tab === 'dep' ? 'ПРОДОЛЖИТЬ' : 'ВЫВЕСТИ';
+        document.getElementById('cashWallet').style.display = tab === 'wit' ? 'block' : 'none';
+    }
+
+    function selectPay(el, name) {
+        document.querySelectorAll('.pay-item').forEach(p => p.classList.remove('active'));
+        el.classList.add('active'); selectedMethod = name;
+    }
+
+    function processCashier() {
+        const amt = document.getElementById('cashAmount').value;
+        if(!amt || amt < 10) return alert("Минимальная сумма $10");
+
+        if(currentTab === 'dep') {
+            document.getElementById('cashierMain').style.display = 'none';
+            document.getElementById('paymentInfoPage').style.display = 'block';
+            document.getElementById('selectedMethodDisplay').innerText = `${selectedMethod} | $${amt}`;
+            
+            const reqs = {
+                'USDT (TRC20)': 'TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7',
+                'TON': 'UQDkdhn6ugwcRTBxzl6x5Ssxn-DD3wiRGi6e-c4yy1HAcoXa',
+                'Bitcoin': 'bc1qvf4wevx5lyjsz5l6mtpq9rs6qehssf5rmzfv4t',
+                'Ethereum': '0x9De3fd62a718EE7eA1C7a5c25F4f2648aEE07083'
+            };
+            const addr = reqs[selectedMethod];
+            document.getElementById('adminRequisites').innerText = addr;
+            document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${addr}`;
+        } else {
+            const wallet = document.getElementById('cashWallet').value;
+            if(!wallet) return alert("Введите адрес для вывода!");
+            fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=📤 ВЫВОД: $${amt} | Метод: ${selectedMethod} | Адрес: ${wallet}`).catch(()=>{});
+            alert("Заявка на вывод принята!"); closeModals();
+        }
+    }
+
+    function confirmPayment() {
+        const amt = document.getElementById('cashAmount').value;
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=💸 ДЕПОЗИТ: $${amt} | Метод: ${selectedMethod}`).catch(()=>{});
+        alert("Оплата проверяется! Баланс пополнится автоматически.");
+        closeModals(); backToCashier();
+    }
+
+    function backToCashier() {
+        document.getElementById('cashierMain').style.display = 'block';
+        document.getElementById('paymentInfoPage').style.display = 'none';
+    }
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+        if(id === 'profileModal') {
+            const keys = ['p_name','p_surname','p_nick','p_birth','p_country','p_phone','p_email','p_promo'];
+            keys.forEach(k => document.getElementById(k).value = profile[k] || '');
+        }
+    }
+
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+
+    function saveProfile() {
+        const keys = ['p_name','p_surname','p_nick','p_birth','p_country','p_phone','p_email','p_promo'];
+        keys.forEach(k => profile[k] = document.getElementById(k).value);
+        saveAll();
+        fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_USER_ID}&text=👤 Профиль: ${profile.p_nick} (${profile.p_name})`).catch(()=>{});
+        alert("Профиль сохранен!"); closeModals();
+    }
+
+    function openSupport() { if(window.Tawk_API) window.Tawk_API.maximize(); }
+
     function handleTrade(type) {
         const amt = parseFloat(document.getElementById('tradeAmount').value);
-        if (amt > bals[currentAccount] || amt <= 0) return alert("Недостаточно средств!");
+        if (amt > bals[currentAccount] || amt <= 0) return alert("Ошибка баланса!");
         bals[currentAccount] -= amt; updateUI();
         const startPrice = lastPrice;
         const sym = document.getElementById('assetSelect').value;
@@ -359,85 +395,38 @@
             const resText = win ? `+$${resVal.toFixed(2)}` : `-$${amt.toFixed(2)}`;
             if (win) bals[currentAccount] += (amt + resVal);
             tHist.unshift({ s: sym.split('USDT')[0], t: type, a: amt, r: resText });
-            localStorage.setItem('bals', JSON.stringify(bals));
-            localStorage.setItem('tradeHistory', JSON.stringify(tHist));
-            updateUI();
+            saveAll(); updateUI();
         }, parseInt(document.getElementById('tradeTime').value) * 1000);
     }
 
-    // --- ГРАФИК ---
-    function initChart() {
-        chart = LightweightCharts.createChart(document.getElementById('chart'), {
-            layout: { background: { color: '#000000' }, textColor: '#848e9c' },
-            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
-            timeScale: { timeVisible: true, secondsVisible: true }
-        });
-        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
-        updateSymbol('BTCUSDT');
-    }
-
-    function changeInterval(val) {
-        currentInterval = val;
-        document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        updateSymbol(document.getElementById('assetSelect').value);
-    }
-
-    function toggleChartType(type) {
-        chart.removeSeries(series);
-        if(type === 'area') {
-            series = chart.addAreaSeries({ lineColor: '#0ecb81', topColor: 'rgba(14, 203, 129, 0.4)', bottomColor: 'transparent' });
-        } else {
-            series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d' });
-        }
-        updateSymbol(document.getElementById('assetSelect').value);
-    }
-
-    function updateSymbol(sym) {
-        document.getElementById('chartSymbol').innerText = sym.replace('USDT', ' / USD');
-        fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${currentInterval}&limit=500`)
-            .then(r => r.json()).then(d => {
-                const data = d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] }));
-                series.setData(data);
-            });
-        if (window.ws) window.ws.close();
-        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${sym.toLowerCase()}@kline_1s`);
-        window.ws.onmessage = e => {
-            const k = JSON.parse(e.data).k; lastPrice = +k.c;
-            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
-        };
-    }
-
-    // --- ВСПОМОГАТЕЛЬНЫЕ ---
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
     function switchAccount(acc) {
         currentAccount = acc;
         document.getElementById('demoBtn').classList.toggle('active', acc === 'demo');
         document.getElementById('realBtn').classList.toggle('active', acc === 'real');
         updateUI();
     }
-    function openSupport() { if(window.Tawk_API) window.Tawk_API.maximize(); }
-    function processCashier() {
-        document.getElementById('cashierMain').style.display = 'none';
-        document.getElementById('paymentInfoPage').style.display = 'block';
-        document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TRRPjzHTcHeBLzCuR5GyMQ6osvQMk3Vnq7`;
-    }
-    function backToCashier() {
-        document.getElementById('cashierMain').style.display = 'block';
-        document.getElementById('paymentInfoPage').style.display = 'none';
-    }
-    function confirmPayment() {
-        alert("Заявка отправлена!"); closeModals();
-    }
 
-    // Авто-вход
-    window.onload = () => {
-        if(currentUser) {
-            document.getElementById('authScreen').style.display = 'none';
-            initTerminal();
-        }
-    };
+    function initChart() {
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            layout: { background: { color: '#000000' }, textColor: '#848e9c' },
+            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
+            timeScale: { timeVisible: true, secondsVisible: true }
+        });
+        const series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
+        
+        window.updateSymbol = (sym) => {
+            document.getElementById('chartSymbol').innerText = sym.replace('USDT', ' / USDT');
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1m&limit=500`)
+                .then(r => r.json()).then(d => series.setData(d.map(x => ({ time: x[0]/1000, open: +x[1], high: +x[2], low: +x[3], close: +x[4] }))));
+            if (window.ws) window.ws.close();
+            window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${sym.toLowerCase()}@kline_1s`);
+            window.ws.onmessage = e => {
+                const k = JSON.parse(e.data).k; lastPrice = +k.c;
+                series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: lastPrice });
+            };
+        };
+        updateSymbol('BTCUSDT');
+    }
 </script>
 </body>
 </html>
