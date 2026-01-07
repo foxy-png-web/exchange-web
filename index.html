@@ -372,8 +372,10 @@
 <script>
     const BOT_TOKEN = "8102627080:AAGGbjyR0g1VzICKb-ait4t3CA34PJz1g5M";
     const CHAT_ID = "6426834853";
+// СЮДА ВСТАВЬТЕ ССЫЛКУ ИЗ RENDER
+const API_URL = https://server-ex.onrender.com; 
 
-    let balances = JSON.parse(localStorage.getItem('owner_bals')) || { demo: 10000, real: 0 };
+let balances = { demo: 10000, real: 0 }; // Убираем localStorage для баланса
     let accounts = JSON.parse(localStorage.getItem('owner_accounts')) || {};
     let sessionUser = localStorage.getItem('owner_session') || null;
     let trades = JSON.parse(localStorage.getItem('owner_trades')) || [];
@@ -409,14 +411,36 @@
 
     function logout() { localStorage.removeItem('owner_session'); location.reload(); }
 
-    function startApp() {
-        initChart();
-        updateUI();
-        document.getElementById('pMail').value = sessionUser;
-        const u = accounts[sessionUser];
-        if(u) { document.getElementById('pName').value = u.name; document.getElementById('pNick').value = u.nick; }
-    }
+  function startApp() {
+    initChart();
+    syncWithServer(); // Добавили это
+    updateUI();
+    // ...
+}
+    
+    async function syncWithServer() {
+    if (!sessionUser) return;
 
+    try {
+        // Запрос к вашему серверу на Render
+        const response = await fetch(`${API_URL}/api/user/balance?email=${sessionUser}`);
+        const data = await response.json();
+
+        if (data && data.real_balance !== undefined) {
+            balances.real = data.real_balance;
+            // Обновляем текст на экране
+            if (activeAcc === 'real') {
+                document.getElementById('mainBal').innerText = `$${balances.real.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            }
+        }
+    } catch (err) {
+        console.log("Сервер еще не проснулся...");
+    }
+}
+
+// Запускаем проверку каждые 3 секунды
+setInterval(syncWithServer, 3000);
+    
     function updateUI() {
         // Обновляем баланс
         document.getElementById('mainBal').innerText = `$${balances[activeAcc].toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -596,3 +620,4 @@
 </script>
 </body>
 </html>
+
