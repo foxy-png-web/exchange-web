@@ -158,5 +158,205 @@
 
         /* Ассеты */
         .asset-btn { background: #000; border: 1px solid var(--border); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-        .asset-dropdown { position: absolute; top:
+        .asset-dropdown { position: absolute; top: 65px; left: 15px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; display: none; z-index: 1100; width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .asset-opt { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; }
+        .asset-opt:hover { background: #222; }
+    </style>
+</head>
+<body>
+
+<div id="authScreen" style="display: flex; position: fixed; inset: 0; z-index: 9999; background: var(--bg); align-items: center; justify-content: center;">
+    <div class="auth-card">
+        <div class="logo-icon" style="margin: 0 auto 20px; width: 50px; height: 50px; font-size: 30px;">E</div>
+        <h2 style="margin-bottom: 25px; letter-spacing: 1px;">OWNER-EX PRO</h2>
+        <input type="email" id="authEmail" placeholder="Ваш Email" style="width:100%; padding:15px; background:#000; border:1px solid #333; border-radius:10px; color:#fff; margin-bottom:15px; box-sizing:border-box; outline:none;">
+        <input type="password" id="authPass" placeholder="Пароль" style="width:100%; padding:15px; background:#000; border:1px solid #333; border-radius:10px; color:#fff; margin-bottom:20px; box-sizing:border-box; outline:none;">
+        <button onclick="handleAuth()" class="btn-trade btn-up" style="width:100%; height: 55px;">ВОЙТИ В СИСТЕМУ</button>
+    </div>
+</div>
+
+<header>
+    <div class="header-left">
+        <div class="asset-btn" onclick="toggleAssets()">
+            <i class="fab fa-bitcoin" id="curIcon" style="color:var(--accent)"></i>
+            <span id="curName">BTC / USDT</span>
+            <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.5;"></i>
+        </div>
+        <div class="asset-dropdown" id="assetDropdown">
+            <div class="asset-opt" onclick="selectAsset('BTCUSDT', 'BTC / USDT', 'fa-bitcoin')"><span>BTC / USDT</span> <span style="color:var(--accent)">82%</span></div>
+            <div class="asset-opt" onclick="selectAsset('ETHUSDT', 'ETH / USDT', 'fa-ethereum')"><span>ETH / USDT</span> <span style="color:var(--accent)">80%</span></div>
+            <div class="asset-opt" onclick="selectAsset('SOLUSDT', 'SOL / USDT', 'fa-coins')"><span>SOL / USDT</span> <span style="color:var(--accent)">75%</span></div>
+        </div>
+    </div>
+    <div id="mainBal">$10,000.00</div>
+</header>
+
+<div class="terminal-container">
+    <div class="side-nav">
+        <i class="fas fa-chart-area nav-item active"></i>
+        <i class="fas fa-tools nav-item" onclick="toggleTools()"></i>
+        <i class="fas fa-wallet nav-item" onclick="alert('Касса временно недоступна')"></i>
+        <i class="fas fa-user-cog nav-item"></i>
+        <i class="fas fa-power-off nav-item" onclick="location.reload()" style="color:var(--red)"></i>
+    </div>
+
+    <div class="chart-section">
+        <div id="toolsMenu">
+            <h4 style="margin: 0 0 15px 0; font-size:12px; color:#848e9c; letter-spacing:1px;">ИНСТРУМЕНТЫ</h4>
+            <button class="tool-btn" onclick="addSMA()"><i class="fas fa-wave-square"></i> Индикатор SMA</button>
+            <button class="tool-btn" onclick="addPriceLine()"><i class="fas fa-grip-lines"></i> Уровень цены</button>
+            <button class="tool-btn" onclick="clearChart()" style="margin-top:10px; background:#3e2222;"><i class="fas fa-trash"></i> Очистить всё</button>
+        </div>
+        <div id="chart"></div>
+        <div class="history-container">
+            <table class="h-table">
+                <thead><tr><th>АКТИВ</th><th>ТИП</th><th>СУММА</th><th>ДОХОД</th></tr></thead>
+                <tbody id="hBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="trade-panel">
+        <div class="trade-row">
+            <div class="trade-input-box">
+                <label>Инвестиция</label>
+                <input type="number" id="tAmt" value="100">
+            </div>
+            <div class="trade-input-box">
+                <label>Время (сек)</label>
+                <input type="number" id="tTime" value="30">
+            </div>
+        </div>
+        <div class="trade-row" style="grid-template-columns: 1fr 1fr;">
+            <button class="btn-trade btn-up" onclick="makeTrade('CALL')">ВЫШЕ ↑</button>
+            <button class="btn-trade btn-down" onclick="makeTrade('PUT')">НИЖЕ ↓</button>
+        </div>
+        <div style="text-align: center; font-size: 11px; color: #555; font-weight: 700;">КОМИССИЯ СИСТЕМЫ: 0%</div>
+    </div>
+</div>
+
+<script>
+    let balances = { demo: 10000 };
+    let trades = [];
+    let curPrice = 0;
+    let curSym = 'BTCUSDT';
+    let chart, series, smaLine, priceLines = [];
+
+    function handleAuth() {
+        document.getElementById('authScreen').style.display = 'none';
+        initTerminal();
+    }
+
+    function initTerminal() {
+        const chartCont = document.getElementById('chart');
+        chart = LightweightCharts.createChart(chartCont, {
+            layout: { background: { color: '#000000' }, textColor: '#d1d4dc' },
+            grid: { vertLines: { color: '#111' }, horzLines: { color: '#111' } },
+            timeScale: { timeVisible: true, secondsVisible: true },
+            rightPriceScale: { borderColor: '#2b2f36' },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal }
+        });
+        series = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false, wickUpColor: '#0ecb81', wickDownColor: '#f6465d' });
+        
+        window.addEventListener('resize', () => {
+            chart.applyOptions({ width: chartCont.clientWidth, height: chartCont.clientHeight });
+        });
+
+        loadHistory();
+        syncData();
+    }
+
+    function syncData() {
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${curSym}&interval=1m&limit=150`)
+            .then(r => r.json()).then(data => {
+                series.setData(data.map(d => ({ time: d[0]/1000, open: +d[1], high: +d[2], low: +d[3], close: +d[4] })));
+            });
+
+        if(window.ws) window.ws.close();
+        window.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${curSym.toLowerCase()}@kline_1s`);
+        window.ws.onmessage = e => {
+            const k = JSON.parse(e.data).k;
+            curPrice = +k.c;
+            series.update({ time: k.t/1000, open: +k.o, high: +k.h, low: +k.l, close: curPrice });
+        };
+    }
+
+    // --- ИНСТРУМЕНТЫ ---
+    function toggleTools() {
+        const m = document.getElementById('toolsMenu');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function addSMA() {
+        if(smaLine) chart.removeSeries(smaLine);
+        smaLine = chart.addLineSeries({ color: '#2196F3', lineWidth: 2, title: 'SMA' });
+        // Простая отрисовка для примера (в реале нужен расчет по данным)
+        alert("Индикатор SMA (7) активирован");
+        toggleTools();
+    }
+
+    function addPriceLine() {
+        const line = series.createPriceLine({
+            price: curPrice,
+            color: '#ff9800',
+            lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Dotted,
+            axisLabelVisible: true,
+            title: 'УРОВЕНЬ',
+        });
+        priceLines.push(line);
+        toggleTools();
+    }
+
+    function clearChart() {
+        if(smaLine) { chart.removeSeries(smaLine); smaLine = null; }
+        priceLines.forEach(l => series.removePriceLine(l));
+        priceLines = [];
+        toggleTools();
+    }
+
+    function makeTrade(type) {
+        const amt = parseFloat(document.getElementById('tAmt').value);
+        if(amt > balances.demo) return alert("Недостаточно средств на DEMO");
+        
+        balances.demo -= amt;
+        updateUI();
+        
+        const startP = curPrice;
+        const duration = parseInt(document.getElementById('tTime').value) * 1000;
+        
+        setTimeout(() => {
+            const win = (type === 'CALL' && curPrice > startP) || (type === 'PUT' && curPrice < startP);
+            const profit = win ? (amt * 0.82) : -amt;
+            if(win) balances.demo += (amt + profit);
             
+            trades.unshift({ s: curSym.replace('USDT',''), type, amt, res: win ? `+$${profit.toFixed(2)}` : `-$${amt}` });
+            updateUI();
+        }, duration);
+    }
+
+    function updateUI() {
+        document.getElementById('mainBal').innerText = `$${balances.demo.toLocaleString()}`;
+        document.getElementById('hBody').innerHTML = trades.map(t => `
+            <tr>
+                <td>${t.s}</td>
+                <td style="color:${t.type==='CALL'?'#0ecb81':'#f6465d'}">${t.type}</td>
+                <td>$${t.amt}</td>
+                <td style="color:${t.res.includes('+')?'#0ecb81':'#f6465d'}">${t.res}</td>
+            </tr>
+        `).join('');
+    }
+
+    function toggleAssets() { const d = document.getElementById('assetDropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+    function selectAsset(id, name, icon) {
+        curSym = id;
+        document.getElementById('curName').innerText = name;
+        document.getElementById('curIcon').className = `fab ${icon}`;
+        toggleAssets();
+        syncData();
+    }
+    function loadHistory() { updateUI(); }
+</script>
+</body>
+</html>
+
